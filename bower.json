@@ -1,8 +1,8 @@
 {
   "name": "oli",
   "description": "Oli language parser for the browser",
-  "license": "MIT",
   "version": "0.1.0",
+  "license": "MIT",
   "author": {
     "name": "Tomas Aparicio"
   },
