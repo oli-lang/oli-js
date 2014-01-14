@@ -1,3 +1,27 @@
+{
+  function loc() {
+    var start = offset();
+    var end = start + text().length;
+
+    var loc = {
+      line: line(),
+      column: column(),
+      start: start,
+      end: end
+    }
+
+    if (options.filename) {
+      loc.filename = options.filename
+    }
+
+    return loc;
+  }
+
+  function astNode(tree) {
+    tree.loc = loc();
+    return tree;
+  }
+}
 
 start
   = __ program:Program __ { return program; }
@@ -184,7 +208,7 @@ ReservedWord
 
 /* Language Tokens */
 
-StartToken 						  = ":"							 !IdentifierPart
+StartToken   					  = ":"							 !IdentifierPart
 EndToken "end of block" = "end"            !IdentifierPart
 
 Identifier "identifier"
@@ -205,34 +229,50 @@ BlockBody
     }
   }
 
- BlockIdentifier
+ValueMetaIdentifier
  	= "(" __ name:Identifier __ ")" {
- 		return {
+ 		return astNode({
  			type: "BlockIdentifier",
  			name: name
- 		}
+ 		})
+  }
+
+ValueDeclaration
+  = id:Identifier __ name:BlockIdentifier? __ StartToken __ value:Identifier* __ EOS {
+    return astNode({
+      type:     "ValueDeclaration",
+      id:       id,
+      value:    value
+    })
   }
 
 BlockStatement
-  = keyword:Identifier __ name:BlockIdentifier? __ StartToken __ statements:BlockStatement* __ EndToken {
-      return {
-        type:       "BlockStatement",
-        name: 			name,
+  = keyword:Identifier __ name:BlockIdentifier? __ StartToken __ statements:TypeDeclaration* __ EndToken {
+      return astNode({
+        type:       "InlineBlockDeclaration",
+        name:       name,
         keyword:    keyword,
         statements: statements !== null ? statements : []
-      };
+      });
     }
 
-TestStatements
-  = StringLiteral
-  / LiteralSequence
-  / EOS
+TypeDeclaration
+  = BlockStatement
+  / ValueDeclaration
+  / Comment
 
-RunDeclarationStatement
-  = TestStatements
+BlockDeclaration
+  = block:BlockStatement* {
+      return astNode({
+        type:        "BlockDeclaration",
+        declarations: block
+        //statements: statements !== null ? statements : []
+      });
+    }
 
 Statement
-  = BlockStatement
+  = BlockDeclaration
+  / ValueDeclaration
   / Comment
 
 /* Start program */

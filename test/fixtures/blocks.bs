@@ -8,7 +8,11 @@
 
 task (my-task):
   run:
-  
+    run:
+      test:
+
+      end
+    end
   end
 end
 
