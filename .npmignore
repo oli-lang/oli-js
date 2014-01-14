@@ -3,5 +3,7 @@ test/
 *.ls
 *.coffee
 .gitignore
+.editorconfig
 .travis.yml
 Gruntfile.*
+bower.json

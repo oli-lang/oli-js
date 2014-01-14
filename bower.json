@@ -1,0 +1,32 @@
+{
+  "name": "oli",
+  "description": "Oli language parser for the browser",
+  "license": "MIT",
+  "version": "0.1.0",
+  "author": {
+    "name": "Tomas Aparicio"
+  },
+  "homepage": "https://github.com/h2non/oli.js",
+  "main": "./dist/oli.js",
+  "keywords": [
+    "parser",
+    "config",
+    "ast"
+  ],
+  "ignore": [
+    "**/.*",
+    ".*",
+    "*.md",
+    "src",
+    "lib",
+    "bin",
+    "test",
+    "Gruntfile.*",
+    ".editorconfig",
+    ".gitignore",
+    ".travis.yml",
+    ".npmignore",
+    "package.json",
+    "bower_components"
+  ]
+}
