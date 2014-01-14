@@ -38,6 +38,7 @@ console.log(parsed)
 
 #### yaml()
 
+#### ast([options])
 
 
 [1]: https://github.com/h2non/oli
