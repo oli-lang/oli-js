@@ -1,0 +1,249 @@
+/**
+ * Buildspec parser grammar expression
+ */
+
+start
+  = __ program:Program __ { return program; }
+
+/* Lexical Grammar */
+
+SourceCharacter
+  = .
+
+// Unicode values for separator, space
+Zs = [\u0020\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]
+
+WhiteSpace "whitespace"
+  = [\t\v\f \u00A0\uFEFF]
+  / Zs
+
+LineTerminator
+  = [\n\r\u2028\u2029]
+
+LineTerminatorSequence "end of line"
+  = "\n"
+  / "\r\n"
+  / "\r"
+  / "\u2028" // line separator
+  / "\u2029" // paragraph separator
+
+EOF
+  = !.
+
+/* Automatic Semicolon Insertion */
+
+EOS
+  = _ LineTerminatorSequence
+  / _ &"}"
+  / __ EOF
+
+EOSNoLineTerminator
+  = _ LineTerminatorSequence
+  / _ &"}"
+  / _ EOF
+
+/* Comments */
+
+Comment "comment"
+  = MultiLineComment
+  / SingleLineComment
+
+MultiLineComment
+  = "##" (!"##" SourceCharacter)* "##"
+
+MultiLineCommentNoLineTerminator
+  = "##" (!("##" / LineTerminator) SourceCharacter)* "##"
+
+SingleLineComment
+  = "#" (!LineTerminator SourceCharacter)*
+
+/* Primitives types */
+
+DecimalDigits
+  = DecimalDigit+
+
+DecimalDigit
+  = [0-9]
+
+StringLiteral "string"
+  = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'") {
+      return parts[1];
+    }
+
+DoubleStringCharacters
+  = chars:DoubleStringCharacter+ { return chars.join(""); }
+
+SingleStringCharacters
+  = chars:SingleStringCharacter+ { return chars.join(""); }
+
+DoubleStringCharacter
+  = !('"' / "\\" / LineTerminator) char_:SourceCharacter { return char_;     }
+  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / LineContinuation
+
+SingleStringCharacter
+  = !("'" / "\\" / LineTerminator) char_:SourceCharacter { return char_;     }
+  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / LineContinuation
+
+LineContinuation
+  = "\\" sequence:LineTerminatorSequence { return sequence; }
+
+EscapeSequence
+  = CharacterEscapeSequence
+  / "0" !DecimalDigit { return "\0"; }
+  / HexEscapeSequence
+  / UnicodeEscapeSequence
+
+CharacterEscapeSequence
+  = SingleEscapeCharacter
+  / NonEscapeCharacter
+
+SingleEscapeCharacter
+  = char_:['"\\bfnrtv] {
+      return char_
+        .replace("b", "\b")
+        .replace("f", "\f")
+        .replace("n", "\n")
+        .replace("r", "\r")
+        .replace("t", "\t")
+        .replace("v", "\x0B") // IE does not recognize "\v".
+    }
+
+NonEscapeCharacter
+  = (!EscapeCharacter / LineTerminator) char_:SourceCharacter { return char_; }
+
+EscapeCharacter
+  = SingleEscapeCharacter
+  / DecimalDigit
+  / "x"
+  / "u"
+
+HexEscapeSequence
+  = "x" digits:$(HexDigit HexDigit) {
+      return String.fromCharCode(parseInt(digits, 16));
+    }
+
+UnicodeEscapeSequence
+  = "u" digits:$(HexDigit HexDigit HexDigit HexDigit) {
+      return String.fromCharCode(parseInt(digits, 16));
+    }
+
+/* Whitespace */
+
+_
+  = (WhiteSpace / LineTerminatorSequence / Comment)*
+
+__
+  = (WhiteSpace / LineTerminatorSequence / Comment)*
+
+HexDigit
+  = [0-9a-fA-F]
+
+UnquotedLiteral "literal"
+  = [0-9a-zA-Z\s\S\t\T\r\R]
+
+LiteralSequence "literal sequence"
+ = chars:SingleStringCharacter+ { return chars.join(""); }
+
+UnicodeEscapeSequence
+  = "u" digits:$(HexDigit HexDigit HexDigit HexDigit) {
+      return String.fromCharCode(parseInt(digits, 16));
+    }
+
+Letter = [a-zA-Z0-9\-\_]
+
+Word 
+	= letters:Letter+ {
+		return letters.join("");
+	}
+
+IdentifierStart
+  = "$"
+  / "_"
+  / "\\" sequence:UnicodeEscapeSequence { return sequence; }
+
+IdentifierPart
+  = IdentifierStart
+  / "\u200C" { return "\u200C"; } // zero-width non-joiner
+  / "\u200D" { return "\u200D"; } // zero-width joiner
+
+IdentifierName "identifier"
+  = start:IdentifierStart parts:IdentifierPart* {
+      return start + parts.join("");
+    }
+
+/* Keywords */
+
+Keyword
+  = (
+      StartToken
+    / EndToken
+  )
+  !IdentifierPart
+
+ReservedWord 
+  = Keyword
+
+/* Language Tokens */ 
+
+StartToken 						  = ":"							 !IdentifierPart
+EndToken "end of block" = "end"            !IdentifierPart
+
+Identifier "identifier"
+  = !ReservedWord name:(
+  	  Word
+  	/ StringLiteral
+   	/ IdentifierName
+  	/ LiteralSequence 
+  ) { return name }
+
+/* Blocks */
+
+BlockBody
+  = __ statements: __? {
+    return {
+      type:       "BlockBody",
+      statements: statements !== null ? statements[0] : []
+    }
+  }
+
+ BlockIdentifier
+ 	= "(" __ name:Identifier __ ")" {
+ 		return {
+ 			type: "BlockIdentifier",
+ 			name: name
+ 		}
+  }
+
+BlockStatement
+  = keyword:Identifier __ name:BlockIdentifier? __ StartToken __ statements:BlockStatement* __ EndToken {
+      return {
+        type:       "BlockStatement",
+        name: 			name,
+        keyword:    keyword,
+        statements: statements !== null ? statements : []
+      };
+    }
+
+TestStatements 
+  = StringLiteral
+  / LiteralSequence
+  / EOS
+
+RunDeclarationStatement
+  = TestStatements
+
+Statement
+  = BlockStatement
+  / Comment
+
+/* Start program */
+
+Program
+  = elements:Statement ? {
+      return {
+        type:     "Program",
+        elements: elements !== null ? elements : []
+      };
+    }

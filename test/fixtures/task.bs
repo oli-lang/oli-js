@@ -1,0 +1,20 @@
+#
+# This is a comment!
+#
+
+##
+  And this is a multi-line comment
+##
+
+task (my-task):
+  run:
+  
+  end
+end
+
+##
+run
+  this is amazing -c 'asdas'
+  Super happy
+end
+##

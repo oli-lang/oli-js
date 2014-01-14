@@ -1,0 +1,47 @@
+{
+  "name": "buildspec",
+  "version": "0.1.0-rc.1",
+  "description": "Buildspec parser for node.js",
+  "homepage": "http://github.com/h2non/buildspec",
+  "bugs": "https://github.com/h2non/buildspec/issues",
+  "author": {
+    "name": "Tomas Aparicio",
+    "email": "tomas@aparicio.me"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/h2non/buildspec.git"
+  },
+  "licenses": "MIT",
+  "main": "lib/buildspec",
+  "directories": {
+    "lib": "./lib"
+  },
+  "bin": {
+    "buildspec": "./bin/buildspec"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "keywords": [],
+  "dependencies": {
+    "pegjs": "~0.8.0"
+  },
+  "devDependencies": {
+    "grunt-mocha-cli": "~1.0.3",
+    "grunt-contrib-watch": "~0.5.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "matchdep": "~0.1.2",
+    "chai": "~1.8.1",
+    "grunt-release": "~0.6.0",
+    "grunt-livescript": "~0.5.1",
+    "LiveScript": "~1.2.0",
+    "mkdirp": "~0.3.5",
+    "suppose": "~0.3.0",
+    "sinon": "~1.7.3",
+    "rimraf": "~2.2.4"
+  }
+}
