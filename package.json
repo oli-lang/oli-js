@@ -1,24 +1,23 @@
 {
-  "name": "buildspec",
+  "name": "oli",
   "version": "0.1.0-rc.1",
-  "description": "Buildspec parser for node.js",
-  "homepage": "http://github.com/h2non/buildspec",
-  "bugs": "https://github.com/h2non/buildspec/issues",
+  "description": "Oli language parser for node.js",
+  "homepage": "http://github.com/h2non/oli.js",
+  "bugs": "https://github.com/h2non/oli.js/issues",
   "author": {
-    "name": "Tomas Aparicio",
-    "email": "tomas@aparicio.me"
+    "name": "Tomas Aparicio"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/h2non/buildspec.git"
+    "url": "https://github.com/h2non/oli.js.git"
   },
   "licenses": "MIT",
-  "main": "lib/buildspec",
+  "main": "lib/oli",
   "directories": {
     "lib": "./lib"
   },
   "bin": {
-    "buildspec": "./bin/buildspec"
+    "oli": "./bin/oli"
   },
   "engines": {
     "node": ">= 0.8.0"
@@ -26,7 +25,17 @@
   "scripts": {
     "test": "grunt test"
   },
-  "keywords": [],
+  "keywords": [
+    "parser",
+    "ast",
+    "language",
+    "config",
+    "minimal",
+    "json",
+    "yaml",
+    "ini",
+    "spec"
+  ],
   "dependencies": {
     "pegjs": "~0.8.0"
   },
