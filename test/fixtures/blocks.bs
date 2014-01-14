@@ -7,7 +7,7 @@
 ##
 
 task (my-task):
-  run:
+  run 'sub-task':
     run:
       test:
 
