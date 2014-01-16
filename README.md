@@ -16,7 +16,7 @@ For the browser
 $ bower install oli
 ```
 Or add the script tag
-```
+```html
 <script src="//raw.github.com/h2non/oli.js/master/dist/oli.js"></script>
 ```
 
