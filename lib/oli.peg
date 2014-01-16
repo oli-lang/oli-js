@@ -97,13 +97,14 @@ DoubleStringCharacters
 SingleStringCharacters
   = chars:SingleStringCharacter+ { return chars.join(""); }
 
+/* LineTerminator */
 DoubleStringCharacter
-  = !('"' / "\\" / LineTerminator) char_:SourceCharacter { return char_;     }
+  = !('"' / "\\") char_:SourceCharacter { return char_;     }
   / "\\" sequence:EscapeSequence                         { return sequence;  }
   / LineContinuation
 
 SingleStringCharacter
-  = !("'" / "\\" / LineTerminator) char_:SourceCharacter { return char_;     }
+  = !("'" / "\\") char_:SourceCharacter { return char_;     }
   / "\\" sequence:EscapeSequence                         { return sequence;  }
   / LineContinuation
 
@@ -346,8 +347,8 @@ ValueTypes
   / NumericLiteral
   / DecimalLiteral
   / DecimalIntegerLiteral
-  / UnquotedLiteralSentence
-  / StringLiteral) {
+  / StringLiteral
+  / UnquotedLiteralSentence) {
     return value
   }
 

@@ -8,7 +8,9 @@
 
 value.amazing > ups >> caca: 10
 value: pepe
-&pepe: hola
+&pepe: hola # pepe
+multi-line: "ajajaja, \' @$
+ajajaj"
 
 # this is a value
 #value 'jajaja': test awesome !!! ajajaja # pepepe
