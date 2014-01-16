@@ -6,11 +6,28 @@
   And this is a multi-line comment
 ##
 
-# this is a value
-value 'jajaja': test awesome !!! ajajaja # pepepe
+value.amazing > ups >> caca: 10
+value: pepe
+&pepe: hola
 
+# this is a value
+#value 'jajaja': test awesome !!! ajajaja # pepepe
 
 ##
+deploy > zeus:
+  server > server.url: 'http://zeus.server.com' # strings can be quoted
+  port: 9000 # number as primitive value
+  retry: yes
+  # nested block
+  authentication:
+    # lists can be implicit using commas
+    tokens:
+      %1DOTnv6B9b]n7pbV535,
+      p16O2$)9,Z63bD&Q-82d
+    end
+  end
+end
+
 # with commas you can create lists
 message: Hello, World!
 
