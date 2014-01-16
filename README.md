@@ -15,18 +15,20 @@ For the browser
 ```
 $ bower install oli
 ```
+Or add the script tag
+```
+<script src="//raw.github.com/h2non/oli.js/master/dist/oli.js"></script>
+```
 
 ## API
 
-#### Example
+### Example
 
 ```js
 var oli = require('oli')
 var json = oli.parse('message: hello, oli!')
 console.log(json)
 ```
-
-### Oli module
 
 #### parse(code)
 
