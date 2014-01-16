@@ -86,7 +86,7 @@ DecimalDigits
 DecimalDigit
   = [0-9]
 
-StringLiteral "string"
+StringLiteral "quoted string"
   = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'") {
       return parts[1];
     }
@@ -212,7 +212,7 @@ StartToken   					  = ":"							 !IdentifierPart
 EndToken "end of block" = "end"            !IdentifierPart
 
 Identifier "identifier"
-  = !ReservedWord name:(
+  = !ReservedWord !Comment name:(
   	  Word
   	/ StringLiteral
    	/ IdentifierName
@@ -243,14 +243,24 @@ ParenthesisIdentifier
   }
 
 ValueMetaIdentifier
- 	= ParenthesisIdentifier
-  / StringLiteral
+ 	= StringLiteral
+  / ParenthesisIdentifier
+
+UnquotedLiteralSentence
+  = !Comment lit:Identifier* {
+    var string = '';
+    for (var k = 0; k < lit.length; k += 1) {
+      string += lit[k].name
+    }
+    return string
+  }
 
 ValueDeclaration
-  = id:Identifier __ name:ValueMetaIdentifier? __ StartToken __ value:Identifier* __ EOS {
+  = id:Identifier __ name:ValueMetaIdentifier? __ StartToken __ value:Identifier* __ EOF {
     return astNode({
       type:     "ValueDeclaration",
       id:       id,
+      name:     name,
       value:    value
     })
   }
@@ -266,9 +276,11 @@ BlockStatement
     }
 
 TypeDeclaration
-  = BlockStatement
-  / ValueDeclaration
+  = ValueDeclaration
   / Comment
+  / BlockStatement
+
+LiteralSequence
 
 BlockDeclaration
   = block:BlockStatement* {
@@ -280,16 +292,16 @@ BlockDeclaration
     }
 
 Statement
-  = BlockDeclaration
-  / ValueDeclaration
+  = ValueDeclaration
+  / BlockDeclaration
   / Comment
 
 /* Start program */
 
 Program
-  = elements:Statement ? {
+  = body:Statement ? {
       return {
         type:     "Program",
-        elements: elements !== null ? elements : []
+        body:     body !== null ? body : []
       };
     }

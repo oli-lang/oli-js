@@ -6,15 +6,22 @@
   And this is a multi-line comment
 ##
 
+# this is a value
+value 'jajaja': test awesome !!! ajajaja # pepepe
+
+
+##
+# with commas you can create lists
+message: Hello, World!
+
 task (my-task):
   run 'sub-task':
     run:
-      test:
-
-      end
+      test: this is a name
     end
   end
 end
+##
 
 ##
 run

@@ -22,23 +22,24 @@ $ bower install oli
 
 ```js
 var oli = require('oli')
-var parsed = oli.parse('value: test').json()
-console.log(parsed)
+var json = oli.parse('message: hello, oli!')
+console.log(json)
 ```
 
 ### Oli module
 
-#### parse([string|buffer])
+#### parse(code)
 
-#### parseAsync([string|buffer], [function])
+#### ast(code [, options])
 
-### Parse API
+#### tokens(code [, options])
 
-#### json()
+#### stringify(object)
 
-#### yaml()
+#### serialize(object)
 
-#### ast([options])
+## To Do
 
+- Serialization support
 
 [1]: https://github.com/h2non/oli
