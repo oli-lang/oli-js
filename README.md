@@ -59,3 +59,7 @@ console.log(json)
 [2]: http://travis-ci.org/h2non/oli.js
 [3]: https://gemnasium.com/h2non/oli.js
 [4]: http://badge.fury.io/js/oli
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/h2non/oli.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
