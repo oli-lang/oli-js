@@ -1,4 +1,7 @@
 {
+  var indentStack = [];
+  var indent = "";
+
   function loc() {
     var start = offset();
     var end = start + text().length;
@@ -8,7 +11,7 @@
       column: column(),
       start: start,
       end: end
-    }
+    };
 
     if (options.filename) {
       loc.filename = options.filename
@@ -18,8 +21,16 @@
   }
 
   function astNode(tree) {
-    tree.loc = loc();
-    return tree;
+    var node = {};
+    node.loc = loc();
+
+    for (var k in tree) {
+      if (tree.hasOwnProperty(k) && tree[k] != null) {
+        node[k] = tree[k];
+      }
+    }
+
+    return node;
   }
 }
 
@@ -37,6 +48,29 @@ Zs = [\u0020\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u
 WhiteSpace "whitespace"
   = [\t\v\f \u00A0\uFEFF]
   / Zs
+
+line
+  = SAMEDENT line:(!EOS c:SourceElements { return c; })+ EOS?
+    children:( INDENT c:line* DEDENT { return c; })?
+    {
+      var o = {};
+      o[line] = children;
+      return children ? o : line.join('');
+    }
+
+SAMEDENT
+  = i:[ \t]* &{ return i.join('') === indent; }
+
+INDENT
+  = i:[ \t]+ &{ return i.length > indent.length; }
+    {
+      indentStack.push(indent);
+      indent = i.join('');
+      pos = offset;
+    }
+
+DEDENT
+  = { indent = indentStack.pop(); }
 
 LineTerminator
   = [\n\r\u2028\u2029]
@@ -60,7 +94,7 @@ EOS
 
 EOSNoLineTerminator
   = _ LineTerminatorSequence
-  / _ &"}"
+  / _ &EndToken
   / _ EOF
 
 /* Comments */
@@ -80,15 +114,13 @@ SingleLineComment
 
 /* Primitives types */
 
-DecimalDigits
-  = DecimalDigit+
-
-DecimalDigit
-  = [0-9]
-
 StringLiteral "quoted string"
   = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'") {
-      return parts[1];
+      return astNode({
+        type:  'StringLiteral',
+        value: parts[1],
+        raw:   parts
+      });
     }
 
 DoubleStringCharacters
@@ -232,17 +264,34 @@ BooleanLiteral
   = TrueToken  { return astNode({ type: "BooleanLiteral", value: true  }) }
   / FalseToken { return astNode({ type: "BooleanLiteral", value: false }) }
 
-NumericLiteral "number"
-  = literal:(HexIntegerLiteral / DecimalLiteral) !IdentifierStart {
-      return literal;
+NumberLiteral "number"
+  = number:(HexIntegerLiteral / DecimalLiteral / IntegerLiteral) {
+    return number;
+  }
+
+IntegerLiteral
+  = number:$(HexIntegerLiteral / SignedInteger / DecimalIntegerLiteral) !IdentifierStart {
+      return astNode({
+        type:   'IntegerLiteral',
+        value:  parseInt(number, 10),
+        raw:    number
+      })
     }
 
 DecimalLiteral
-  = parts:$(DecimalIntegerLiteral "." DecimalDigits? ExponentPart?) {
-      return parseFloat(parts);
+  = number:(
+    parts:$(DecimalIntegerLiteral "." DecimalDigits? ExponentPart?) {
+      return parts;
     }
-  / parts:$("." DecimalDigits ExponentPart?)     { return parseFloat(parts); }
-  / parts:$(DecimalIntegerLiteral ExponentPart?) { return parseFloat(parts); }
+  / parts:$("." DecimalDigits ExponentPart?)     { return parts; }
+  / parts:$(SignedInteger "." DecimalDigits ExponentPart?) { return parts; }
+  ) {
+      return astNode({
+        type:  'DecimalLiteral',
+        value: parseFloat(number),
+        raw:   number
+      });
+    }
 
 DecimalIntegerLiteral
   = "0" / NonZeroDigit DecimalDigits?
@@ -263,7 +312,7 @@ ExponentIndicator
   = [eE]
 
 SignedInteger
-  = [-+]? DecimalDigits
+  = [-+] DecimalDigits
 
 HexIntegerLiteral
   = "0" [xX] digits:$HexDigit+ { return parseInt(digits, 16); }
@@ -315,20 +364,36 @@ BlockBody
     }
   }
 
-ParenthesisIdentifier
-  = "(" __ id:Identifier __ ")" {
+ValueIdentifierExpression
+  = id:ValueIdentifierAlias __ extend:(ValueCloneExpression / ValueMergeExpression) {
     return astNode({
-      type: "ParenthesisIdentifier",
-      id: id
+      type: 'ValueIdentifierExpression',
+      id: id,
+      extend: extend
     })
   }
 
-ValueMetaIdentifier
- 	= ">"? __ id:Identifier? __ ">>"? __ extend:Identifier? {
+ValueIdentifierAlias
+  = ">" __ id:Identifier {
     return astNode({
-      type:   'MetaIdentifier',
-      id:     id,
-      extend: extend
+      type:   'ValueIdentifierAlias',
+      id:     id
+    })
+  }
+
+ValueCloneExpression
+ 	= ">>" __ id:Identifier {
+    return astNode({
+      type:   'ValueCloneExpression',
+      id:     id
+    })
+  }
+
+ValueMergeExpression
+  = ">>>" __ id:Identifier {
+    return astNode({
+      type:   'ValueMergeExpression',
+      id:     id
     })
   }
 
@@ -341,20 +406,14 @@ UnquotedLiteralSentence
     return string
   }
 
-ValueTypes
+ValueType
   = value:(
     BooleanLiteral
-  / NumericLiteral
-  / DecimalLiteral
-  / DecimalIntegerLiteral
+  / NumberLiteral
   / StringLiteral
+  / ListExpression
   / UnquotedLiteralSentence) {
     return value
-  }
-
-ValueIdentifierExpression
-  = name:ValueMetaIdentifier {
-    return name
   }
 
 ReferenceIdentifier
@@ -371,10 +430,34 @@ IdentifierExpression
     return id
   }
 
-ValueDeclaration
-  = id:IdentifierExpression __ ref:ValueIdentifierExpression? __ StartToken __ value:ValueTypes __ {
+/* Lists */
+
+ListElementExpression
+  = head:ValueType tail:(__ ElementSeparator __ ListElementsExpressions)* {
+    var result = [ head ];
+    for (var i = 0; i < tail.length; i+=1) {
+      result.push(tail[i][3]);
+    }
+    return result;
+  }
+
+ListExpression
+  = "[" __ items:ListElementExpression __ "]" {
+    return items !== null ? items : [];
+  }
+
+ElementSeparator
+  = EOS
+  / ","
+
+ListElementsExpressions
+  = Statement
+  / ValueType
+
+ValueAssignmentExpression
+  = id:IdentifierExpression __ ref:ValueIdentifierExpression? __ StartToken __ value:ListElementsExpressions __ EOS {
     return astNode({
-      type:     "ValueDeclaration",
+      type:     "ValueAssignmentExpression",
       id:       id,
       ref:      ref,
       value:    value
@@ -392,7 +475,7 @@ BlockStatement
     }
 
 TypeDeclaration
-  = ValueDeclaration
+  = ValueAssignmentExpression
   / Comment
   / BlockStatement
 
@@ -406,7 +489,7 @@ BlockDeclaration
     }
 
 Statement
-  = ValueDeclaration
+  = ValueAssignmentExpression
   / BlockDeclaration
   / Comment
 

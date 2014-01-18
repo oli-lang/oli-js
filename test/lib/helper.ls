@@ -1,30 +1,36 @@
 require! {
   fs
   path
+  util
   chai
   grunt
   sinon
   mkdirp
   rimraf
   suppose
+  traverse
   child_process.spawn
+  '../../lib/oli'
   '../../package.json'.version
 }
 
-node = process.execPath
+node-bin = process.execPath
 oli-bin = path.join __dirname, '/../../', 'bin/oli'
 cwd = process.cwd!
-home-var = if process.platform is 'win32' then 'USERPROFILE' else 'HOME'
 
 module.exports =
 
-  oli: require '../../'
+  oli: oli
+  ast: oli.ast
+  parse: oli.parse
+  generate-parser: oli.generate-parser
   oli-bin: oli-bin
+
   cwd: cwd
-  node: node
+  node-bin: node-bin
   version: version
-  grunt: grunt
   sinon: sinon
+  traverse: traverse
   expect: chai.expect
   should: chai.should
   assert: chai.assert
@@ -32,9 +38,16 @@ module.exports =
   mkdirp: mkdirp.sync
   chdir: process.chdir
   env: process.env
-  home-var: home-var
-  home: process.env[home-var]
   join: path.join
+
+  node: (ast, path) ->
+    parent = <[ body ]>
+    path = path.split '.' if typeof path is 'string'
+    parent = parent ++ <[ 0 ]> if ast.body.length is 1
+    traverse ast .get parent ++ path
+
+  inspect: ->
+    util.inspect(it, { depth: null, loc: true }) |> console.log
 
   createWriteStream: ->
     fs.createWriteStream ...
@@ -42,10 +55,10 @@ module.exports =
   exists: ->
     fs.exists-sync it
 
-  read: grunt.file.read
+  read: fs.read-file-sync
 
   exec: (type, args, callback) ->
-    command = spawn node, [ oli-bin ] ++ args
+    command = spawn node-bin, [ oli-bin ] ++ args
     if type is 'close'
       command.on type, callback
     else
@@ -54,5 +67,4 @@ module.exports =
       command.on 'close', (code) -> data |> callback _, code
 
   suppose: (args) ->
-    suppose node, [ oli-bin ] ++ args
-  
+    suppose node-bin, [ oli-bin ] ++ args

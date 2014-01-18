@@ -21,6 +21,7 @@
     "lib",
     "bin",
     "test",
+    "grammar",
     "Gruntfile.*",
     ".editorconfig",
     ".gitignore",

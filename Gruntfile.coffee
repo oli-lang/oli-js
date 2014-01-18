@@ -3,11 +3,10 @@ module.exports = (grunt) ->
   # load all grunt tasks
   (require 'matchdep').filterDev('grunt-*').forEach grunt.loadNpmTasks
 
-  # Project configuration
   grunt.initConfig
     pkg: grunt.file.readJSON 'package.json'
 
-    clean: ['lib', 'test/*.js', 'test/fixtures/.tmp/**']
+    clean: ['dist', 'test/*.js', 'test/fixtures/.tmp/**']
 
     livescript:
       options:
@@ -39,9 +38,19 @@ module.exports = (grunt) ->
           'test/*.ls'
         ]
 
+    browserify:
+      dist:
+        files:
+          'dist/oli.js': ['lib/oli.js']
+
     watch:
       options:
         spawn: false
+      lib:
+        files: ['lib/**/*.js', 'lib/*.peg']
+        tasks: ['test']
+      grammar:
+        files: ['grammar/**/*.peg']
       src:
         files: ['src/**/*.ls']
         tasks: ['test']
@@ -60,7 +69,7 @@ module.exports = (grunt) ->
     'mochacli'
   ]
 
-  grunt.registerTask 'dev', [
+  grunt.registerTask 'zen', [
     'compile',
     'mochacli'
     'watch'
@@ -68,6 +77,8 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'publish', [
     'test'
+    'clean'
+    'browserify'
     'release'
   ]
 

@@ -1,8 +1,12 @@
-# oli.js
+# oli.js [![Build Status](https://secure.travis-ci.org/h2non/oli.js.png?branch=master)][9] [![Dependency Status](https://gemnasium.com/h2non/oli.js.png)][10] [![NPM version](https://badge.fury.io/js/oli.js.png)][11]
 
-> [Oli][1] language parser for node and the browser
+> [Oli][1] language parser and compiler for node and the browser
 
-> **work in progress**
+<table>
+<tr>
+<td>Supports Oli Version</td><td>0.1.0</td>
+</tr>
+</table>
 
 ## Installation
 
@@ -19,6 +23,12 @@ Or add the script tag
 ```html
 <script src="//raw.github.com/h2non/oli.js/master/dist/oli.js"></script>
 ```
+
+## Parser Milestones
+
+- Type Inference
+- Un operators
+- Nested blocks
 
 ## API
 
@@ -43,5 +53,6 @@ console.log(json)
 ## To Do
 
 - Serialization support
+- Better browser support
 
 [1]: https://github.com/h2non/oli
