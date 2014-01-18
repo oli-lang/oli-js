@@ -4,7 +4,7 @@
 
 <table>
 <tr>
-<td>Supports Oli Version</td><td>0.1.0</td>
+<td>Implemented version</td><td>0.1.x</td>
 </tr>
 </table>
 
