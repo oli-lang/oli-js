@@ -1,4 +1,4 @@
-# oli.js [![Build Status](https://secure.travis-ci.org/h2non/oli.js.png?branch=master)][9] [![Dependency Status](https://gemnasium.com/h2non/oli.js.png)][10] [![NPM version](https://badge.fury.io/js/oli.js.png)][11]
+# oli.js [![Build Status](https://secure.travis-ci.org/h2non/oli.js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/h2non/oli.js.png)] [![NPM version](https://badge.fury.io/js/oli.js.png)][3]
 
 > [Oli][1] language parser and compiler for node and the browser
 
@@ -56,3 +56,5 @@ console.log(json)
 - Better browser support
 
 [1]: https://github.com/h2non/oli
+[2]: http://travis-ci.org/AdesisNetlife/croak
+[3]:  http://badge.fury.io/js/oli
