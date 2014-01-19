@@ -6,7 +6,7 @@
 
 <table>
 <tr>
-<td>Oli supported version</td><td>0.1</td>
+<td>Supported language version</td><td>0.1</td>
 </tr>
 </table>
 
