@@ -36,9 +36,10 @@ Or add the script tag
 - Compiler
   - Templating
   - Math operations
+  - Structure types
 - Serializer
   - Type inference
-  - Nested structures with expressions determination
+  - Nested structures with type expressions determination
 
 ## Features
 
