@@ -1,4 +1,3 @@
-
 /* Language Tokens */
 
 StartToken              = ":"              !IdentifierPart
