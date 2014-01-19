@@ -1,0 +1,42 @@
+/* Statements */
+
+Statement
+  = Comment
+  / CopyStatement
+  / BlockStatement
+
+BlockElements
+  = element:BlockElement __ ElementSeparator {
+    return element
+  }
+
+BlockElement
+  = head:ListElementsExpressions value:(__ ElementSeparator? __ EOS? __ value:ListElementsExpressions { return value; })* {
+      var result = [ head ];
+      for (var i = 0, l = value.length; i < l; i+=1) {
+        result.push(value[i]);
+      }
+      return result;
+    }
+
+BlockStatement
+  = id:IdentifierExpression __ StartToken
+      __ body:(Statement+ / BlockElements) __
+    __ (EndToken / EOS) {
+      return astNode({
+        type:     "BlockStatement",
+        id:       id,
+        body:     body !== null ? body : []
+      });
+    }
+
+CopyStatement
+  = id:IdentifierExpression __ CopyToken
+      __ source:IdentifierExpression __
+    __ (EndToken / EOS) {
+      return astNode({
+        type:     "CopyStatement",
+        id:       id,
+        source:   source
+      });
+    }

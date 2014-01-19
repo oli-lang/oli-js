@@ -2,6 +2,8 @@
 
 > [Oli][1] language parser and compiler for node and the browser
 
+> Spoiler! work in progress!!
+
 <table>
 <tr>
 <td>Oli supported version</td><td>0.1</td>
@@ -45,7 +47,7 @@ Or add the script tag
 
 - Powerful type inference and pattern matching
 - Heavily tested (see code coverage)
-- Great performance (see [benchmarks results][5])
+- Good performance (run `grunt bench`)
 - Oli official implementation from the language creator
 
 ## API
@@ -69,7 +71,18 @@ console.log(json)
 #### serialize(object)
 
 
-## Development
+## Contributing
+
+Wanna help? Cool! It will be really apreciated :)
+
+You must add new test cases for any new feature or refactor you do,
+always following the same design/code patterns that already exist
+
+Tests specs are completely written in LiveScript language.
+Take a look to the language [documentation][3] if you are new with it.
+You should follow the LiveScript language conventions defined in the [coding style guide][4]
+
+### Development
 
 Only node.js is required for development
 
@@ -98,24 +111,13 @@ grunt bench
 $ grunt dev [--force]
 ```
 
-## Contributing
-
-Wanna help? Cool! It will be really apreciated :)
-
-You must add new test cases for any feature or refactor you do,
-always to following the same design/code patterns that already exist
-
-Tests specs are completely written in LiveScript language.
-Take a look to the language [documentation][3] if you are new with it.
-You should follow the LiveScript language conventions defined in the [coding style guide][4]
-
 ## To Do/Wish list
 
 - Browser support
 - Compiler to JSON
 - Serialization support
 - Built-in operators
-- Online parser
+- Online parser (github pages)
 
 Do you miss something? Feel free to open an issue or make a PR!
 
@@ -132,6 +134,3 @@ Released under the MIT license
 [2]: http://travis-ci.org/h2non/oli.js
 [3]: https://gemnasium.com/h2non/oli.js
 [4]: http://badge.fury.io/js/oli
-[5]: https://github.com/h2non/oli.js/blob/master/benchmarks/results.md
-
-

@@ -112,3 +112,22 @@ describe 'Expressions', ->
       it 'should parse "oli" as clone identifier', ->
         expect node ast('&oli >>> rules > say: "hola"'), 'id.reference.name'
           .to.be.equal 'oli'
+
+
+  describe 'copy declaration', (_) ->
+
+    it 'should parse "hello" as identifier', ->
+      expect node ast('hello:> oli'), 'id.name'
+        .to.be.equal 'hello'
+    
+    it 'should parse "oli" as source identifier', ->
+      expect node ast('hello:> oli'), 'source.name'
+        .to.be.equal 'oli'
+
+    it 'should parse "use this language" as reference identifier', ->
+      expect node ast('hello:> use this language'), 'source.name'
+        .to.be.equal 'use this language'
+
+    it 'should parse "\'this language rules\'" as reference identifier', ->
+      expect node ast('hello:> "this language rules"'), 'source.name'
+        .to.be.equal 'this language rules'

@@ -1,0 +1,77 @@
+
+/* Lexical Grammar */
+
+SourceCharacter
+  = .
+
+WhiteSpace "whitespace"
+  = [\t\v\f \u00A0\uFEFF]
+  / Zs
+
+/* Experimental: todo! */
+line
+  = SAMEDENT line:(!EOS c:SourceElements { return c; })+ EOS?
+    children:( INDENT c:line* DEDENT { return c; })?
+    {
+      var o = {};
+      o[line] = children;
+      return children ? o : line.join('');
+    }
+
+SAMEDENT
+  = i:[ \t]* &{ return i.join('') === indent; }
+
+INDENT
+  = i:[ \t]+ &{ return i.length > indent.length; }
+    {
+      indentStack.push(indent);
+      indent = i.join('');
+      pos = offset;
+    }
+
+DEDENT
+  = { indent = indentStack.pop(); }
+
+ElementSeparator
+  = EOS
+  / ","
+
+LineTerminator
+  = [\n\r\u2028\u2029]
+
+LineTerminatorSequence "end of line"
+  = "\n"
+  / "\r\n"
+  / "\r"
+  / "\u2028" // line separator
+  / "\u2029" // paragraph separator
+
+EOF
+  = !.
+
+/* Automatic Semicolon Insertion */
+
+EOS
+  = _ LineTerminatorSequence
+  / _  &EndToken
+  / __ EOF
+
+EOSNoLineTerminator
+  = _ LineTerminatorSequence
+  / _ &EndToken
+  / _ EOF
+
+/* Comments */
+
+Comment "comment"
+  = MultiLineComment
+  / SingleLineComment
+
+MultiLineComment
+  = "##" (!"##" SourceCharacter)* "##"
+
+MultiLineCommentNoLineTerminator
+  = "##" (!("##" / LineTerminator) SourceCharacter)* "##"
+
+SingleLineComment
+  = "#" (!LineTerminator SourceCharacter)*

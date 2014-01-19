@@ -1,0 +1,127 @@
+/* Primitives types */
+
+BooleanLiteral
+  = TrueToken  { return astNode({ type: "BooleanLiteral", value: true  }) }
+  / FalseToken { return astNode({ type: "BooleanLiteral", value: false }) }
+
+NumberLiteral "number"
+  = number:(HexIntegerLiteral / DecimalLiteral / IntegerLiteral) {
+    return number;
+  }
+
+IntegerLiteral
+  = number:$(HexIntegerLiteral / SignedInteger / DecimalIntegerLiteral) !IdentifierStart {
+      return astNode({
+        type:   'IntegerLiteral',
+        value:  parseInt(number, 10),
+        raw:    number
+      })
+    }
+
+DecimalLiteral
+  = number:(
+    parts:$(DecimalIntegerLiteral "." DecimalDigits? ExponentPart?) {
+      return parts;
+    }
+  / parts:$("." DecimalDigits ExponentPart?)     { return parts; }
+  / parts:$(SignedInteger "." DecimalDigits ExponentPart?) { return parts; }
+  ) {
+      return astNode({
+        type:  'DecimalLiteral',
+        value: parseFloat(number),
+        raw:   number
+      });
+    }
+
+DecimalIntegerLiteral
+  = "0" / NonZeroDigit DecimalDigits?
+
+DecimalDigits
+  = DecimalDigit+
+
+DecimalDigit
+  = [0-9]
+
+NonZeroDigit
+  = [1-9]
+
+ExponentPart
+  = ExponentIndicator SignedInteger
+
+ExponentIndicator
+  = [eE]
+
+SignedInteger
+  = [-+] DecimalDigits
+
+HexIntegerLiteral
+  = "0" [xX] digits:$HexDigit+ { return parseInt(digits, 16); }
+
+HexDigit
+  = [0-9a-fA-F]
+
+/* String */
+
+StringLiteral "quoted string"
+  = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'") {
+      return astNode({
+        type:  'StringLiteral',
+        value: parts[1],
+        raw:   parts.join('')
+      });
+    }
+
+DoubleStringCharacters
+  = chars:DoubleStringCharacter+ { return chars.join(""); }
+
+SingleStringCharacters
+  = chars:SingleStringCharacter+ { return chars.join(""); }
+
+/* LineTerminator */
+DoubleStringCharacter
+  = !('"' / "\\") char_:SourceCharacter { return char_;     }
+  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / LineContinuation
+
+SingleStringCharacter
+  = !("'" / "\\") char_:SourceCharacter { return char_;     }
+  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / LineContinuation
+
+LineContinuation
+  = "\\" sequence:LineTerminatorSequence { return sequence; }
+
+EscapeSequence
+  = CharacterEscapeSequence
+  / "0" !DecimalDigit { return "\0"; }
+  / HexEscapeSequence
+  / UnicodeEscapeSequence
+
+CharacterEscapeSequence
+  = SingleEscapeCharacter
+  / NonEscapeCharacter
+
+SingleEscapeCharacter
+  = char_:['"\\bfnrtv] {
+      return char_
+        .replace("b", "\b")
+        .replace("f", "\f")
+        .replace("n", "\n")
+        .replace("r", "\r")
+        .replace("t", "\t")
+        .replace("v", "\x0B") // IE does not recognize "\v".
+    }
+
+NonEscapeCharacter
+  = (!EscapeCharacter / LineTerminator) char_:SourceCharacter { return char_; }
+
+EscapeCharacter
+  = SingleEscapeCharacter
+  / DecimalDigit
+  / "x"
+  / "u"
+
+HexEscapeSequence
+  = "x" digits:$(HexDigit HexDigit) {
+      return String.fromCharCode(parseInt(digits, 16));
+    }

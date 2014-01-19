@@ -1,0 +1,283 @@
+/* Expressions */
+_
+  = (WhiteSpace / LineTerminatorSequence / Comment)*
+__
+  = (WhiteSpace / LineTerminatorSequence / Comment)*
+
+PrimitiveValueExpression
+  = BooleanLiteral
+  / NumberLiteral
+  / StringLiteral
+  / ListExpression
+
+LiteralSequenceCharacters
+  = !":" !EOS !"[" !"]" char:SingleStringCharacter { return char; }
+
+UnquotedStringLiteral "unquoted string"
+  = !"-" chars:LiteralSequenceCharacters+ __ (Comment / EOS) {
+    return astNode({
+      type: 'StringLiteral',
+      value: chars.join('')
+    })
+  }
+
+IdentifierLetter = [a-zA-Z0-9\-\_\.]
+
+IdentifierWord
+  = letters:IdentifierLetter+ {
+    return letters.join("");
+  }
+
+Identifier "identifier"
+  = !ReservedWord name:IdentifierWord {
+    return astNode({
+      type: 'Identifier',
+      name: name
+    });
+  }
+
+IdentifierName "identifier"
+  = start:IdentifierStart parts:IdentifierPart* {
+      return start + parts.join("");
+    }
+
+IdentifierSeparators
+  = [\.\-]
+
+IdentifierStart
+  = UnicodeLetter
+  / "$"
+  / "_"
+  / "\\" sequence:UnicodeEscapeSequence { return sequence; }
+
+IdentifierPart
+  = IdentifierSeparators
+  / IdentifierStart
+  / UnicodeCombiningMark
+  / UnicodeDigit
+  / UnicodeConnectorPunctuation
+  / "\u200C" { return "\u200C"; } // zero-width non-joiner
+  / "\u200D" { return "\u200D"; } // zero-width joiner
+
+PostfixExpression
+  = operator:PostfixOperator {
+      return {
+        type:       "PostfixExpression",
+        operator:   operator
+      };
+    }
+
+UnaryExpression
+  = PostfixExpression
+  / operator:UnaryOperator __ expression:UnaryExpression {
+      return {
+        type:       "UnaryExpression",
+        operator:   operator,
+        expression: expression
+      };
+    }
+
+MultiplicativeExpression
+  = head:UnaryExpression
+    tail:(__ MultiplicativeOperator __ UnaryExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+AdditiveExpression
+  = head:MultiplicativeExpression
+    tail:(__ AdditiveOperator __ MultiplicativeExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+ShiftExpression
+  = head:AdditiveExpression
+    tail:(__ AdditiveExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+RelationalExpression
+  = head:ShiftExpression
+    tail:(__ RelationalOperator __ ShiftExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+RelationalExpressionNoIn
+  = head:ShiftExpression
+    tail:(__ RelationalOperatorNoIn __ ShiftExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+EqualityExpression
+  = head:RelationalExpression
+    tail:(__ EqualityOperator __ RelationalExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+EqualityExpressionNoIn
+  = head:RelationalExpressionNoIn
+    tail:(__ EqualityOperator __ RelationalExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+/* Indentifier */
+
+IdentifierLiteralExpression
+  = id:StringLiteral {
+      return id.value;
+    }
+  / tail:(id:Identifier spaces:__ {
+      var result = id.name;
+      if (spaces) {
+        result += spaces.join('');
+      }
+      return result;
+    })* {
+      var i, l, result = '';
+      if (tail) {
+        result += tail.join('');
+      }
+      return result.trim();
+    }
+
+IdentifierNameExpression
+  = IdentifierReferenceExpression / IdentifierLiteralExpression
+
+IdentifierOperationExpression
+  = IdentifierMergeExpression / IdentifierCloneExpression
+
+IdentifierAliasExpression
+  = ">" __ id:IdentifierLiteralExpression {
+    return astNode({
+      type:   'IdentifierReferenceExpression',
+      name:   id
+    })
+  }
+
+IdentifierCloneExpression
+  = ">>" __ id:IdentifierLiteralExpression {
+    return astNode({
+      type:   'IdentifierCloneExpression',
+      name:   id
+    })
+  }
+
+IdentifierMergeExpression
+  = ">>>" __ id:IdentifierLiteralExpression {
+    return astNode({
+      type:   'IdentifierMergeExpression',
+      name:   id
+    })
+  }
+
+IdentifierReferenceExpression
+  = "&" __ id:IdentifierLiteralExpression {
+    return astNode({
+      type: 'IdentifierReferenceExpression',
+      name: id
+    })
+  }
+
+IdentifierExpression
+  = id:IdentifierNameExpression __ operation:IdentifierOperationExpression? __ ref:IdentifierAliasExpression? {
+    if (id.type === 'IdentifierReferenceExpression') {
+      return astNode({
+        type: 'IdentifierExpression',
+        name:      id.name,
+        reference: id,
+        operation: operation
+      })
+    } else {
+      return astNode({
+        type:      'IdentifierExpression',
+        name:      id,
+        reference: ref,
+        operation: operation
+      });
+    }
+  }
+
+ListElementExpression
+  = head:ListElementsExpressions tail:(__ ElementSeparator __ ListElementsExpressions)* {
+    var result = [ head ];
+    for (var i = 0; i < tail.length; i+=1) {
+      result.push(tail[i][3]);
+    }
+    return result;
+  }
+
+ListExpression
+  = "-" __ elements:ListElementExpression
+  / "[" __ elements:ListElementExpression __ "]" {
+    return astNode({
+      type:  'ListExpression',
+      elements: elements !== null ? elements : []
+    })
+  }
+
+ListElementsExpressions
+  = Statement
+  / PrimitiveValueExpression
+  / UnquotedStringLiteral

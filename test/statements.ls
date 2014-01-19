@@ -6,40 +6,7 @@
 } = require './lib/helper'
 
 describe 'Statements', ->
-
-  describe 'value assignment', ->
-    
-    describe 'unquoted one-word string', (_) ->
-      code = 'value: hello'
-
-      it 'should be a ValueDeclaration', ->
-        #inspect(traverse ast(code) .paths!)
-        expect node ast(code), 'type' .to.exist
-
-      it 'should have the value "hello"', ->
-        expect node ast(code), 'id.name' .to.be.equal 'value'
-    
-    describe 'quoted string', (_) ->
-      code = 'value: "hello oli!"'
-
-      it 'should be a ValueDeclaration', ->
-        expect node ast(code), 'type' .to.exist
-
-      it 'should have the string value', ->
-        expect node ast(code), 'body.0.value' .to.be.equal 'hello oli!'
-    
-    describe 'number', (_) ->
-      code = 'value: 123'
-
-      it 'should be a ValueDeclaration', ->
-        expect node ast(code), 'type' .to.exist
-
-    describe 'boolean', (_) ->
-      code = 'value: yes'
-
-      it 'should be a ValueDeclaration', ->
-        expect node ast(code), 'type' .to.exist
-
+  
   describe 'block assignment', ->
     
     describe 'in-line', (_) ->
@@ -108,6 +75,31 @@ describe 'Statements', ->
           .to.be.equal -3
 
       it 'should parse a nested block of mix types and separators', ->
+        code = '''
+        hello: 
+          from:
+            text: 
+              true, 'it\\'s cool!!'
+              12.09130
+              [ 
+                'oli',
+                'rules!',
+                yes
+              ]
+              'amazing pepe' 'another string'
+              &value: [ 1, 2 ]
+            end
+          end
+        end
+        '''
+        expect node ast(code), 'body.0.body.0.body.3.elements.1.value'
+          .to.be.equal 'rules!'
+        expect node ast(code), 'body.0.body.0.body.6.body.0.elements.1.value'
+          .to.be.equal 2
+
+    describe 'multi-statement', (_) ->
+
+      it 'should parse both first-level blocks', ->
         code = '''
         hello: 
           from:

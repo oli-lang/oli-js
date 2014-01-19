@@ -10,7 +10,7 @@ module.exports = (grunt) ->
 
     peg:
       example:
-        src: 'grammar/oli.peg'
+        src: ['grammar/oli.peg', 'grammar/lexic.peg', 'grammar/*.peg']
         dest: 'lib/parser.js'
 
     livescript:

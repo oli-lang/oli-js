@@ -1,0 +1,55 @@
+
+/* Language Tokens */
+
+StartToken              = ":"              !IdentifierPart
+CopyToken               = ":>"             !IdentifierPart
+TrueToken               = "true"  / "yes"  !IdentifierPart
+FalseToken              = "false" / "no"   !IdentifierPart
+EndToken "end of block" = "end"            !IdentifierPart
+
+Keyword
+  = (
+      StartToken
+    / EndToken
+  )
+  !IdentifierPart
+
+ReservedWord
+  = Keyword
+
+/* Operators */
+
+PostfixOperator
+  = "++"
+  / "--"
+
+UnaryOperator
+  = "++"
+  / "--"
+  / "+"
+  / "-"
+  / "!"
+
+EqualityOperator
+  = "=="
+  / "!="
+
+AdditiveOperator
+  = "+" !("+" / "=") { return "+"; }
+  / "-" !("-" / "=") { return "-"; }
+
+RelationalOperator
+  = "<="
+  / ">="
+  / "<"
+  / ">"
+
+RelationalOperatorNoIn
+  = "<="
+  / ">="
+  / "<"
+  / ">"
+
+MultiplicativeOperator
+  = operator:("*" / "/" / "%") !"=" { return operator; }
+
