@@ -51,8 +51,9 @@ module.exports = (grunt) ->
 
     benchmark:
       all:
+        options:
+          displayResults: true
         src: [ 'benchmarks/*.js' ]
-        dest: 'benchmarks/results.md'
 
     browserify:
       dist:

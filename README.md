@@ -34,7 +34,8 @@ Or add the script tag
   - String interpolation and templaiting
   - Comparison, math and logical operators
 - Compiler
-  -
+  - Templating
+  - Math operations
 - Serializer
   - Type inference
   - Nested structures with expressions determination
