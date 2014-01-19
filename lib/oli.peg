@@ -89,8 +89,8 @@ EOF
 /* Automatic Semicolon Insertion */
 
 EOS
-  = _ LineTerminatorSequence
-  / _ &"}"
+  = _  LineTerminatorSequence
+  / _  &EndToken
   / __ EOF
 
 EOSNoLineTerminator
@@ -196,19 +196,12 @@ LiteralSequenceCharacters
   = !":" !EOS char:SingleStringCharacter { return char; }
 
 UnquotedStringLiteral "unquoted string"
-  = !EndToken chars:LiteralSequenceCharacters+ __ !EndToken {
+  = chars:LiteralSequenceCharacters+ __ Comment? __ EOS {
     return astNode({
       type: 'StringLiteral',
       value: chars.join('')
     })
   }
-  /*head:IdentifierStart tail:(__ UnquotedLiteral+) __ EOS {
-    var result = [ head ];
-    for (var i = 0; i < tail.length; i+=1) {
-      result.push(tail[i][3]);
-    }
-    return result;
-  }*/
 
 UnicodeEscapeSequence
   = "u" digits:$(HexDigit HexDigit HexDigit HexDigit) {
@@ -607,10 +600,9 @@ ListExpression
   }
 
 ListElementsExpressions
-  = ValueAssignmentStatement
+  = Statement
   / ValueType
   / UnquotedStringLiteral
-  / Statement
 
 ValueAssignmentStatement
   = id:IdentifierExpression __ ref:ValueIdentifierExpression? __ StartToken __ value:ListElementsExpressions __ EOS {
@@ -635,16 +627,13 @@ BlockStatement
     }
 
 TypeDeclaration
-  = ValueAssignmentStatement
-  / ListExpression
+  = Statement
   / ValueType
-  / Comment
-  / BlockStatement
 
 Statement
-  = ValueAssignmentStatement
+  = Comment
   / BlockStatement
-  / Comment
+  / ValueAssignmentStatement
 
 SourceElements
   = head:Statement tail:(__ Statement)* {
