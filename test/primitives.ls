@@ -43,12 +43,16 @@ describe 'Primitive types', ->
   describe 'string', (_) ->
 
     it 'should parse "hello oli!" as string', ->
-      #inspect ast('number: "hello oli!"')
-      expect node ast('number: "hello oli!"'), 'value.value' .to.be.equal 'hello oli!'
+      expect node ast('string: "hello oli!"'), 'value.value' .to.be.equal 'hello oli!'
 
     it 'should parse "hello oli!" as string with single quotes', ->
-      expect node ast("number: 'hello oli!'"), 'value.value' .to.be.equal 'hello oli!'
+      expect node ast("string: 'hello oli!'"), 'value.value' .to.be.equal 'hello oli!'
 
     it 'should parse "hello \'oli!" as string with escape character', ->
-      expect node ast("number: 'hello \\'oli!'"), 'value.value' .to.be.equal 'hello \'oli!'
+      expect node ast("string: 'hello \\'oli!'"), 'value.value' .to.be.equal 'hello \'oli!'
+
+    it 'should parse "hello, oli!" as unquoted string', ->
+      #inspect ast('string: hello oli!')
+      expect node ast('string: hello, oli!'), 'value.value' .to.be.equal 'hello, oli!'
+      #expect node ast('string: pepe , hoho # jajaja'), 'value.value' .to.be.equal 'hello, oli!'
 

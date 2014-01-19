@@ -49,6 +49,7 @@ WhiteSpace "whitespace"
   = [\t\v\f \u00A0\uFEFF]
   / Zs
 
+/* experimental dent support */
 line
   = SAMEDENT line:(!EOS c:SourceElements { return c; })+ EOS?
     children:( INDENT c:line* DEDENT { return c; })?
@@ -119,7 +120,7 @@ StringLiteral "quoted string"
       return astNode({
         type:  'StringLiteral',
         value: parts[1],
-        raw:   parts
+        raw:   parts.join('')
       });
     }
 
@@ -191,26 +192,38 @@ _
 __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
 
-UnquotedLiteral "literal"
-  = [0-9a-zA-Z\s\S\t\T\r\R]
+LiteralSequenceCharacters
+  = !":" !EOS char:SingleStringCharacter { return char; }
 
-LiteralSequence "literal sequence"
- = chars:SingleStringCharacter+ { return chars.join(""); }
+UnquotedStringLiteral "unquoted string"
+  = !EndToken chars:LiteralSequenceCharacters+ __ !EndToken {
+    return astNode({
+      type: 'StringLiteral',
+      value: chars.join('')
+    })
+  }
+  /*head:IdentifierStart tail:(__ UnquotedLiteral+) __ EOS {
+    var result = [ head ];
+    for (var i = 0; i < tail.length; i+=1) {
+      result.push(tail[i][3]);
+    }
+    return result;
+  }*/
 
 UnicodeEscapeSequence
   = "u" digits:$(HexDigit HexDigit HexDigit HexDigit) {
       return String.fromCharCode(parseInt(digits, 16));
     }
 
-Letter = [a-zA-Z0-9\-\_\.]
+IdentifierLetter = [a-zA-Z0-9\-\_\.]
 
-Word
-	= letters:Letter+ {
+IdentifierWord
+	= letters:IdentifierLetter+ {
 		return letters.join("");
 	}
 
 Identifier "identifier"
-  = !ReservedWord name:IdentifierName {
+  = !ReservedWord name:IdentifierWord {
     return astNode({
       type: 'Identifier',
       name: name
@@ -320,6 +333,166 @@ HexIntegerLiteral
 HexDigit
   = [0-9a-fA-F]
 
+/* Operators */
+
+PostfixExpression
+  = operator:PostfixOperator {
+      return {
+        type:       "PostfixExpression",
+        operator:   operator
+      };
+    }
+
+PostfixOperator
+  = "++"
+  / "--"
+
+UnaryExpression
+  = PostfixExpression
+  / operator:UnaryOperator __ expression:UnaryExpression {
+      return {
+        type:       "UnaryExpression",
+        operator:   operator,
+        expression: expression
+      };
+    }
+
+UnaryOperator
+  = "++"
+  / "--"
+  / "+"
+  / "-"
+  / "~"
+  /  "!"
+
+MultiplicativeExpression
+  = head:UnaryExpression
+    tail:(__ MultiplicativeOperator __ UnaryExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+MultiplicativeOperator
+  = operator:("*" / "/" / "%") !"=" { return operator; }
+
+AdditiveExpression
+  = head:MultiplicativeExpression
+    tail:(__ AdditiveOperator __ MultiplicativeExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+AdditiveOperator
+  = "+" !("+" / "=") { return "+"; }
+  / "-" !("-" / "=") { return "-"; }
+
+ShiftExpression
+  = head:AdditiveExpression
+    tail:(__ AdditiveExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+RelationalExpression
+  = head:ShiftExpression
+    tail:(__ RelationalOperator __ ShiftExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+RelationalOperator
+  = "<="
+  / ">="
+  / "<"
+  / ">"
+
+RelationalExpressionNoIn
+  = head:ShiftExpression
+    tail:(__ RelationalOperatorNoIn __ ShiftExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+RelationalOperatorNoIn
+  = "<="
+  / ">="
+  / "<"
+  / ">"
+
+EqualityExpression
+  = head:RelationalExpression
+    tail:(__ EqualityOperator __ RelationalExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+EqualityExpressionNoIn
+  = head:RelationalExpressionNoIn
+    tail:(__ EqualityOperator __ RelationalExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type:     "BinaryExpression",
+          operator: tail[i][1],
+          left:     result,
+          right:    tail[i][3]
+        };
+      }
+      return result;
+    }
+
+EqualityOperator
+  = "=="
+  / "!="
+
 /* Keywords */
 
 Keyword
@@ -356,14 +529,6 @@ Identifier "identifier"
 
 /* Blocks */
 
-BlockBody
-  = __ statements: __? {
-    return {
-      type:       "BlockBody",
-      statements: statements !== null ? statements[0] : []
-    }
-  }
-
 ValueIdentifierExpression
   = id:ValueIdentifierAlias __ extend:(ValueCloneExpression / ValueMergeExpression) {
     return astNode({
@@ -397,22 +562,12 @@ ValueMergeExpression
     })
   }
 
-UnquotedLiteralSentence
-  = !Comment lit:Identifier* {
-    var string = '';
-    for (var k = 0; k < lit.length; k += 1) {
-      string += lit[k].name
-    }
-    return string
-  }
-
 ValueType
   = value:(
     BooleanLiteral
   / NumberLiteral
   / StringLiteral
-  / ListExpression
-  / UnquotedLiteralSentence) {
+  / ListExpression) {
     return value
   }
 
@@ -426,11 +581,16 @@ ReferenceIdentifier
 
 IdentifierExpression
   = id:(ReferenceIdentifier
-  / Identifier) {
+  / Identifier
+  / StringLiteral) {
     return id
   }
 
 /* Lists */
+
+ElementSeparator
+  = EOS
+  / ","
 
 ListElementExpression
   = head:ValueType tail:(__ ElementSeparator __ ListElementsExpressions)* {
@@ -446,18 +606,16 @@ ListExpression
     return items !== null ? items : [];
   }
 
-ElementSeparator
-  = EOS
-  / ","
-
 ListElementsExpressions
-  = Statement
+  = ValueAssignmentStatement
   / ValueType
+  / UnquotedStringLiteral
+  / Statement
 
-ValueAssignmentExpression
+ValueAssignmentStatement
   = id:IdentifierExpression __ ref:ValueIdentifierExpression? __ StartToken __ value:ListElementsExpressions __ EOS {
     return astNode({
-      type:     "ValueAssignmentExpression",
+      type:     "ValueAssignmentStatement",
       id:       id,
       ref:      ref,
       value:    value
@@ -465,32 +623,27 @@ ValueAssignmentExpression
   }
 
 BlockStatement
-  = keyword:Identifier __ name:ValueIdentifierExpression? __ StartToken __ statements:TypeDeclaration __ EndToken {
+  = keyword:IdentifierExpression __ name:ValueIdentifierExpression? __ StartToken
+      __ body:TypeDeclaration+ __
+    EndToken {
       return astNode({
-        type:       "InlineBlockDeclaration",
-        name:       name,
-        keyword:    keyword,
-        statements: statements !== null ? statements : []
+        type:     "BlockStatement",
+        name:     name,
+        keyword:  keyword,
+        body:     body !== null ? body : []
       });
     }
 
 TypeDeclaration
-  = ValueAssignmentExpression
+  = ValueAssignmentStatement
+  / ListExpression
+  / ValueType
   / Comment
   / BlockStatement
 
-BlockDeclaration
-  = block:BlockStatement {
-      return astNode({
-        type:        "BlockDeclaration",
-        declarations: block
-        //statements: statements !== null ? statements : []
-      });
-    }
-
 Statement
-  = ValueAssignmentExpression
-  / BlockDeclaration
+  = ValueAssignmentStatement
+  / BlockStatement
   / Comment
 
 SourceElements
