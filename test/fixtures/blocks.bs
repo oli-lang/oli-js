@@ -41,10 +41,11 @@ deploy > zeus:
   retry: yes
   # nested block
   authentication:
-    # lists can be implicit using commas
+    # lists can be implicit
+    # you can separate elements by commas or EOL
     tokens:
-      - %1DOTnv6B9b]n7pbV535
-      - p16O2$)9,Z63bD&Q-82d
+      0cc175b9c0f1b6a8, 31c399e269772661
+      693a9fdd4c2fd070
     end
   end
 end

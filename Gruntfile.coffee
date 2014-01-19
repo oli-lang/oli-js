@@ -6,7 +6,12 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON 'package.json'
 
-    clean: ['dist', 'test/*.js', 'test/fixtures/.tmp/**']
+    clean: ['dist', 'test/*.js', 'lib/parser.js', 'test/fixtures/.tmp/**']
+
+    peg:
+      example:
+        src: 'grammar/oli.peg'
+        dest: 'lib/parser.js'
 
     livescript:
       options:
@@ -17,6 +22,12 @@ module.exports = (grunt) ->
         cwd: 'src/'
         src: ['**/*.ls']
         dest: 'lib/'
+        ext: '.js'
+      benchmarks:
+        expand: true
+        cwd: 'benchmarks'
+        src: ['**/*.ls']
+        dest: 'benchmarks'
         ext: '.js'
       test:
         expand: true
@@ -38,6 +49,11 @@ module.exports = (grunt) ->
           'test/*.ls'
         ]
 
+    benchmark:
+      all:
+        src: [ 'benchmarks/*.js' ]
+        dest: 'benchmarks/results.md'
+
     browserify:
       dist:
         files:
@@ -47,10 +63,11 @@ module.exports = (grunt) ->
       options:
         spawn: false
       lib:
-        files: ['lib/**/*.js', 'lib/*.peg']
+        files: ['!lib/parser.js', 'lib/**/*.js', 'lib/*.peg']
         tasks: ['test']
       grammar:
         files: ['grammar/**/*.peg']
+        tasks: ['test']
       src:
         files: ['src/**/*.ls']
         tasks: ['test']
@@ -62,15 +79,22 @@ module.exports = (grunt) ->
   grunt.registerTask 'compile', [
     'clean'
     'livescript'
+    'peg'
   ]
 
   grunt.registerTask 'test', [
-    'compile',
+    'compile'
     'mochacli'
   ]
 
+  grunt.registerTask 'bench', [
+    'compile'
+    'mochacli'
+    'benchmark'
+  ]
+
   grunt.registerTask 'zen', [
-    'compile',
+    'compile'
     'mochacli'
     'watch'
   ]
