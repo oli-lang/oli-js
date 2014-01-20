@@ -1,6 +1,6 @@
 /* Expressions */
 _
-  = (WhiteSpace / LineTerminatorSequence / Comment)*
+  = (WhiteSpace / Comment)*
 __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
 
@@ -11,17 +11,15 @@ PrimitiveValueExpression
   / ListExpression
 
 LiteralSequenceCharacters
-  = !":" !EOS !"[" !"]" char:SingleStringCharacter { return char; }
+  = !":" !LineTerminator !"[" !"]" char:SingleStringCharacter { return char; }
 
 UnquotedStringLiteral "unquoted string"
-  = !"-" chars:LiteralSequenceCharacters+ __ (Comment / EOS) {
+  = !"-" !":" _ chars:LiteralSequenceCharacters+ _ &EndToken? {
     return astNode({
       type: 'StringLiteral',
       value: chars.join('')
     })
   }
-
-IdentifierLetter = [a-zA-Z0-9\-\_\.]
 
 IdentifierWord
   = letters:IdentifierLetter+ {
@@ -37,12 +35,10 @@ Identifier "identifier"
   }
 
 IdentifierName "identifier"
-  = start:IdentifierStart parts:IdentifierPart* {
-      return start + parts.join("");
-    }
+  = UnquotedStringLiteral
 
-IdentifierSeparators
-  = [\.\-]
+IdentifierCharacter
+  = [\-\.\_\$\!]
 
 IdentifierStart
   = UnicodeLetter
@@ -51,7 +47,7 @@ IdentifierStart
   / "\\" sequence:UnicodeEscapeSequence { return sequence; }
 
 IdentifierPart
-  = IdentifierSeparators
+  = IdentifierCharacter
   / IdentifierStart
   / UnicodeCombiningMark
   / UnicodeDigit
@@ -188,30 +184,32 @@ IdentifierLiteralExpression
   = id:StringLiteral {
       return id.value;
     }
-  / tail:(id:Identifier spaces:__ {
-      var result = id.name;
-      if (spaces) {
-        result += spaces.join('');
-      }
-      return result;
-    })* {
-      var i, l, result = '';
-      if (tail) {
-        result += tail.join('');
-      }
-      return result.trim();
+  / id:Identifier {
+      return id.name.trim();
     }
 
 IdentifierNameExpression
-  = IdentifierReferenceExpression / IdentifierLiteralExpression
+  = IdentifierReferenceNegationExpression / IdentifierReferenceExpression / IdentifierLiteralExpression
 
 IdentifierOperationExpression
   = IdentifierMergeExpression / IdentifierCloneExpression
 
-IdentifierAliasExpression
+IdentifierArrowExpression
+  = IdentifierArrowNegationReferenceExpression / IdentifierArrowReferenceExpression
+
+IdentifierArrowReferenceExpression
   = ">" __ id:IdentifierLiteralExpression {
     return astNode({
+      // type as using "&"
       type:   'IdentifierReferenceExpression',
+      name:   id
+    })
+  }
+
+IdentifierArrowNegationReferenceExpression
+  = "!>" __ id:IdentifierLiteralExpression {
+    return astNode({
+      type:   'IdentifierAliasNegationExpression',
       name:   id
     })
   }
@@ -240,24 +238,96 @@ IdentifierReferenceExpression
     })
   }
 
-IdentifierExpression
-  = id:IdentifierNameExpression __ operation:IdentifierOperationExpression? __ ref:IdentifierAliasExpression? {
-    if (id.type === 'IdentifierReferenceExpression') {
-      return astNode({
-        type: 'IdentifierExpression',
-        name:      id.name,
-        reference: id,
-        operation: operation
-      })
-    } else {
-      return astNode({
-        type:      'IdentifierExpression',
-        name:      id,
-        reference: ref,
-        operation: operation
-      });
-    }
+IdentifierReferenceNegationExpression
+  = "!&" __ id:IdentifierLiteralExpression {
+    return astNode({
+      type:    'IdentifierReferenceNegationExpression',
+      name:    id
+    })
   }
+
+AttributeAssignmentExpression
+  = id:IdentifierNameExpression __ value:(StartToken __ value:(PrimitiveValueExpression / IdentifierNameExpression) {
+      return value;
+    })? {
+    var node = astNode({
+      type:  'AttributeAssignmentExpression',
+      left: {
+        type: id.type || 'IdentifierLiteral',
+        value: id.value || id
+      }
+    });
+    if (value) {
+      if (value.type === 'ListExpression') {
+        node.right = value;
+      } else {
+        node.right = {
+          type:  value.type || 'StringLiteral',
+          value: value.value || value,
+          raw:   value.raw || (typeof value !== 'object' ? value : null)
+        };
+      }
+    }
+    return node;
+  }
+
+IdentifierAttributesList
+  = head:AttributeAssignmentExpression tail:(__ "," __ AttributeAssignmentExpression)* {
+    var result = [ head ];
+    for (var i = 0, l = tail.length; i < l; i+=1) {
+      result.push(tail[i][3]);
+    }
+    return result;
+  }
+
+IdentifierAttributesExpression
+  = "(" __ attrs:IdentifierAttributesList? __ ")" {
+    return attrs !== null ? attrs : null;
+  }
+
+IdentifierExpression
+  = id:IdentifierNameExpression __ operation:IdentifierOperationExpression?
+    __ ref:IdentifierArrowExpression? __ attrs:IdentifierAttributesExpression? {
+    var node;
+    switch (id.type) {
+      case 'IdentifierReferenceExpression':
+        node = astNode({
+          type:       'IdentifierExpression',
+          name:       id.name,
+          reference:  id,
+          operation:  operation,
+          attributes: attrs
+        })
+      break;
+      case 'IdentifierReferenceNegationExpression':
+        node = astNode({
+          type:     'IdentifierExpression',
+          name:      id.name,
+          negation:  true,
+          reference: id,
+          operation: operation,
+          attributes:     attrs
+        })
+      break;
+      default:
+        node = astNode({
+          type:       'IdentifierExpression',
+          name:       id,
+          reference:  ref,
+          operation:  operation,
+          attributes: attrs
+        });
+      break;
+    }
+    return node;
+  }
+
+/* List */
+
+ListElementsExpressions
+  = PrimitiveValueExpression
+  / UnquotedStringLiteral
+  / Statement
 
 ListElementExpression
   = head:ListElementsExpressions tail:(__ ElementSeparator __ ListElementsExpressions)* {
@@ -277,7 +347,3 @@ ListExpression
     })
   }
 
-ListElementsExpressions
-  = Statement
-  / PrimitiveValueExpression
-  / UnquotedStringLiteral

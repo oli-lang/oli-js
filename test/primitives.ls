@@ -46,5 +46,5 @@ describe 'Primitive types', ->
       expect node ast("string: 'hello \\'oli!'"), 'body.0.value' .to.be.equal 'hello \'oli!'
 
     it 'should parse "hello, oli!" as unquoted string', ->
-      expect node ast('string: hello, oli!'), 'body.0.value' .to.be.equal 'hello, oli!'
+      expect node ast('string: "hello, oli!"'), 'body.0.value' .to.be.equal 'hello, oli!'
 

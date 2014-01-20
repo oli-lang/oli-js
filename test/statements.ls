@@ -6,21 +6,21 @@
 } = require './lib/helper'
 
 describe 'Statements', ->
-  
+
   describe 'block assignment', ->
-    
+
     describe 'in-line', (_) ->
 
       it 'should parse "oli!" as string literal"', ->
-        expect node ast('hello: "oli!" end'), 'body.0.value' 
+        expect node ast('hello: "oli!" end'), 'body.0.value'
           .to.be.equal 'oli!'
-     
+
       it 'should parse "hello: yes end"', ->
-        expect node ast('hello: yes end'), 'body.0.value' 
+        expect node ast('hello: yes end'), 'body.0.value'
           .to.be.equal true
 
       it 'should parse "hello: 13.85 end"', ->
-        expect node ast('hello: 13.85 end'), 'body.0.value' 
+        expect node ast('hello: 13.85 end'), 'body.0.value'
           .to.be.equal 13.85
 
       it 'should parse "hello: [ 1, 2 ] end"', ->
@@ -33,22 +33,26 @@ describe 'Statements', ->
         expect node ast('hello: from: oli: lang: oli!'), 'body.0.body.0.body.0.body.0.value'
           .to.be.equal 'oli!'
 
-      it 'should parse "hello: from: oli: lang: ..." as indented blocks', ->
+      it 'should parse "hello: form: oli: lang: ..." as indented blocks', ->
         code = '''
-        hello: 
+        hello:
           from:
-            lang: this is oli! # comment!
+            oli:
+              lang: 'this is oli!'
+            end
           end
         end
         '''
-        expect node ast(code), 'body.0.body.0.body.0.value'
+        #inspect ast(code).body[0].body[0].body[0].body[0].body.value
+        expect node ast(code), 'body.0.body.0.body.0.body.value'
           .to.be.equal 'this is oli!'
-
+    /*
+      # TODO!
       it 'should parse a nested block statements of strings', ->
         code = '''
-        hello: 
+        hello:
           from:
-            text: 
+            text:
               'this'
               'is'
               'oli!'
@@ -61,9 +65,9 @@ describe 'Statements', ->
 
       it 'should parse a nested block statements of numbers', ->
         code = '''
-        hello: 
+        hello:
           from:
-            text: 
+            text:
               12345
               0.1231
               -3
@@ -76,12 +80,12 @@ describe 'Statements', ->
 
       it 'should parse a nested block of mix types and separators', ->
         code = '''
-        hello: 
+        hello:
           from:
-            text: 
+            text:
               true, 'it\\'s cool!!'
               12.09130
-              [ 
+              [
                 'oli',
                 'rules!',
                 yes
@@ -101,23 +105,16 @@ describe 'Statements', ->
 
       it 'should parse both first-level blocks', ->
         code = '''
-        hello: 
-          from:
-            text: 
-              true, 'it\\'s cool!!'
-              12.09130
-              [ 
-                'oli',
-                'rules!',
-                yes
-              ]
-              'amazing pepe' 'another string'
-              &value: [ 1, 2 ]
-            end
-          end
+        hello:
+          from: 'oli'
+          hole: 'pepepe!', 'happy'
         end
+        happy: 'hey'
         '''
+        inspect ast(code)
         expect node ast(code), 'body.0.body.0.body.3.elements.1.value'
           .to.be.equal 'rules!'
         expect node ast(code), 'body.0.body.0.body.6.body.0.elements.1.value'
           .to.be.equal 2
+
+    */
