@@ -34,7 +34,7 @@ describe 'Statements', ->
           .to.be.equal 'oli!'
 
       it 'should parse "hello: form: oli: lang: ..." as indented blocks', ->
-        code = '''
+        code = ast '''
         hello:
           from:
             oli:
@@ -43,28 +43,26 @@ describe 'Statements', ->
           end
         end
         '''
-        #inspect ast(code).body[0].body[0].body[0].body[0].body.value
-        expect node ast(code), 'body.0.body.0.body.0.body.value'
+        expect node code, 'body.0.body.0.body.0.body.0.value'
           .to.be.equal 'this is oli!'
-    /*
-      # TODO!
+
       it 'should parse a nested block statements of strings', ->
-        code = '''
+        code = ast '''
         hello:
           from:
             text:
-              'this'
-              'is'
-              'oli!'
+              'awesome'
+              'it is cool'
+              'looks nice!'
             end
           end
         end
         '''
-        expect node ast(code), 'body.0.body.0.body.2.value'
-          .to.be.equal 'oli!'
+        expect node code, 'body.0.body.0.body.2.value'
+          .to.be.equal 'looks nice!'
 
       it 'should parse a nested block statements of numbers', ->
-        code = '''
+        code = ast '''
         hello:
           from:
             text:
@@ -75,20 +73,36 @@ describe 'Statements', ->
           end
         end
         '''
-        expect node ast(code), 'body.0.body.0.body.2.value'
+        expect node code, 'body.0.body.0.body.2.value'
           .to.be.equal -3
 
-      it 'should parse a nested block of mix types and separators', ->
-        code = '''
+      it 'should parse a nested block statements of boolean', ->
+        code = ast '''
         hello:
           from:
             text:
-              true, 'it\\'s cool!!'
+              true
+              false
+              yes
+              no
+            end
+          end
+        end
+        '''
+        expect node code, 'body.0.body.0.body.3.value'
+          .to.be.equal false
+
+      it 'should parse a nested block of mix types and separators', ->
+        code = ast '''
+        hello:
+          from:
+            text:
+              true 'it\\'s cool!!'
               12.09130
               [
-                'oli',
-                'rules!',
-                yes
+                test, this rules!
+                'oli' 'is' 'pretty'
+                oh, yes
               ]
               'amazing pepe' 'another string'
               &value: [ 1, 2 ]
@@ -96,25 +110,24 @@ describe 'Statements', ->
           end
         end
         '''
-        expect node ast(code), 'body.0.body.0.body.3.elements.1.value'
-          .to.be.equal 'rules!'
-        expect node ast(code), 'body.0.body.0.body.6.body.0.elements.1.value'
-          .to.be.equal 2
+        #inspect code
+        expect node code, 'body.0.body.0.body.3.elements.4.value'
+          .to.be.equal 'pretty'
+
 
     describe 'multi-statement', (_) ->
 
       it 'should parse both first-level blocks', ->
-        code = '''
+        ast-obj = ast '''
         hello:
-          from: 'oli'
-          hole: 'pepepe!', 'happy'
+          world: true
+          'string'
+          yes
         end
-        happy: 'hey'
+        another block: 'fantastic'
         '''
-        inspect ast(code)
-        expect node ast(code), 'body.0.body.0.body.3.elements.1.value'
-          .to.be.equal 'rules!'
-        expect node ast(code), 'body.0.body.0.body.6.body.0.elements.1.value'
-          .to.be.equal 2
+        expect node ast-obj, '0.body.1.value'
+          .to.be.equal 'string'
+        expect node ast-obj, '1.body.0.value'
+          .to.be.equal 'fantastic'
 
-    */

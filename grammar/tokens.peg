@@ -1,10 +1,11 @@
 /* Language Tokens */
 
-StartToken              = ":"              !IdentifierPart
-CopyToken               = ":>"             !IdentifierPart
-TrueToken               = "true"  / "yes"  !IdentifierPart
-FalseToken              = "false" / "no"   !IdentifierPart
-EndToken "end of block" = "end"            !IdentifierPart
+SeparatorCommaToken     = ","                    !IdentifierPart
+StartToken              = AssignmentOperator     !IdentifierPart
+CopyToken               = CopyAssignmentOperator !IdentifierPart
+TrueToken               = "true"  / "yes"        !IdentifierPart
+FalseToken              = "false" / "no"         !IdentifierPart
+EndToken "end of block" = "end"                  !IdentifierPart
 
 Keyword
   = (
@@ -17,6 +18,12 @@ ReservedWord
   = Keyword
 
 /* Operators */
+
+AssignmentOperator
+  = ":"
+
+CopyAssignmentOperator
+  = ":>"
 
 PostfixOperator
   = "++"

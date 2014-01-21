@@ -11,30 +11,6 @@ IdentifierLetter
   = [a-zA-Z0-9\-\_\.\$\@\!\?\%\+\;]
   / WhiteSpace
 
-/* Experimental: todo! */
-line
-  = SAMEDENT line:(!EOS c:SourceElements { return c; })+ EOS?
-    children:( INDENT c:line* DEDENT { return c; })?
-    {
-      var o = {};
-      o[line] = children;
-      return children ? o : line.join('');
-    }
-
-SAMEDENT
-  = i:[ \t]* &{ return i.join('') === indent; }
-
-INDENT
-  = i:[ \t]+ &{ return i.length > indent.length; }
-    {
-      indentStack.push(indent);
-      indent = i.join('');
-      pos = offset;
-    }
-
-DEDENT
-  = { indent = indentStack.pop(); }
-
 ElementSeparator
   = EOS
   / ","
@@ -51,8 +27,6 @@ LineTerminatorSequence "end of line"
 
 EOF
   = !.
-
-/* Automatic Semicolon Insertion */
 
 EOS
   = _ LineTerminatorSequence
@@ -78,3 +52,30 @@ MultiLineCommentNoLineTerminator
 
 SingleLineComment
   = "#" (!LineTerminator SourceCharacter)*
+
+/* Experimental dent-based parsing, todo!
+
+LINE
+  = SAMEDENT LINE:(!EOS c:SourceElements { return c; })+ EOS?
+    children:( INDENT c:LINE* DEDENT { return c; })?
+    {
+      var o = {};
+      o[LINE] = children;
+      return children ? o : LINE.join('');
+    }
+
+SAMEDENT
+  = i:[ \t]* &{ return i.join('') === indent; }
+
+INDENT
+  = i:[ \t]+ &{ return i.length > indent.length; }
+    {
+      indentStack.push(indent);
+      indent = i.join('');
+      pos = offset;
+    }
+
+DEDENT
+  = { indent = indentStack.pop(); }
+
+*/

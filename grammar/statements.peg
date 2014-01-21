@@ -48,22 +48,22 @@ ValueBlockStatement
       });
     }
 
+// todo: pending create specific nested blocks support
+// support for list of elements comma separated
 BlockStatement
-  = id:IdentifierExpression __ StartToken
-      __
-      body:(
-          body:(id:IdentifierExpression __ StartToken __ value:PrimitiveValueExpression {
-            return astNode({
-              type: 'InnerBlockStatement',
-              id:   id,
-              body: value
-            })
+  = id:IdentifierExpression __ StartToken __
+    body:(
+        Comment
+      / body:(id:IdentifierExpression _ StartToken _ value:PrimitiveValueExpression+ {
+          return astNode({
+            type: 'InnerBlockStatement',
+            id:   id,
+            body: value
           })
-        / body:BlockStatement {
-          return body;
-        }
-      )+ __
-    EndToken {
+        })
+      / BlockStatement
+      / (LineTerminatorSequence? __ value:PrimitiveValueExpression __ { return value; })
+    )+ __ EndToken {
       return astNode({
         type:     "BlockStatement",
         id:       id,

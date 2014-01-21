@@ -11,10 +11,10 @@ PrimitiveValueExpression
   / ListExpression
 
 LiteralSequenceCharacters
-  = !":" !LineTerminator !"[" !"]" char:SingleStringCharacter { return char; }
+  = !(":" / "," / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
 
 UnquotedStringLiteral "unquoted string"
-  = !"-" !":" _ chars:LiteralSequenceCharacters+ _ &EndToken? {
+  = !("-" / ":") _ chars:LiteralSequenceCharacters+ _ &EndToken? {
     return astNode({
       type: 'StringLiteral',
       value: chars.join('')
@@ -77,7 +77,7 @@ MultiplicativeExpression
   = head:UnaryExpression
     tail:(__ MultiplicativeOperator __ UnaryExpression)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -92,7 +92,7 @@ AdditiveExpression
   = head:MultiplicativeExpression
     tail:(__ AdditiveOperator __ MultiplicativeExpression)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -107,7 +107,7 @@ ShiftExpression
   = head:AdditiveExpression
     tail:(__ AdditiveExpression)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -122,7 +122,7 @@ RelationalExpression
   = head:ShiftExpression
     tail:(__ RelationalOperator __ ShiftExpression)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -137,7 +137,7 @@ RelationalExpressionNoIn
   = head:ShiftExpression
     tail:(__ RelationalOperatorNoIn __ ShiftExpression)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -152,7 +152,7 @@ EqualityExpression
   = head:RelationalExpression
     tail:(__ EqualityOperator __ RelationalExpression)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -167,7 +167,7 @@ EqualityExpressionNoIn
   = head:RelationalExpressionNoIn
     tail:(__ EqualityOperator __ RelationalExpressionNoIn)* {
       var result = head;
-      for (var i = 0; i < tail.length; i++) {
+      for (var i = 0, l = tail.length; i < l; i++) {
         result = {
           type:     "BinaryExpression",
           operator: tail[i][1],
@@ -330,9 +330,9 @@ ListElementsExpressions
   / Statement
 
 ListElementExpression
-  = head:ListElementsExpressions tail:(__ ElementSeparator __ ListElementsExpressions)* {
+  = head:ListElementsExpressions tail:(__ ElementSeparator? __ ListElementsExpressions)* {
     var result = [ head ];
-    for (var i = 0; i < tail.length; i+=1) {
+    for (var i = 0, l = tail.length; i < l; i+=1) {
       result.push(tail[i][3]);
     }
     return result;
