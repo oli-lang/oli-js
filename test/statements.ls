@@ -148,7 +148,6 @@ describe 'Statements', ->
           end
         end
         '''
-        #inspect code
         expect node code, 'body.0.body.0.body.3.elements.4.value'
           .to.be.equal 'pretty'
 
@@ -172,6 +171,15 @@ describe 'Statements', ->
         expect node ast-obj, '2.body.0.value'
           .to.be.equal true
 
-      /* todo
+
       it 'first level primitives values', ->
-      */
+        ast-obj = ast '''
+        true
+        123.2313
+        'hello oli!'
+        '''
+        expect node ast-obj, '0.value'
+          .to.be.equal true
+        expect node ast-obj, '2.value'
+          .to.be.equal 'hello oli!'
+
