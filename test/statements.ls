@@ -7,6 +7,44 @@
 
 describe 'Statements', ->
 
+  describe 'primitives types', ->
+
+    describe 'string', (_) ->
+
+      it 'should parse "in line" as string', ->
+        expect node ast('"in line"'), 'value'
+          .to.be.equal 'in line'
+
+      it 'should parse "in\\nline" as multi-line string', ->
+        expect node ast('"in\nline"'), 'value'
+          .to.be.equal 'in\nline'
+
+    describe 'number', (_) ->
+
+      it 'should parse "12345" as number', ->
+        expect node ast('12345'), 'value'
+          .to.be.equal 12345
+
+      it 'should parse "12.345" as decimal number', ->
+        expect node ast('12.345'), 'value'
+          .to.be.equal 12.345
+
+    describe 'boolean', (_) ->
+
+      it 'should parse "yes" as boolean', ->
+        expect node ast('yes'), 'value'
+          .to.be.equal true
+
+      it 'should parse "false" as boolean false', ->
+        expect node ast('false'), 'value'
+          .to.be.equal false
+
+      it 'should parse "false\\ntrue" as both boolean values', ->
+        expect node ast('false\ntrue'), '0.value'
+          .to.be.equal false
+        expect node ast('false\ntrue'), '1.value'
+          .to.be.equal true
+
   describe 'block assignment', ->
 
     describe 'in-line', (_) ->
@@ -116,7 +154,7 @@ describe 'Statements', ->
 
 
     describe 'multi-statement', (_) ->
-
+      # todo: in-line value statement without end keyword block terminator support
       it 'should parse both first-level blocks', ->
         ast-obj = ast '''
         hello:
@@ -124,10 +162,16 @@ describe 'Statements', ->
           'string'
           yes
         end
-        another block: 'fantastic'
+        another block: 'fantastic' end
+        final block: yes
         '''
         expect node ast-obj, '0.body.1.value'
           .to.be.equal 'string'
         expect node ast-obj, '1.body.0.value'
           .to.be.equal 'fantastic'
+        expect node ast-obj, '2.body.0.value'
+          .to.be.equal true
 
+      /* todo
+      it 'first level primitives values', ->
+      */

@@ -40,7 +40,7 @@ CopyStatement
 ValueBlockStatement
   = id:IdentifierExpression __ StartToken
       _ !EOS _ body:(Statement+ / BlockElementsInLine) _
-    EOS {
+    (LineTerminatorSequence / EOS) {
       return astNode({
         type:     "ValueBlockStatement",
         id:       id,
@@ -62,7 +62,7 @@ BlockStatement
           })
         })
       / BlockStatement
-      / (LineTerminatorSequence? __ value:PrimitiveValueExpression __ { return value; })
+      / (__ value:PrimitiveValueExpression __ { return value; })
     )+ __ EndToken {
       return astNode({
         type:     "BlockStatement",
