@@ -1,4 +1,4 @@
-# oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-jsjs.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
+# oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
 
 > [Oli][1] language parser and compiler for node and the browser
 
@@ -131,6 +131,6 @@ Released under the MIT license
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/h2non/oli.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 [1]: https://github.com/oli-lang/oli
-[2]: http://travis-ci.org/oli-lang/oli.js
-[3]: https://gemnasium.com/oli-lang/oli.js
+[2]: http://travis-ci.org/oli-lang/oli-js
+[3]: https://gemnasium.com/oli-lang/oli-js
 [4]: http://badge.fury.io/js/oli
