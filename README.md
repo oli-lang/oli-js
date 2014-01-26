@@ -1,4 +1,4 @@
-# oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli.js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli.js.png)][3] [![NPM version](https://badge.fury.io/js/oli.js.png)][4]
+# oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-jsjs.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
 
 > [Oli][1] language parser and compiler for node and the browser
 
