@@ -10,14 +10,30 @@ PrimitiveValueExpression
   / StringLiteral
   / ListExpression
 
+UnquotedLiteralInLine
+  = UnquotedStringLiteral _ (EndToken / LineTerminatorSequence)?
+
 LiteralSequenceCharacters
+  = !(":" / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
+
+LiteralSequenceListCharacters
   = !(":" / "," / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
 
-UnquotedStringLiteral "unquoted string"
-  = !("-" / ":") _ chars:LiteralSequenceCharacters+ _ &EndToken? {
+UnquotedStringLiteral "unquoted literal"
+  = !("-" / ":") _ chars:LiteralSequenceCharacters+ _ (&EndToken / LineTerminatorSequence)? {
     return astNode({
       type: 'StringLiteral',
-      value: chars.join('')
+      value: chars.join(''),
+      raw: chars.join('')
+    })
+  }
+
+UnquotedStringListLiteral "unquoted literal"
+  = !("-" / ":") _ chars:LiteralSequenceListCharacters+ _ (&EndToken / LineTerminatorSequence)? {
+    return astNode({
+      type: 'StringLiteral',
+      value: chars.join(''),
+      raw: chars.join('')
     })
   }
 
@@ -231,7 +247,7 @@ IdentifierMergeExpression
   }
 
 IdentifierReferenceExpression
-  = "&" __ id:IdentifierLiteralExpression {
+  = ReferenceOperator __ id:IdentifierLiteralExpression {
     return astNode({
       type: 'IdentifierReferenceExpression',
       name: id
@@ -239,7 +255,7 @@ IdentifierReferenceExpression
   }
 
 IdentifierReferenceNegationExpression
-  = "!&" __ id:IdentifierLiteralExpression {
+  = LogicalNotOperator ReferenceOperator __ id:IdentifierLiteralExpression {
     return astNode({
       type:    'IdentifierReferenceNegationExpression',
       name:    id
@@ -326,7 +342,7 @@ IdentifierExpression
 
 ListElementsExpressions
   = PrimitiveValueExpression
-  / UnquotedStringLiteral
+  / UnquotedStringListLiteral
   / Statement
 
 ListElementExpression

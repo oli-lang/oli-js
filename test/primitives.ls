@@ -37,14 +37,23 @@ describe 'Primitive types', ->
   describe 'string', (_) ->
 
     it 'should parse "hello oli!" as string', ->
-      expect node ast('string: "hello oli!"'), 'body.0.value' .to.be.equal 'hello oli!'
+      expect node ast('"hello oli!"'), 'value' .to.be.equal 'hello oli!'
 
     it 'should parse "hello oli!" as string with single quotes', ->
-      expect node ast("string: 'hello oli!'"), 'body.0.value' .to.be.equal 'hello oli!'
+      expect node ast("'hello oli!'"), 'value' .to.be.equal 'hello oli!'
 
     it 'should parse "hello \'oli!" as string with escape character', ->
-      expect node ast("string: 'hello \\'oli!'"), 'body.0.value' .to.be.equal 'hello \'oli!'
+      expect node ast("'hello \\'oli!'"), 'value' .to.be.equal 'hello \'oli!'
 
     it 'should parse "hello, oli!" as unquoted string', ->
-      expect node ast('string: "hello, oli!"'), 'body.0.value' .to.be.equal 'hello, oli!'
+      expect node ast('"hello, oli!"'), 'value' .to.be.equal 'hello, oli!'
+
+    describe 'unquoted', (_) ->
+
+      it 'should parse "hello oli!" as unquoted string', ->
+        expect node ast('hello oli!'), 'value' .to.be.equal 'hello oli!'
+
+      it 'should parse "oli, sintax, is pretty!" as unquoted string', ->
+        expect node ast('oli, sintax, is pretty!'), 'value'
+          .to.be.equal 'oli, sintax, is pretty!'
 

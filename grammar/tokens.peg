@@ -25,6 +25,12 @@ AssignmentOperator
 CopyAssignmentOperator
   = ":>"
 
+ReferenceOperator
+  = "@"
+
+LogicalNotOperator
+  = "!"
+
 PostfixOperator
   = "++"
   / "--"
