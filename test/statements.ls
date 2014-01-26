@@ -21,28 +21,35 @@ describe 'Statements', ->
 
     describe 'number', (_) ->
 
-      it 'should parse "12345" as number', ->
-        expect node ast('12345'), 'value'
-          .to.be.equal 12345
+      it 'should parse "12" as numeric integer', ->
+        expect node ast('number: 12'), 'body.0.value' .to.be.equal 12
 
-      it 'should parse "12.345" as decimal number', ->
-        expect node ast('12.345'), 'value'
-          .to.be.equal 12.345
+      it 'should parse "+1234" as numeric possitive integer', ->
+        expect node ast('number: +1234'), 'body.0.value' .to.be.equal 1234
+
+      it 'should parse "-183" as numeric signed off integer', ->
+        expect node ast('number: -183'), 'body.0.value' .to.be.equal -183
+
+      it 'should parse as "99.123" number literal', ->
+        expect node ast('number: 99.123'), 'body.0.value' .to.be.equal 99.123
+
+      it 'should parse as "-99.123" as float signed off literal', ->
+        expect node ast('number: -99.123'), 'body.0.value' .to.be.equal -99.123
 
     describe 'boolean', (_) ->
 
-      it 'should parse "yes" as boolean', ->
-        expect node ast('yes'), 'value'
-          .to.be.equal true
+      it 'should parse "boolean: yes" as boolean literal', ->
+        expect node ast('boolean: yes'), 'body.0.value' .to.be.true
 
-      it 'should parse "false" as boolean false', ->
-        expect node ast('false'), 'value'
-          .to.be.equal false
+      it 'should parse "boolean: false" as boolean literal', ->
+        expect node ast('boolean: no'), 'body.0.value' .to.be.false
+        expect node ast('boolean: false'), 'body.0.value' .to.be.false
 
       it 'should parse "false\\ntrue" as both boolean values', ->
-        expect node ast('false\ntrue'), '0.value'
+        ast-tree = ast('false\ntrue')
+        expect node ast-tree, '0.value'
           .to.be.equal false
-        expect node ast('false\ntrue'), '1.value'
+        expect node ast-tree, '1.value'
           .to.be.equal true
 
   describe 'block assignment', ->
@@ -153,7 +160,6 @@ describe 'Statements', ->
 
 
     describe 'multi-statement', (_) ->
-      # todo: in-line value statement without end keyword block terminator support
       it 'should parse both first-level blocks', ->
         ast-obj = ast '''
         hello:

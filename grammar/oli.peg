@@ -1,6 +1,6 @@
 {
-  var indentStack = [];
-  var indent = "";
+  //var indentStack = [];
+  //var indent = "";
 
   function loc() {
     var start = offset();
