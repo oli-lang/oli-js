@@ -10,14 +10,11 @@ PrimitiveValueExpression
   / StringLiteral
   / ListExpression
 
-UnquotedLiteralInLine
-  = UnquotedStringLiteral _ (EndToken / LineTerminatorSequence)?
-
 LiteralSequenceCharacters
-  = !(":" / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
+  = !(":" / LineTerminator / EndToken / "[" / "]") char:SingleStringCharacter { return char; }
 
 LiteralSequenceListCharacters
-  = !(":" / "," / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
+  = !(":" / "," / EndToken / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
 
 UnquotedStringLiteral "unquoted literal"
   = !("-" / ":") _ chars:LiteralSequenceCharacters+ _ (&EndToken / LineTerminatorSequence)? {
@@ -29,7 +26,7 @@ UnquotedStringLiteral "unquoted literal"
   }
 
 UnquotedStringListLiteral "unquoted literal"
-  = !("-" / ":") _ chars:LiteralSequenceListCharacters+ _ (&EndToken / LineTerminatorSequence)? {
+  = !("-" / ":") _ chars:LiteralSequenceListCharacters+ _ &(EndToken / LineTerminatorSequence)? {
     return astNode({
       type: 'StringLiteral',
       value: chars.join(''),
@@ -302,7 +299,7 @@ IdentifierAttributesExpression
   }
 
 IdentifierExpression
-  = id:IdentifierNameExpression __ operation:IdentifierOperationExpression?
+  = !"-" _ id:IdentifierNameExpression __ operation:IdentifierOperationExpression?
     __ ref:IdentifierArrowExpression? __ attrs:IdentifierAttributesExpression? {
     var node;
     switch (id.type) {
@@ -341,9 +338,9 @@ IdentifierExpression
 /* List */
 
 ListElementsExpressions
-  = PrimitiveValueExpression
+  = Statement
+  / PrimitiveValueExpression
   / UnquotedStringListLiteral
-  / Statement
 
 ListElementExpression
   = head:ListElementsExpressions tail:(__ ElementSeparator? __ ListElementsExpressions)* {
@@ -355,8 +352,9 @@ ListElementExpression
   }
 
 ListExpression
-  = "-" __ elements:ListElementExpression
-  / "[" __ elements:ListElementExpression __ "]" {
+  = elements:(
+    "-" _ elements:ListElementExpression { return elements; }
+  / "[" __ elements:ListElementExpression __ "]" { return elements; }) {
     return astNode({
       type:  'ListExpression',
       elements: elements !== null ? elements : []

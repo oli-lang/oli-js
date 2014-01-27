@@ -12,7 +12,7 @@ IdentifierLetter
   / WhiteSpace
 
 ElementSeparator
-  = EOS
+  = EOSNoLineTerminator
   / ","
 
 LineTerminator
@@ -30,12 +30,11 @@ EOF
 
 EOS
   = _ LineTerminatorSequence
-  / __ &EndToken
-  / __ EOF
+  / _ EOF
+  / __ EndToken
 
 EOSNoLineTerminator
   = _ LineTerminatorSequence
-  / _ &EndToken
   / _ EOF
 
 /* Comments */

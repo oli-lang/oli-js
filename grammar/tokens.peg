@@ -25,6 +25,15 @@ AssignmentOperator
 CopyAssignmentOperator
   = ":>"
 
+ExtendOperator
+  = "->"
+
+MergeOperator
+  = "-->"
+
+CopyOperator
+  = "=>"
+
 ReferenceOperator
   = "@"
 

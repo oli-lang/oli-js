@@ -70,12 +70,10 @@ describe 'Statements', ->
             .to.be.equal 'oli!'
 
         it 'should parse "hello: yes end"', ->
-          expect node ast('hello: yes end'), 'body.0.value'
-            .to.be.equal true
+          expect node ast('hello: yes end'), 'body.0.value' .to.be.equal true
 
         it 'should parse "hello: 13.85 end"', ->
-          expect node ast('hello: 13.85 end'), 'body.0.value'
-            .to.be.equal 13.85
+          expect node ast('hello: 13.85 end'), 'body.0.value' .to.be.equal 13.85
 
         it 'should parse "hello: [ 1, 2 ] end"', ->
           expect node ast('hello: [ 1, 2 ] end'), 'body.0.elements.0.value'
@@ -169,31 +167,55 @@ describe 'Statements', ->
 
       describe 'multi-statement', (_) ->
 
-        it 'should parse both first-level blocks', ->
+        it 'first level primitives types', ->
+          ast-obj = ast '''
+          true no
+          123.2313
+          'hello oli!'
+          string literal
+          [ 1, 2, 'hello' ]
+          '''
+          expect node ast-obj, '0.value' .to.be.equal true
+          expect node ast-obj, '1.value' .to.be.equal false
+          expect node ast-obj, '3.value' .to.be.equal 'hello oli!'
+          expect node ast-obj, '4.value' .to.be.equal 'string literal'
+          expect node ast-obj, '5.elements.2.value' .to.be.equal 'hello'
+
+        it 'should parse first-level expressions', ->
           ast-obj = ast '''
           hello:
             world: true
             'string'
             yes
           end
-          another block: 'fantastic' end
+          another block: 'cool'
           final block: yes
+          list: [
+            test: hi
+          ]
           '''
-          expect node ast-obj, '0.body.1.value'
-            .to.be.equal 'string'
-          expect node ast-obj, '1.body.0.value'
-            .to.be.equal 'fantastic'
-          expect node ast-obj, '2.body.0.value'
-            .to.be.equal true
+          expect node ast-obj, '0.body.1.value' .to.be.equal 'string'
+          expect node ast-obj, '1.body.0.value' .to.be.equal 'cool'
+          expect node ast-obj, '2.body.0.value' .to.be.equal true
 
-        it 'first level primitives values', ->
+        it 'should parse multiple mixed types statements', ->
           ast-obj = ast '''
-          true
-          123.2313
-          'hello oli!'
+          hello:
+            using: true
+            'string'
+            yes
+          end
+          this: is: a: nested: block: hello!
+          final block: yes
+          no
+          123.41
+          love it: yes
           '''
-          expect node ast-obj, '0.value'
-            .to.be.equal true
-          expect node ast-obj, '2.value'
-            .to.be.equal 'hello oli!'
+          expect node ast-obj, '0.body.1.value' .to.be.equal 'string'
+          expect node ast-obj, '2.body.0.value' .to.be.equal true
+          expect node ast-obj, '3.value' .to.be.equal false
+          expect node ast-obj, '4.value' .to.be.equal 123.41
+          expect node ast-obj, '1.body.0.body.0.body.0.body.0.body.0.value' .to.be.equal 'hello!'
+          expect node ast-obj, '5.body.0.value' .to.be.equal true
+
 

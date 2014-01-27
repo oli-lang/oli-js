@@ -6,7 +6,7 @@
 
 <table>
 <tr>
-<td>Supported language version</td><td>0.1</td>
+<td>Oli spec version</td><td>0.1</td>
 </tr>
 </table>
 
@@ -25,9 +25,9 @@ For the browser
 ```
 $ bower install oli
 ```
-Or add the script tag
+Or load the script remotely
 ```html
-<script src="//raw.github.com/oli-lang/oli.js/master/dist/oli.js"></script>
+<script src="//raw.github.com/oli-lang/oli-js/master/oli.js"></script>
 ```
 ## Milestones
 
@@ -63,6 +63,9 @@ console.log(json)
 #### parse(code)
 
 #### ast(code [, options])
+
+The most low-level API method.
+It returns an object that represent the parsed abstract-syntax tree
 
 #### tokens(code [, options])
 

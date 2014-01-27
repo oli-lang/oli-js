@@ -7,6 +7,52 @@
 
 describe 'Expressions', ->
 
+  describe 'lists', ->
+
+    describe 'brackets expression', (_) ->
+
+      it 'should parse a list of numbers', ->
+        expect node ast('[ 1, 2, 3 ]'), 'elements.1.value' .to.be.equal 2
+        expect node ast('[ 1, 2, 3 ]'), 'elements.2.value' .to.be.equal 3
+
+      it 'should parse a list of strings', ->
+        expect node ast('[ hello oli!, it is, "cool" ]'), 'elements.0.value'
+          .to.be.equal 'hello oli!'
+        expect node ast('[ hello oli!, it is, "cool" ]'), 'elements.2.value'
+          .to.be.equal 'cool'
+
+      it 'should parse a list of booleans', ->
+        expect node ast('[ yes, true, no ]'), 'elements.2.value'
+          .to.be.equal false
+
+      it 'should parse a list with inner blocks', ->
+        ast-obj = ast '''[
+          pretty: yes
+          oli: rules!
+        ]'''
+        expect node ast-obj, 'elements.1.body.0.value'
+          .to.be.equal 'rules!'
+
+    describe 'dash expression', (_) ->
+
+      it 'should parse a list of numbers', ->
+        expect node ast('- 1, 2, 3'), 'elements.1.value' .to.be.equal 2
+        expect node ast('- 1, 2, 3'), 'elements.2.value' .to.be.equal 3
+
+      it 'should parse a list of strings', ->
+        expect node ast('- hello oli!, it is, "cool"'), 'elements.0.value'
+          .to.be.equal 'hello oli!'
+        expect node ast('- hello oli!, it is, "cool"'), 'elements.2.value'
+          .to.be.equal 'cool'
+
+      it 'should parse a list of booleans', ->
+        expect node ast('- yes, true, no'), 'elements.2.value'
+          .to.be.equal false
+
+      it 'should parse a list of booleans', ->
+        expect node ast('- hello: world'), 'elements.0.body.0.value'
+          .to.be.equal 'world'
+
   describe 'identifier declaration', ->
 
     describe 'name', (_) ->

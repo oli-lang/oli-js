@@ -6,16 +6,6 @@ Statement
   / ValueBlockStatement
   / BlockStatement
 
-BlockElements
-  = element:BlockElement __ ElementSeparator {
-    return element;
-  }
-
-BlockElementsInLine
-  = element:BlockElement _ ElementSeparator {
-    return element;
-  }
-
 BlockElement
   = head:ListElementsExpressions value:(__ ElementSeparator?
    __ value:ListElementsExpressions { return value; })* {
@@ -38,13 +28,14 @@ CopyStatement
     }
 
 ValueBlockStatement
-  = id:IdentifierExpression __ StartToken
-      _ !EOS _ body:(Statement+ / BlockElementsInLine) _
-    (LineTerminatorSequence / EOS) {
+  = id:IdentifierExpression _ StartToken
+      _ body:(Statement / body:(PrimitiveValueExpression / UnquotedStringListLiteral) _
+    EOS { return body; }) {
       return astNode({
         type:     "ValueBlockStatement",
         id:       id,
-        body:     body !== null ? body : []
+        body:     body !== null ?
+          (Array.isArray(body) ? body : [ body ]) : []
       });
     }
 
