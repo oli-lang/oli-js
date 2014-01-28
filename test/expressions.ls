@@ -62,12 +62,8 @@ describe 'Expressions', ->
       it 'should ignore the comment on parsing', ->
         expect ast('# this is a comment!').body .to.have.length 0
 
-      it 'should not parse the first level comment', ->
-        expect node ast('hello: world # a comment!'), 'body.0.value'
-          .to.be.equal 'world'
-
-      it 'should not parse the first level comment', ->
-        expect node ast('- hello: world # a comment!'), 'elements.0.body.0.value'
+      it 'should not parse the interpolated comment', ->
+        expect node ast('hello: world # comment!'), 'body.0.value'
           .to.be.equal 'world'
 
     describe 'multi-line', (_) ->
@@ -79,6 +75,10 @@ describe 'Expressions', ->
         expect ast('''##
           this is a comment!
         ##''').body .to.have.length 0
+
+      it 'should not parse the first level comment', ->
+        expect node ast('hello: world ## comment! ##'), 'body.0.value'
+          .to.be.equal 'world'
 
   describe 'identifier declaration', ->
 
