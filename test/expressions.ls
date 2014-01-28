@@ -62,9 +62,25 @@ describe 'Expressions', ->
       it 'should ignore the comment on parsing', ->
         expect ast('# this is a comment!').body .to.have.length 0
 
-      it 'should not parse the interpolated comment', ->
+      it 'should parse properly with a the interpolated comment', ->
         expect node ast('hello: world # comment!'), 'body.0.value'
           .to.be.equal 'world'
+
+      it 'should parse properly with higher comment', ->
+        ast-obj = ast('''
+          # comment!
+          oli!
+        ''')
+        expect node ast-obj, 'value' .to.be.equal 'oli!'
+
+      it 'should parse block with interpolated comment', ->
+        ast-obj = ast '''
+          hello:
+            # comment!
+            world: using: oli # another comment
+          end
+        '''
+        expect node ast-obj, 'body.0.body.0.body.0.value' .to.be.equal 'oli'
 
     describe 'multi-line', (_) ->
 
@@ -100,13 +116,21 @@ describe 'Expressions', ->
         expect node ast('hello oli: "hola"'), 'id.name'
           .to.be.equal 'hello oli'
 
-      it 'should parse "hello  world  oli" as reference identifier ', ->
-        expect node ast('hello  world  oli: "hola"'), 'id.name'
-          .to.be.equal 'hello  world  oli'
+      it 'should parse "hello - world . oli" as reference identifier ', ->
+        expect node ast('hello - world . oli: "hola"'), 'id.name'
+          .to.be.equal 'hello - world . oli'
 
-      it 'should parse "\'hello  world  oli\'" as reference identifier ', ->
-        expect node ast('"hello  world  oli": "hola"'), 'id.name'
-          .to.be.equal 'hello  world  oli'
+      it 'should parse "{hello world oli}" as reference identifier ', ->
+        expect node ast('{hello world oli}: "hola"'), 'id.name'
+          .to.be.equal 'hello world oli'
+
+      it 'should parse "{\'hello world oli\'}" as reference identifier ', ->
+        expect node ast('{hello world oli}: "hola"'), 'id.name'
+          .to.be.equal 'hello world oli'
+
+      it 'should parse "\'hello world oli\'" as reference identifier ', ->
+        expect node ast('"hello world oli": "hola"'), 'id.name'
+          .to.be.equal 'hello world oli'
 
     describe 'reference alias', (_) ->
 
@@ -116,6 +140,10 @@ describe 'Expressions', ->
 
       it 'should parse "oli rules" as reference identifier', ->
         expect node ast('hello > oli rules: "hola"'), 'id.reference.name'
+          .to.be.equal 'oli rules'
+
+      it 'should parse "{oli rules}" as reference identifier', ->
+        expect node ast('hello > {oli rules}: "hola"'), 'id.reference.name'
           .to.be.equal 'oli rules'
 
       it 'should parse "\'oli rules\'" as reference identifier', ->

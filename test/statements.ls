@@ -162,6 +162,7 @@ describe 'Statements', ->
             end
           end
           '''
+          inspect code
           expect node code, 'body.0.body.0.body.3.elements.4.value'
             .to.be.equal 'pretty'
 

@@ -67,12 +67,14 @@ console.log(json)
 The most low-level API method.
 It returns an object that represent the parsed abstract-syntax tree
 
+#### compile(ast)
+
 #### tokens(code [, options])
 
 #### stringify(object)
 
 #### serialize(object)
-
+Alias to `stringify()` method
 
 ## Contributing
 
