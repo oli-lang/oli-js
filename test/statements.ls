@@ -8,6 +8,7 @@
 describe 'Statements', ->
 
   describe 'blocks', ->
+
     describe 'primitives types', ->
 
       describe 'string', (_) ->
@@ -61,7 +62,7 @@ describe 'Statements', ->
           expect node ast-tree, '0.value' .to.be.equal false
           expect node ast-tree, '1.value' .to.be.equal true
 
-    describe 'block assignment', ->
+    describe 'assignment', ->
 
       describe 'in-line', (_) ->
 
@@ -76,8 +77,7 @@ describe 'Statements', ->
           expect node ast('hello: 13.85 end'), 'body.0.value' .to.be.equal 13.85
 
         it 'should parse "hello: [ 1, 2 ] end"', ->
-          expect node ast('hello: [ 1, 2 ] end'), 'body.0.elements.0.value'
-            .to.be.equal 1
+          expect node ast('hello: [ 1, 2 ] end'), 'body.0.elements.0.value' .to.be.equal 1
 
       describe 'nested', (_) ->
 
@@ -95,8 +95,7 @@ describe 'Statements', ->
             end
           end
           '''
-          expect node code, 'body.0.body.0.body.0.body.0.value'
-            .to.be.equal 'this is oli!'
+          expect node code, 'body.0.body.0.body.0.body.0.value' .to.be.equal 'this is oli!'
 
         it 'should parse a nested block statements of strings', ->
           code = ast '''
@@ -110,8 +109,7 @@ describe 'Statements', ->
             end
           end
           '''
-          expect node code, 'body.0.body.0.body.2.value'
-            .to.be.equal 'looks nice!'
+          expect node code, 'body.0.body.0.body.2.value' .to.be.equal 'looks nice!'
 
         it 'should parse a nested block statements of numbers', ->
           code = ast '''
@@ -125,8 +123,7 @@ describe 'Statements', ->
             end
           end
           '''
-          expect node code, 'body.0.body.0.body.2.value'
-            .to.be.equal -3
+          expect node code, 'body.0.body.0.body.2.value' .to.be.equal -3
 
         it 'should parse a nested block statements of boolean', ->
           code = ast '''
@@ -141,8 +138,7 @@ describe 'Statements', ->
             end
           end
           '''
-          expect node code, 'body.0.body.0.body.3.value'
-            .to.be.equal false
+          expect node code, 'body.0.body.0.body.3.value' .to.be.equal false
 
         it 'should parse a nested block of mix types and separators', ->
           code = ast '''
@@ -162,7 +158,6 @@ describe 'Statements', ->
             end
           end
           '''
-          inspect code
           expect node code, 'body.0.body.0.body.3.elements.4.value'
             .to.be.equal 'pretty'
 

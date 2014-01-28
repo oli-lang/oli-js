@@ -45,8 +45,8 @@ Program
     }
 
 SourceElements
-  = head:(Statement / PrimitiveValueExpression / UnquotedStringLiteral)
-    tail:(__ (Statement / PrimitiveValueExpression / UnquotedStringLiteral))* {
+  = head:Statement
+    tail:(__ Statement)* {
       var result = [ head ];
       for (var i = 0, l = tail.length; i < l; i += 1) {
         result.push(tail[i][1]);

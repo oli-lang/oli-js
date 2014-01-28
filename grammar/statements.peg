@@ -1,16 +1,28 @@
 /* Statements */
 
-Statement
+PrimitiveTypeStatement
+  = PrimitiveValueExpression
+  / UnquotedStringLiteral
+
+MainStatement
   = Comment
   / CopyStatement
   / ValueBlockStatement
   / BlockStatement
 
+Statement
+  = MainStatement
+  / PrimitiveTypeStatement
+
 StatementList
   = Statement
   / PrimitiveValueExpression
-  / UnquotedStringListLiteral
   / UnquotedStringLiteral
+
+ListElementStatement
+  = MainStatement
+  / PrimitiveValueExpression
+  / UnquotedStringListLiteral
 
 BlockStatementList
   = head:StatementList tail:(__ ElementSeparator? __ StatementList)* {
@@ -21,20 +33,19 @@ BlockStatementList
     return result;
   }
 
-BlockElement
-  = head:BlockStatementList tail:(__ ElementSeparator?
-   __ value:BlockStatementList { return value; })* {
-      var result = [ head ];
-      for (var i = 0, l = tail.length; i < l; i+=1) {
-        result.push(tail[i]);
-      }
-      return result;
+ListBlockStatement
+  = head:ListElementStatement tail:(__ ElementSeparator? __ ListElementStatement)* {
+    var result = [ head ];
+    for (var i = 0, l = tail.length; i < l; i+=1) {
+      result.push(tail[i][3]);
     }
+    return result;
+  }
 
 CopyStatement
   = id:IdentifierExpression __ CopyToken
       __ source:IdentifierExpression __
-    __ (EndToken / EOS) {
+    __ EOS {
       return astNode({
         type:     "CopyStatement",
         id:       id,
@@ -45,8 +56,7 @@ CopyStatement
 ValueBlockStatement
   = id:IdentifierExpression _ StartToken
       _ !LineTerminatorSequence
-      _ body:(Statement / body:(PrimitiveValueExpression / UnquotedStringListLiteral) _
-      EOS { return body; }) {
+      _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; }) {
       return astNode({
         type:     "ValueBlockStatement",
         id:       id,
