@@ -1,5 +1,7 @@
 /* Language Tokens */
 
+CommentToken            = "#"
+MultiLineCommentToken   = CommentToken CommentToken
 SeparatorCommaToken     = ","                    !IdentifierPart
 StartToken              = AssignmentOperator     !IdentifierPart
 CopyToken               = CopyAssignmentOperator !IdentifierPart
@@ -26,10 +28,10 @@ CopyAssignmentOperator
   = ":>"
 
 ExtendOperator
-  = "->"
+  = ">>"
 
 MergeOperator
-  = "-->"
+  = ">>>"
 
 CopyOperator
   = "=>"

@@ -39,8 +39,8 @@ ValueBlockStatement
       });
     }
 
-// todo: pending create specific nested blocks support
-// support for list of elements comma separated
+// todo: pending create specific nested blocks
+// with support for list of elements comma separated
 BlockStatement
   = id:IdentifierExpression __ StartToken __
     body:(

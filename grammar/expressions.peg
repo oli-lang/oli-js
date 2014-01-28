@@ -11,16 +11,16 @@ PrimitiveValueExpression
   / ListExpression
 
 LiteralSequenceCharacters
-  = !(":" / LineTerminator / EndToken / "[" / "]") char:SingleStringCharacter { return char; }
+  = !(":" / LineTerminator / CommentToken / EndToken / "[" / "]") char:SingleStringCharacter { return char; }
 
 LiteralSequenceListCharacters
-  = !(":" / "," / EndToken / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
+  = !(":" / "," / EndToken / CommentToken / LineTerminator / "[" / "]") char:SingleStringCharacter { return char; }
 
 UnquotedStringLiteral "unquoted literal"
   = !("-" / ":") _ chars:LiteralSequenceCharacters+ _ (&EndToken / LineTerminatorSequence)? {
     return astNode({
       type: 'StringLiteral',
-      value: chars.join(''),
+      value: chars.join('').trim(),
       raw: chars.join('')
     })
   }
@@ -29,7 +29,7 @@ UnquotedStringListLiteral "unquoted literal"
   = !("-" / ":") _ chars:LiteralSequenceListCharacters+ _ &(EndToken / LineTerminatorSequence)? {
     return astNode({
       type: 'StringLiteral',
-      value: chars.join(''),
+      value: chars.join('').trim(),
       raw: chars.join('')
     })
   }
@@ -228,7 +228,7 @@ IdentifierArrowNegationReferenceExpression
   }
 
 IdentifierCloneExpression
-  = ">>" __ id:IdentifierLiteralExpression {
+  = ExtendOperator __ id:IdentifierLiteralExpression {
     return astNode({
       type:   'IdentifierCloneExpression',
       name:   id
@@ -236,7 +236,7 @@ IdentifierCloneExpression
   }
 
 IdentifierMergeExpression
-  = ">>>" __ id:IdentifierLiteralExpression {
+  = MergeOperator __ id:IdentifierLiteralExpression {
     return astNode({
       type:   'IdentifierMergeExpression',
       name:   id

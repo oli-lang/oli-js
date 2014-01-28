@@ -9,7 +9,7 @@ describe 'Expressions', ->
 
   describe 'lists', ->
 
-    describe 'brackets expression', (_) ->
+    describe 'brackets', (_) ->
 
       it 'should parse a list of numbers', ->
         expect node ast('[ 1, 2, 3 ]'), 'elements.1.value' .to.be.equal 2
@@ -30,10 +30,12 @@ describe 'Expressions', ->
           pretty: yes
           oli: rules!
         ]'''
+        expect node ast-obj, 'elements.0.body.0.value'
+          .to.be.equal true
         expect node ast-obj, 'elements.1.body.0.value'
           .to.be.equal 'rules!'
 
-    describe 'dash expression', (_) ->
+    describe 'dash', (_) ->
 
       it 'should parse a list of numbers', ->
         expect node ast('- 1, 2, 3'), 'elements.1.value' .to.be.equal 2
@@ -52,6 +54,31 @@ describe 'Expressions', ->
       it 'should parse a list of booleans', ->
         expect node ast('- hello: world'), 'elements.0.body.0.value'
           .to.be.equal 'world'
+
+  describe 'comments', ->
+
+    describe 'in-line', (_) ->
+
+      it 'should ignore the comment on parsing', ->
+        expect ast('# this is a comment!').body .to.have.length 0
+
+      it 'should not parse the first level comment', ->
+        expect node ast('hello: world # a comment!'), 'body.0.value'
+          .to.be.equal 'world'
+
+      it 'should not parse the first level comment', ->
+        expect node ast('- hello: world # a comment!'), 'elements.0.body.0.value'
+          .to.be.equal 'world'
+
+    describe 'multi-line', (_) ->
+
+      it 'should ignore the in-line comment on parsing', ->
+        expect ast('## this is a comment! ##').body .to.have.length 0
+
+      it 'should ignore the comment on parsing', ->
+        expect ast('''##
+          this is a comment!
+        ##''').body .to.have.length 0
 
   describe 'identifier declaration', ->
 
