@@ -38,15 +38,17 @@ describe 'Primitive types', ->
 
     it 'should parse "hello oli!" as string', ->
       expect node ast('"hello oli!"'), 'value' .to.be.equal 'hello oli!'
+      expect node ast('"hello oli!"'), 'template' .to.be.true
 
     it 'should parse "hello oli!" as string with single quotes', ->
       expect node ast("'hello oli!'"), 'value' .to.be.equal 'hello oli!'
+      expect node ast("'\"hello oli!\"'"), 'template' .to.be.false
 
     it 'should parse "hello \'oli!" as string with escape character', ->
       expect node ast("'hello \\'oli!'"), 'value' .to.be.equal 'hello \'oli!'
 
     it 'should parse "hello, oli!" as unquoted string', ->
-      expect node ast('"hello, oli!"'), 'value' .to.be.equal 'hello, oli!'
+      expect node ast('hello, oli!'), 'value' .to.be.equal 'hello, oli!'
 
     describe 'unquoted', (_) ->
 

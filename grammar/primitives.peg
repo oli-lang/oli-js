@@ -67,7 +67,8 @@ StringLiteral "quoted string"
       return astNode({
         type:  'StringLiteral',
         value: parts[1],
-        raw:   parts.join('')
+        raw:   parts.join(''),
+        template: parts[0] === '"'
       });
     }
 
@@ -78,6 +79,7 @@ SingleStringCharacters
   = chars:SingleStringCharacter+ { return chars.join(""); }
 
 /* LineTerminator */
+
 DoubleStringCharacter
   = !('"' / "\\") char_:SourceCharacter { return char_;     }
   / "\\" sequence:EscapeSequence                         { return sequence;  }

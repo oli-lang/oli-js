@@ -60,12 +60,16 @@ var json = oli.parse('message: hello, oli!')
 console.log(json)
 ```
 
-#### parse(code)
+#### parse(code [, options])
+Alias: `eval`
 
 #### ast(code [, options])
 
-The most low-level API method.
+This is the most low-level API method.
 It returns an object that represent the parsed abstract-syntax tree
+
+**Note**: AST nodes types or inner data structures can change between minor versions, as the parser is still beta.
+Please, be aware with that in order to prevent possible inconsistencies if your implementation is coupled to the parsed AST
 
 #### compile(ast)
 

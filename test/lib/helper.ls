@@ -23,6 +23,7 @@ module.exports =
   oli: oli
   ast: oli.ast
   parse: oli.parse
+  tokens: oli.tokens
   generate-parser: oli.generate-parser
   oli-bin: oli-bin
 

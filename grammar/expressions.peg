@@ -6,6 +6,7 @@ __
 
 PrimitiveValueExpression
   = BooleanLiteral
+  / ReferenceExpression
   / NumberLiteral
   / StringLiteral
   / ListExpression
@@ -24,7 +25,8 @@ UnquotedStringLiteral "unquoted literal"
     return astNode({
       type: 'StringLiteral',
       value: chars.join('').trim(),
-      raw: chars.join('')
+      raw: chars.join(''),
+      template: true
     })
   }
 
@@ -33,17 +35,28 @@ UnquotedStringListLiteral "unquoted literal"
     return astNode({
       type: 'StringLiteral',
       value: chars.join('').trim(),
-      raw: chars.join('')
+      raw: chars.join(''),
+      template: true
     })
   }
 
 IdentifierWord
-  = letters:IdentifierLetter+ {
+  = !LiteralReservedTokens letters:(IdentifierLetter / WhiteSpace)+ {
     return letters.join("");
   }
 
 Identifier "identifier"
   = !ReservedWord name:IdentifierWord {
+    return astNode({
+      type: 'Identifier',
+      name: name
+    });
+  }
+
+ReferenceIdentifier "reference"
+  = !ReservedWord name:(!LiteralReservedTokens letters:IdentifierLetter+ {
+    return letters.join("");
+  }) {
     return astNode({
       type: 'Identifier',
       name: name
@@ -58,7 +71,6 @@ IdentifierCharacter
 
 IdentifierStart
   = UnicodeLetter
-  / "$"
   / "_"
   / "\\" sequence:UnicodeEscapeSequence { return sequence; }
 
@@ -194,13 +206,34 @@ EqualityExpressionNoIn
       return result;
     }
 
+/* Value reference */
+
+ReferenceLiteralExpression
+  = id:StringLiteral {
+      return id.value;
+    }
+  / "{" __ id:(ReferenceIdentifier / StringLiteral)__ "}" {
+      return id.value ? id.value : id.name.trim();
+    }
+  / id:ReferenceIdentifier {
+      return id.name.trim();
+    }
+
+ReferenceExpression
+  = ReferenceOperator id:ReferenceLiteralExpression {
+    return astNode({
+      type: 'ReferenceExpression',
+      name: id
+    })
+  }
+
 /* Indentifier */
 
 IdentifierLiteralExpression
   = id:StringLiteral {
       return id.value;
     }
-  / id:"{" __ id:(Identifier / StringLiteral)__ "}" {
+  / "{" __ id:(Identifier / StringLiteral)__ "}" {
       return id.value ? id.value : id.name.trim();
     }
   / id:Identifier {
@@ -220,8 +253,8 @@ IdentifierArrowReferenceExpression
   = ">" __ id:IdentifierLiteralExpression {
     return astNode({
       // type as using "&"
-      type:   'IdentifierReferenceExpression',
-      name:   id
+      type: 'IdentifierReferenceExpression',
+      name: id
     })
   }
 
@@ -250,7 +283,7 @@ IdentifierMergeExpression
   }
 
 IdentifierReferenceExpression
-  = ReferenceOperator __ id:IdentifierLiteralExpression {
+  = AnchorOperator __ id:IdentifierLiteralExpression {
     return astNode({
       type: 'IdentifierReferenceExpression',
       name: id
@@ -258,7 +291,7 @@ IdentifierReferenceExpression
   }
 
 IdentifierReferenceNegationExpression
-  = LogicalNotOperator ReferenceOperator __ id:IdentifierLiteralExpression {
+  = LogicalNotOperator AnchorOperator __ id:IdentifierLiteralExpression {
     return astNode({
       type:    'IdentifierReferenceNegationExpression',
       name:    id
@@ -283,7 +316,8 @@ AttributeAssignmentExpression
         node.right = {
           type:  value.type || 'StringLiteral',
           value: value.value || value,
-          raw:   value.raw || (typeof value !== 'object' ? value : null)
+          raw:   value.raw || (typeof value !== 'object' ? value : null),
+          template: value.template
         };
       }
     }

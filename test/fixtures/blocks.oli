@@ -1,0 +1,70 @@
+#
+# This is a comment!
+#
+
+##
+  And this is a multi-line comment
+##
+
+value.amazing > ups >> pepe: jajaja
+value: pe: pe
+!&pepe: hola # comment
+multi-line: "ajajaja, \' @$
+ajajaj#"
+
+list: [
+  yes,
+  awesome,
+  language,
+  jajaja: hola,
+  12.042,
+  [ # comment
+    yes, no,
+    ##
+      inner mult-line comment
+    ##
+    [ amazing, 23.1232 ## and here ## ]
+  ]
+]
+
+# this is a value
+#value 'jajaja': test awesome !!! ajajaja # pepepe
+
+##
+in.line:
+  test: 'oli rules'
+end
+
+deploy > zeus:
+  !&server: 'http://zeus.server.com' # strings can be quoted
+  port: 9000 # number as primitive value
+  retry: yes
+  # nested block
+  authentication:
+    # lists can be implicit
+    # you can separate elements by commas or EOL
+    tokens:
+      0cc175b9c0f1b6a8, 31c399e269772661
+      693a9fdd4c2fd070
+    end
+  end
+end
+
+# with commas you can create lists
+message: Hello, World!
+
+task (my-task):
+  run 'sub-task':
+    run:
+      test: this is a name
+    end
+  end
+end
+##
+
+##
+run
+  this is amazing -c 'asdas'
+  Super happy
+end
+##

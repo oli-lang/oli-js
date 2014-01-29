@@ -36,8 +36,14 @@ MergeOperator
 CopyOperator
   = "=>"
 
+ValueAssigmentOperator
+  = "="
+
 ReferenceOperator
-  = "@"
+  = "*"
+
+AnchorOperator
+  = "&"
 
 LogicalNotOperator
   = "!"

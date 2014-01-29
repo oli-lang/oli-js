@@ -153,7 +153,7 @@ describe 'Statements', ->
                   oh, yes
                 ]
                 'amazing pepe' 'another string'
-                @value: [ 1, 2 ]
+                value: [ 1, 2 ]
               end
             end
           end

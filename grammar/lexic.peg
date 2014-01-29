@@ -8,8 +8,7 @@ WhiteSpace "whitespace"
   / Zs
 
 IdentifierLetter
-  = [a-zA-Z0-9\-\_\.\$\@\!\?\%\+\;]
-  / WhiteSpace
+  = [a-zA-Z0-9\-\\/\\\_\^\|\º\¨\ç\¡\¿\.\$\@\!\?\%\+\;]
 
 ElementSeparator
   = EOSNoLineTerminator

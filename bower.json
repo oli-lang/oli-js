@@ -1,6 +1,6 @@
 {
   "name": "oli",
-  "description": "Oli language parser for the browser",
+  "description": "Oli language parser",
   "version": "0.1.0",
   "license": "MIT",
   "author": {

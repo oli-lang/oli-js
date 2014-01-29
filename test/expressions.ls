@@ -7,7 +7,24 @@
 
 describe 'Expressions', ->
 
-  describe 'lists', ->
+  describe 'reference', (_) ->
+
+    it 'should parse "*value" as reference expression', ->
+      expect node ast('*value'), 'name' .to.be.equal 'value'
+
+    it 'should parse "*{value}" as reference expression', ->
+      expect node ast('*{value}'), 'name' .to.be.equal 'value'
+
+    it 'should parse "*\'value\'" as reference expression', ->
+      expect node ast('*"value"'), 'name' .to.be.equal 'value'
+
+    it 'should parse "*value ref" as reference expression', ->
+      expect node ast('*value ref'), '0.name' .to.be.equal 'value'
+
+    it 'should parse "block: *value" as reference expression', ->
+      expect node ast('block: *value'), 'body.0.name' .to.be.equal 'value'
+
+  describe 'list', ->
 
     describe 'brackets', (_) ->
 
@@ -162,26 +179,26 @@ describe 'Expressions', ->
 
     describe 'reference alias with ampersand', (_) ->
 
-      it 'should parse "@oli" as reference identifier', ->
-        expect node ast('@oli: "hola"'), 'id.reference.name'
+      it 'should parse "&oli" as reference identifier', ->
+        expect node ast('&oli: "hola"'), 'id.reference.name'
           .to.be.equal 'oli'
 
-      it 'should parse "@hello oli" as reference identifier', ->
-        expect node ast('@hello oli: "hola"'), 'id.reference.name'
+      it 'should parse "&hello oli" as reference identifier', ->
+        expect node ast('&hello oli: "hola"'), 'id.reference.name'
           .to.be.equal 'hello oli'
 
-      it 'should parse "@\'hello oli\'" as reference identifier', ->
-        expect node ast('@"hello oli": "hola"'), 'id.reference.name'
+      it 'should parse "&\'hello oli\'" as reference identifier', ->
+        expect node ast('&"hello oli": "hola"'), 'id.reference.name'
           .to.be.equal 'hello oli'
 
       describe 'negation', (_) ->
 
-        it 'should parse "!@hello oli" as reference identifier', ->
-          expect node ast('!@hello oli: "hola"'), 'id.reference.name'
+        it 'should parse "!&hello oli" as reference identifier', ->
+          expect node ast('!&hello oli: "hola"'), 'id.reference.name'
             .to.be.equal 'hello oli'
 
-        it 'should parse "!@\'hello oli\'" as reference identifier', ->
-          expect node ast('!@"hello oli": "hola"'), 'id.reference.name'
+        it 'should parse "!&\'hello oli\'" as reference identifier', ->
+          expect node ast('!&"hello oli": "hola"'), 'id.reference.name'
             .to.be.equal 'hello oli'
 
     describe 'clone', (_) ->
@@ -231,7 +248,7 @@ describe 'Expressions', ->
           .to.be.equal 'rules'
 
       it 'should parse "oli" as clone identifier', ->
-        expect node ast('@oli >>> rules > say: "hola"'), 'id.reference.name'
+        expect node ast('&oli >>> rules > say: "hola"'), 'id.reference.name'
           .to.be.equal 'oli'
 
   describe 'copy declaration', (_) ->
