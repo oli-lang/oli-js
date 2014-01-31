@@ -6,7 +6,6 @@ PrimitiveTypeStatement
 
 MainStatement
   = Comment
-  / CopyStatement
   / ValueBlockStatement
   / BlockStatement
 
@@ -24,13 +23,11 @@ ListElementStatement
   / PrimitiveValueExpression
   / UnquotedStringListLiteral
 
-BlockStatementList
-  = head:StatementList tail:(__ ElementSeparator? __ StatementList)* {
-    var result = [ head ];
-    for (var i = 0, l = tail.length; i < l; i+=1) {
-      result.push(tail[i][3]);
-    }
-    return result;
+BlockAsignmentOperator
+  = operator:(AsignRawOperator
+  / DeclarationAssignOperator
+  / StartToken) {
+    return operator[0];
   }
 
 ListBlockStatement
@@ -42,37 +39,47 @@ ListBlockStatement
     return result;
   }
 
-CopyStatement
-  = id:IdentifierExpression __ CopyToken
-      __ source:IdentifierExpression __
-    __ EOS {
-      return astNode({
-        type:     "CopyStatement",
-        id:       id,
-        source:   source
-      });
+BlockElementStatement
+  = head:StatementList tail:(__ ElementSeparator? __ StatementList)* {
+    var result = [ head ];
+    for (var i = 0, l = tail.length; i < l; i+=1) {
+      result.push(tail[i][3]);
     }
+    return result;
+  }
 
 ValueBlockStatement
-  = id:IdentifierExpression _ StartToken
+  = id:IdentifierExpression _ operator:BlockAsignmentOperator
       _ !LineTerminatorSequence
-      _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; }) {
+      _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; })
+    {
       return astNode({
-        type:     "ValueBlockStatement",
-        id:       id,
-        body:     body !== null ?
-          (Array.isArray(body) ? body : [ body ]) : []
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'ValueBlockStatement',
+          operator: operator,
+          left:     id,
+          right:    body
+        })
       });
     }
 
 // todo: pending create specific nested blocks
 // with support for list of elements comma separated
 BlockStatement
-  = id:IdentifierExpression __ StartToken __
-    body:BlockStatementList __ EndToken {
+  = id:IdentifierExpression __ operator:BlockAsignmentOperator
+    __ body:BlockElementStatement __ EndToken
+    {
       return astNode({
-        type:     "BlockStatement",
-        id:       id,
-        body:     body !== null ? body : []
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'BlockStatement',
+          operator: operator,
+          left:     id,
+          right:    {
+            type: 'BodyStatement',
+            body: body !== null ? body : []
+          }
+        })
       });
     }

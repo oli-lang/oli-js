@@ -12,7 +12,7 @@ PrimitiveValueExpression
   / ListExpression
 
 LiteralReservedTokens
-  = ":" / LineTerminator / CommentToken / EndToken / "[" / "]"
+  = ":" / ReferenceNotOperator / LineTerminator / CommentToken / EndToken / "[" / "]"
 
 LiteralSequenceCharacters
   = !LiteralReservedTokens char:SingleStringCharacter { return char; }
@@ -127,18 +127,20 @@ IdentifierArrowExpression
   = IdentifierArrowNegationReferenceExpression / IdentifierArrowReferenceExpression
 
 IdentifierArrowReferenceExpression
-  = ">" __ id:IdentifierLiteralExpression {
+  = operator:RelationalOperator __ id:IdentifierLiteralExpression {
     return astNode({
       // type as using "&"
-      type: 'IdentifierReferenceExpression',
+      type: 'ReferenceExpression',
+      operator: operator,
       name: id
     })
   }
 
 IdentifierArrowNegationReferenceExpression
-  = "!>" __ id:IdentifierLiteralExpression {
+  = operator:ReferenceNotOperator __ id:IdentifierLiteralExpression {
     return astNode({
-      type:   'IdentifierAliasNegationExpression',
+      type:   'ReferenceExpression',
+      operator: operator,
       name:   id
     })
   }

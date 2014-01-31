@@ -28,10 +28,10 @@ describe 'Primitive types', ->
     it 'should parse "-183" as numeric signed off integer', ->
       expect node ast('-183'), 'value' .to.be.equal -183
 
-    it 'should parse as "99.123" number literal', ->
+    it 'should parse "99.123" as number literal', ->
       expect node ast('99.123'), 'value' .to.be.equal 99.123
 
-    it 'should parse as "-99.123" as float signed off literal', ->
+    it 'should parse "-99.123" as float signed off literal', ->
       expect node ast('-99.123'), 'value' .to.be.equal -99.123
 
   describe 'string', (_) ->
