@@ -3,8 +3,7 @@
 CommentToken            = "#"
 MultiLineCommentToken   = CommentToken CommentToken
 SeparatorCommaToken     = ","                    !IdentifierPart
-StartToken              = AssignmentOperator     !IdentifierPart
-CopyToken               = CopyAssignmentOperator !IdentifierPart
+StartToken              = AsignOperator          !IdentifierPart
 TrueToken               = "true"  / "yes"        !IdentifierPart
 FalseToken              = "false" / "no"         !IdentifierPart
 EndToken "end of block" = "end"                  !IdentifierPart
@@ -12,7 +11,8 @@ EndToken "end of block" = "end"                  !IdentifierPart
 Keyword
   = (
       StartToken
-    / EndToken
+    / ReferenceNotOperator
+    / FatArrayOperator
   )
   !IdentifierPart
 
@@ -21,11 +21,20 @@ ReservedWord
 
 /* Operators */
 
-AssignmentOperator
+AsignOperator
   = ":"
 
-CopyAssignmentOperator
+DeclarationAssignOperator
+  = "="
+
+RelationalOperator
+  = ">"
+
+AsignRawOperator
   = ":>"
+
+ReferenceNotOperator
+  = "!>"
 
 ExtendOperator
   = ">>"
@@ -33,11 +42,9 @@ ExtendOperator
 MergeOperator
   = ">>>"
 
-CopyOperator
+// to do: use
+FatArrayOperator
   = "=>"
-
-ValueAssigmentOperator
-  = "="
 
 ReferenceOperator
   = "*"
@@ -77,7 +84,7 @@ RelationalOperatorNoIn
   = "<="
   / ">="
   / "<"
-  / ">"
+  / RelationalOperator
 
 MultiplicativeOperator
   = operator:("*" / "/" / "%") !"=" { return operator; }
