@@ -25,7 +25,7 @@ ListElementStatement
 
 BlockAsignmentOperator
   = operator:(AsignRawOperator
-  / DeclarationAssignOperator
+  / VariableAssignOperator
   / StartToken) {
     return operator[0];
   }

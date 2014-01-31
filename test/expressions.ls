@@ -24,6 +24,10 @@ describe 'Expressions', ->
     it 'should parse "block: *value" as reference expression', ->
       expect node ast('block: *value'), 'expression.right.name' .to.be.equal 'value'
 
+    # to do: string literal with references expression
+    xit 'should parse "block: *value hello!" as reference expression', ->
+      expect node ast('block: *value hello!!'), 'expression.right.name' .to.be.equal 'value'
+
   describe 'list', ->
 
     describe 'brackets', (_) ->
@@ -259,26 +263,27 @@ describe 'Expressions', ->
       it 'should parse "oli" as clone identifier', ->
         expect node ast('&oli >>> rules > say: "hola"'), 'expression.left.reference.name'
           .to.be.equal 'oli'
-  /*
+
   # To do: replace with string raw blocks
-  describe 'copy declaration', (_) ->
+  xdescribe 'raw string blocks', (_) ->
 
-    it 'should parse "hello" as identifier', ->
-      expect node ast('hello:> oli'), 'expression.left.name'
-        .to.be.equal 'hello'
+    describe 'in-line', (_) ->
 
-    it 'should parse "oli" as source identifier', ->
-      expect node ast('hello:> oli'), 'source.name'
-        .to.be.equal 'oli'
+      it 'should parse "hello" as identifier', ->
+        expect node ast('hello:- oli'), 'expression.left.name'
+          .to.be.equal 'hello'
 
-    it 'should parse "use this language" as reference identifier', ->
-      expect node ast('hello:> use this language'), 'source.name'
-        .to.be.equal 'use this language'
+      it 'should parse "oli" as source identifier', ->
+        expect node ast('hello:- oli'), 'source.name'
+          .to.be.equal 'oli'
 
-    it 'should parse "\'this language rules\'" as reference identifier', ->
-      expect node ast('hello:> "this language rules"'), 'source.name'
-        .to.be.equal 'this language rules'
-  */
+      it 'should parse "use this language" as reference identifier', ->
+        expect node ast('hello:- use this language'), 'source.name'
+          .to.be.equal 'use this language'
+
+      it 'should parse "\'this language rules\'" as reference identifier', ->
+        expect node ast('hello:- "this language rules"'), 'source.name'
+          .to.be.equal 'this language rules'
 
   describe 'attributes declaration', (_) ->
 

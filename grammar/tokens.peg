@@ -1,4 +1,4 @@
-/* Language Tokens */
+/* Tokens */
 
 CommentToken            = "#"
 MultiLineCommentToken   = CommentToken CommentToken
@@ -24,7 +24,7 @@ ReservedWord
 AsignOperator
   = ":"
 
-DeclarationAssignOperator
+VariableAssignOperator
   = "="
 
 RelationalOperator
@@ -54,38 +54,3 @@ AnchorOperator
 
 LogicalNotOperator
   = "!"
-
-PostfixOperator
-  = "++"
-  / "--"
-
-UnaryOperator
-  = "++"
-  / "--"
-  / "+"
-  / "-"
-  / "!"
-
-EqualityOperator
-  = "=="
-  / "!="
-
-AdditiveOperator
-  = "+" !("+" / "=") { return "+"; }
-  / "-" !("-" / "=") { return "-"; }
-
-RelationalOperator
-  = "<="
-  / ">="
-  / "<"
-  / ">"
-
-RelationalOperatorNoIn
-  = "<="
-  / ">="
-  / "<"
-  / RelationalOperator
-
-MultiplicativeOperator
-  = operator:("*" / "/" / "%") !"=" { return operator; }
-
