@@ -6,7 +6,7 @@ __
 
 PrimitiveValueExpression
   = BooleanLiteral
-  / ReferenceExpression _ ("," / &EOS)
+  / ReferenceExpression
   / NumberLiteral
   / StringLiteral
   / ListExpression
@@ -97,7 +97,7 @@ ReferenceLiteralExpression
     }
 
 ReferenceExpression
-  = ReferenceOperator id:ReferenceLiteralExpression {
+  = ReferenceOperator id:ReferenceLiteralExpression _ ("," / EOS) {
     return astNode({
       type: 'ReferenceExpression',
       name: id

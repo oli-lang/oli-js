@@ -18,15 +18,28 @@ describe 'Expressions', ->
     it 'should parse "*\'value\'" as reference expression', ->
       expect node ast('*"value"'), 'name' .to.be.equal 'value'
 
-    it 'should parse "*value ref" as reference expression', ->
-      expect node ast('*value ref'), '0.name' .to.be.equal 'value'
-
     it 'should parse "block: *value" as reference expression', ->
       expect node ast('block: *value'), 'expression.right.name' .to.be.equal 'value'
 
-    # to do: string literal with references expression
-    xit 'should parse "block: *value hello!" as reference expression', ->
-      expect node ast('block: *value hello!!'), 'expression.right.name' .to.be.equal 'value'
+    it 'should parse "block: *value end" as reference expression', ->
+      ast-obj = ast('''
+        block:
+          *value
+        end
+      ''')
+      expect node ast-obj, 'expression.right.body.0.name' .to.be.equal 'value'
+
+    describe 'interpolated expression', (_) ->
+
+      it 'should parse "*value text" as string literal', ->
+        expect node ast('*value text'), 'value' .to.be.equal '*value text'
+
+      it 'should parse "text *value" as string literal', ->
+        expect node ast('text *value'), 'value' .to.be.equal 'text *value'
+
+      it 'should parse "block: *value hello!" as string literal', ->
+        expect node ast('block: *value hello!'), 'expression.right.value'
+          .to.be.equal '*value hello!'
 
   describe 'list', ->
 
@@ -288,6 +301,24 @@ describe 'Expressions', ->
 
       it 'should parse "\'this language rules\'" as reference identifier', ->
         expect node ast('hello:- "this language rules"'), 'source.name.name'
+          .to.be.equal 'this language rules'
+
+    describe 'folded line feeds', (_) ->
+
+      it 'should parse "hello" as identifier', ->
+        expect node ast('hello:= oli'), 'expression.left.name.name'
+          .to.be.equal 'hello'
+
+      it 'should parse "oli" as source identifier', ->
+        expect node ast('hello:= oli'), 'source.name.name'
+          .to.be.equal 'oli'
+
+      it 'should parse "use this language" as reference identifier', ->
+        expect node ast('hello:= use this language'), 'source.name.name'
+          .to.be.equal 'use this language'
+
+      it 'should parse "\'this language rules\'" as reference identifier', ->
+        expect node ast('hello:= "this language rules"'), 'source.name.name'
           .to.be.equal 'this language rules'
 
   describe 'attributes declaration', (_) ->
