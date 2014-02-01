@@ -18,6 +18,12 @@ describe 'Expressions', ->
     it 'should parse "*\'value\'" as reference expression', ->
       expect node ast('*"value"'), 'name' .to.be.equal 'value'
 
+    it 'should parse "*this.is.a.value" as dot member access reference', ->
+      expect node ast('*this.is.a.value'), 'name' .to.be.equal 'this.is.a.value'
+
+    it 'should parse "*{this.is.a.value}" as dot member access reference', ->
+      expect node ast('*{this.is.a.value}'), 'name' .to.be.equal 'this.is.a.value'
+
     it 'should parse "block: *value" as reference expression', ->
       expect node ast('block: *value'), 'expression.right.name' .to.be.equal 'value'
 
@@ -36,6 +42,10 @@ describe 'Expressions', ->
 
       it 'should parse "text *value" as string literal', ->
         expect node ast('text *value'), 'value' .to.be.equal 'text *value'
+
+      it 'should parse "block: *value hello!" as string literal', ->
+        expect node ast('block: *value hello!'), 'expression.right.value'
+          .to.be.equal '*value hello!'
 
       it 'should parse "block: *value hello!" as string literal', ->
         expect node ast('block: *value hello!'), 'expression.right.value'

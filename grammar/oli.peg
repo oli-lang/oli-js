@@ -21,15 +21,8 @@
   }
 
   function astNode(tree) {
-    var node = { loc: loc() };
-
-    for (var k in tree) {
-      if (tree.hasOwnProperty(k) && tree[k] != null) {
-        node[k] = tree[k];
-      }
-    }
-
-    return node;
+    tree.loc = loc();
+    return tree;
   }
 }
 

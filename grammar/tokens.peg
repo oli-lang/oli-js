@@ -27,14 +27,26 @@ AsignOperator
 VariableAssignOperator
   = "="
 
-RelationalOperator
-  = ">"
-
 AsignRawOperator
   = ":>"
 
 AsignNotOperator
   = ":!"
+
+AsignUnfoldOperator
+  = ":="
+
+AsignFoldOperator
+  = ":-"
+
+AsignPipeOperator
+  = "|"
+
+AsignPipeNotOperator
+  = "|!"
+
+RelationalOperator
+  = ">"
 
 RelationalNotOperator
   = "!>"

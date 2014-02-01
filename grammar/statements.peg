@@ -25,10 +25,13 @@ ListElementStatement
 
 BlockAsignmentOperator
   = operator:(
-    AsignRawOperator
-  / VariableAssignOperator
+    VariableAssignOperator
+  / AsignNotOperator
+  / AsignRawOperator
+  / AsignUnfoldOperator
+  / AsignFoldOperator
   / StartToken) {
-    return operator[0];
+    return operator;
   }
 
 ListBlockStatement
@@ -50,7 +53,18 @@ BlockElementStatement
   }
 
 ValueStatement
-  = id:IdentifierExpression _ operator:BlockAsignmentOperator
+  = id:IdentifierExpression _ operator:AsignNotOperator _ EOS {
+      return astNode({
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'ValueStatement',
+          operator: operator,
+          left:     id,
+          right:    null
+        })
+      });
+    }
+  / id:IdentifierExpression _ operator:BlockAsignmentOperator
       _ !LineTerminatorSequence
       _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; })
     {
@@ -60,13 +74,11 @@ ValueStatement
           type:     'ValueStatement',
           operator: operator,
           left:     id,
-          right:    body
+          right:    operator === ':!' ? null : body
         })
       });
     }
 
-// todo: pending create specific nested blocks
-// with support for list of elements comma separated
 BlockStatement
   = id:IdentifierExpression __ operator:BlockAsignmentOperator
     __ body:BlockElementStatement __ EndToken
@@ -77,7 +89,7 @@ BlockStatement
           type:     'BlockStatement',
           operator: operator,
           left:     id,
-          right:    {
+          right:    operator === ':!' ? null : {
             type: 'BodyStatement',
             body: body !== null ? body : []
           }

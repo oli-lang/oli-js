@@ -243,4 +243,52 @@ describe 'Statements', ->
           expect node ast-obj, '1.expression.right.expression.right.value' .to.be.equal 'hello!'
           expect node ast-obj, '5.expression.right.value' .to.be.equal true
 
+    describe 'assignment operators', ->
 
+      describe 'empty (:!)', (_) ->
+
+        it 'should parse "empty:!" as empty block', ->
+          ast-obj = node ast('empty:!'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':!'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'empty'
+          expect node ast-obj, 'right' .to.be.null
+
+        it 'should parse "empty:! \'text\'" as empty block', ->
+          ast-obj = node ast('empty:! "text"'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':!'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'empty'
+          expect node ast-obj, 'right' .to.be.null
+
+        it 'should parse "empty:! \'text\' end" as empty block', ->
+          ast-obj = node ast('empty:! "text" end'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':!'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'empty'
+          expect node ast-obj, 'right' .to.be.null
+
+      describe 'unfold (:=)', (_) ->
+
+        it 'should parse "block:= hello!" as empty block', ->
+          ast-obj = node ast('block:= hello!'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':='
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.value' .to.be.equal 'hello!'
+
+        it 'should parse "block:= \'string\' end" as empty block', ->
+          ast-obj = node ast('block:= "string" end'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':='
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.value' .to.be.equal 'string'
+
+      describe 'fold (:-)', (_) ->
+
+        it 'should parse "block:- hello!" as empty block', ->
+          ast-obj = node ast('block:- hello!'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':-'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.value' .to.be.equal 'hello!'
+
+        it 'should parse "block:= \'string\' end" as empty block', ->
+          ast-obj = node ast('block:- "string" end'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':-'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.value' .to.be.equal 'string'
