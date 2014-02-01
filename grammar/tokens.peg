@@ -11,7 +11,7 @@ EndToken "end of block" = "end"                  !IdentifierPart
 Keyword
   = (
       StartToken
-    / ReferenceNotOperator
+    / RelationalNotOperator
     / FatArrayOperator
   )
   !IdentifierPart
@@ -33,8 +33,25 @@ RelationalOperator
 AsignRawOperator
   = ":>"
 
-ReferenceNotOperator
+AsignNotOperator
+  = ":!"
+
+RelationalNotOperator
   = "!>"
+
+ReferenceOperator
+  = "*"
+
+AnchorOperator
+  = "&"
+
+LogicalNotOperator
+  = "!"
+
+AnchorNotOperator
+  = operators:(LogicalNotOperator AnchorOperator) {
+    return operators.join('');
+  }
 
 ExtendOperator
   = ">>"
@@ -45,12 +62,3 @@ MergeOperator
 // to do: use
 FatArrayOperator
   = "=>"
-
-ReferenceOperator
-  = "*"
-
-AnchorOperator
-  = "&"
-
-LogicalNotOperator
-  = "!"

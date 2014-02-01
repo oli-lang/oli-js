@@ -42,9 +42,12 @@ module.exports =
   join: path.join
 
   node: (ast, path) ->
-    parent = <[ body ]>
+    parent = []
     path = path.split '.' if typeof path is 'string'
-    parent = parent ++ <[ 0 ]> if ast.body.length is 1
+    if ast.body and ast.body.length
+      parent = <[ body ]>
+      parent = parent ++ <[ 0 ]> if ast.body.length is 1
+
     traverse ast .get parent ++ path
 
   inspect: ->

@@ -12,7 +12,7 @@ PrimitiveValueExpression
   / ListExpression
 
 LiteralReservedTokens
-  = ":" / ReferenceNotOperator / LineTerminator / CommentToken / EndToken / "[" / "]"
+  = ":" / RelationalNotOperator / LineTerminator / CommentToken / EndToken / "[" / "]"
 
 LiteralSequenceCharacters
   = !LiteralReservedTokens char:SingleStringCharacter { return char; }
@@ -49,7 +49,7 @@ Identifier "identifier"
   = !ReservedWord name:IdentifierWord {
     return astNode({
       type: 'Identifier',
-      name: name
+      name: name.trim()
     });
   }
 
@@ -104,107 +104,97 @@ ReferenceExpression
     })
   }
 
-/* Indentifier */
+/* Block Indentifier Expressions */
 
 IdentifierLiteralExpression
-  = id:StringLiteral {
-      return id.value;
-    }
+  = StringLiteral
   / "{" __ id:(Identifier / StringLiteral)__ "}" {
-      return id.value ? id.value : id.name.trim();
+      return id;
     }
-  / id:Identifier {
-      return id.name.trim();
-    }
+  / Identifier
 
 IdentifierNameExpression
-  = IdentifierReferenceNegationExpression / IdentifierReferenceExpression / IdentifierLiteralExpression
+  = IdentifierReferenceExpression / IdentifierLiteralExpression
 
 IdentifierOperationExpression
-  = IdentifierMergeExpression / IdentifierCloneExpression
+  = IdentifierBinaryExpression / IdentifierUnaryExpression
 
-IdentifierArrowExpression
-  = IdentifierArrowNegationReferenceExpression / IdentifierArrowReferenceExpression
+IdentifierBinaryExpression
+  = left:IdentifierCloneExpression
+    __ right:IdentifierArrowReferenceExpression {
+    return {
+      type:  'BinaryExpression',
+      left:  left,
+      right: right
+    };
+  }
 
-IdentifierArrowReferenceExpression
-  = operator:RelationalOperator __ id:IdentifierLiteralExpression {
+IdentifierUnaryExpression
+  = operator:(
+        MergeOperator
+      / ExtendOperator
+      / RelationalNotOperator
+      / RelationalOperator
+    ) __ argument:IdentifierLiteralExpression {
     return astNode({
-      // type as using "&"
-      type: 'ReferenceExpression',
+      type:     'UnaryExpression',
       operator: operator,
-      name: id
-    })
-  }
-
-IdentifierArrowNegationReferenceExpression
-  = operator:ReferenceNotOperator __ id:IdentifierLiteralExpression {
-    return astNode({
-      type:   'ReferenceExpression',
-      operator: operator,
-      name:   id
-    })
-  }
-
-IdentifierCloneExpression
-  = ExtendOperator __ id:IdentifierLiteralExpression {
-    return astNode({
-      type:   'IdentifierCloneExpression',
-      name:   id
-    })
-  }
-
-IdentifierMergeExpression
-  = MergeOperator __ id:IdentifierLiteralExpression {
-    return astNode({
-      type:   'IdentifierMergeExpression',
-      name:   id
+      argument: argument
     })
   }
 
 IdentifierReferenceExpression
-  = AnchorOperator __ id:IdentifierLiteralExpression {
+  = operator:(AnchorNotOperator / AnchorOperator) __ argument:IdentifierLiteralExpression {
     return astNode({
-      type: 'IdentifierReferenceExpression',
-      name: id
+      type:     'UnaryOperator',
+      operator: operator,
+      argument: argument
     })
   }
 
-IdentifierReferenceNegationExpression
-  = LogicalNotOperator AnchorOperator __ id:IdentifierLiteralExpression {
+IdentifierArrowReferenceExpression
+  = operator:(RelationalNotOperator / RelationalOperator)__ argument:IdentifierLiteralExpression {
     return astNode({
-      type:    'IdentifierReferenceNegationExpression',
-      name:    id
+      type:     'UnaryExpression',
+      operator: operator,
+      argument: argument
     })
   }
 
-AttributeAssignmentExpression
-  = id:IdentifierNameExpression __ value:(StartToken __ value:(PrimitiveValueExpression / IdentifierNameExpression) {
+IdentifierCloneExpression
+  = operator:(MergeOperator / ExtendOperator) __ argument:IdentifierLiteralExpression {
+    return astNode({
+      type:     'UnaryExpression',
+      operator: operator,
+      argument: argument
+    })
+  }
+
+AttributeExpression
+  = id:IdentifierNameExpression __ value:(StartToken __ value:(PrimitiveValueExpression / IdentifierLiteralExpression) {
       return value;
     })? {
     var node = astNode({
-      type:  'AttributeAssignmentExpression',
-      left: {
-        type: id.type || 'IdentifierLiteral',
-        value: id.value || id
-      }
+      type:  'AttributeExpression',
+      left:  id
     });
     if (value) {
-      if (value.type === 'ListExpression') {
-        node.right = value;
+      if (value.type === 'Identifier') {
+        node.right = astNode({
+          type:     'StringLiteral',
+          value:    value.name,
+          raw:      value.name,
+          template: true
+        });
       } else {
-        node.right = {
-          type:  value.type || 'StringLiteral',
-          value: value.value || value,
-          raw:   value.raw || (typeof value !== 'object' ? value : null),
-          template: value.template
-        };
+        node.right = value;
       }
     }
     return node;
   }
 
 IdentifierAttributesList
-  = head:AttributeAssignmentExpression tail:(__ "," __ AttributeAssignmentExpression)* {
+  = head:AttributeExpression tail:(__ "," __ AttributeExpression)* {
     var result = [ head ];
     for (var i = 0, l = tail.length; i < l; i+=1) {
       result.push(tail[i][3]);
@@ -218,40 +208,15 @@ IdentifierAttributesExpression
   }
 
 IdentifierExpression
-  = !"-" _ id:IdentifierNameExpression __ operation:IdentifierOperationExpression?
-    __ ref:IdentifierArrowExpression? __ attrs:IdentifierAttributesExpression? {
-    var node;
-    switch (id.type) {
-      case 'IdentifierReferenceExpression':
-        node = astNode({
-          type:       'IdentifierExpression',
-          name:       id.name,
-          reference:  id,
-          operation:  operation,
-          attributes: attrs
-        })
-      break;
-      case 'IdentifierReferenceNegationExpression':
-        node = astNode({
-          type:     'IdentifierExpression',
-          name:      id.name,
-          negation:  true,
-          reference: id,
-          operation: operation,
-          attributes:     attrs
-        })
-      break;
-      default:
-        node = astNode({
-          type:       'IdentifierExpression',
-          name:       id,
-          reference:  ref,
-          operation:  operation,
-          attributes: attrs
-        });
-      break;
-    }
-    return node;
+  = !"-" _ id:IdentifierNameExpression
+  __ expression:IdentifierOperationExpression?
+  __ attrs:IdentifierAttributesExpression? {
+    return astNode({
+      type:       'IdentifierExpression',
+      id:         id,
+      expression: expression,
+      attributes: attrs
+    });
   }
 
 /* List */
@@ -265,4 +230,3 @@ ListExpression
       elements: elements !== null ? elements : []
     })
   }
-

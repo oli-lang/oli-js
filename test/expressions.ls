@@ -123,146 +123,151 @@ describe 'Expressions', ->
     describe 'name', (_) ->
 
       it 'should parse "hello" as identifier', ->
-        expect node ast('hello: "oli!"'), 'expression.left.name'
+        expect node ast('hello: "oli!"'), 'expression.left.id.name'
           .to.be.equal 'hello'
 
       it 'should parse "hello.oli" as identifier', ->
-        expect node ast('hello.oli: "hola"'), 'expression.left.name'
+        expect node ast('hello.oli: "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello.oli'
 
       it 'should parse "hello-oli" as identifier', ->
-        expect node ast('hello-oli: "hola"'), 'expression.left.name'
+        expect node ast('hello-oli: "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello-oli'
 
       it 'should parse "hello oli" as reference identifier ', ->
-        expect node ast('hello oli: "hola"'), 'expression.left.name'
+        expect node ast('hello oli: "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello oli'
 
       it 'should parse "hello - world . oli" as reference identifier ', ->
-        expect node ast('hello - world . oli: "hola"'), 'expression.left.name'
+        expect node ast('hello - world . oli: "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello - world . oli'
 
       it 'should parse "{hello world oli}" as reference identifier ', ->
-        expect node ast('{hello world oli}: "hola"'), 'expression.left.name'
+        expect node ast('{hello world oli}: "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello world oli'
 
       it 'should parse "{\'hello world oli\'}" as reference identifier ', ->
-        expect node ast('{ "hello world oli" }: "hola"'), 'expression.left.name'
+        expect node ast('{ "hello world oli" }: "hola"'), 'expression.left.id.value'
           .to.be.equal 'hello world oli'
 
       it 'should parse "\'hello world oli\'" as reference identifier ', ->
-        expect node ast('"hello world oli": "hola"'), 'expression.left.name'
+        expect node ast('"hello world oli": "hola"'), 'expression.left.id.value'
           .to.be.equal 'hello world oli'
 
     describe 'reference alias', (_) ->
 
       it 'should parse "oli" as reference identifier', ->
-        expect node ast('hello > oli: "hola"'), 'expression.left.reference.name'
-          .to.be.equal 'oli'
+        ast-obj = node ast('hello > oli: "hola"'), 'expression.left.expression'
+        expect node ast-obj, 'argument.name' .to.be.equal 'oli'
+        expect node ast-obj, 'operator' .to.be.equal '>'
 
       it 'should parse "oli rules" as reference identifier', ->
-        expect node ast('hello > oli rules: "hola"'), 'expression.left.reference.name'
+        expect node ast('hello > oli rules: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'oli rules'
 
       it 'should parse "{oli rules}" as reference identifier', ->
-        expect node ast('hello > {oli rules}: "hola"'), 'expression.left.reference.name'
+        expect node ast('hello > {oli rules}: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'oli rules'
 
       it 'should parse "\'oli rules\'" as reference identifier', ->
-        expect node ast('hello > "oli rules": "hola"'), 'expression.left.reference.name'
+        expect node ast('hello > "oli rules": "hola"'), 'expression.left.expression.argument.value'
           .to.be.equal 'oli rules'
 
       describe 'negation', (_) ->
 
         it 'should parse "hello" as reference identifier', ->
-          expect node ast('hello !> oli rules: "hola"'), 'expression.left.name'
+          expect node ast('hello !> oli rules: "hola"'), 'expression.left.id.name'
             .to.be.equal 'hello'
 
         it 'should parse "\'oli rules\'" as reference identifier', ->
-          expect node ast('hello !> "oli rules": "hola"'), 'expression.left.reference.name'
+          expect node ast('hello !> "oli rules": "hola"'), 'expression.left.expression.argument.value'
             .to.be.equal 'oli rules'
 
     describe 'reference alias with ampersand', (_) ->
 
       it 'should parse "&oli" as reference identifier', ->
-        expect node ast('&oli: "hola"'), 'expression.left.reference.name'
-          .to.be.equal 'oli'
+        ast-obj = node ast('&oli: "hola"'), 'expression.left'
+        expect node ast-obj, 'id.argument.name' .to.be.equal 'oli'
+        expect node ast-obj, 'id.operator' .to.be.equal '&'
 
       it 'should parse "&hello oli" as reference identifier', ->
-        expect node ast('&hello oli: "hola"'), 'expression.left.reference.name'
+        expect node ast('&hello oli: "hola"'), 'expression.left.id.argument.name'
           .to.be.equal 'hello oli'
 
       it 'should parse "&\'hello oli\'" as reference identifier', ->
-        expect node ast('&"hello oli": "hola"'), 'expression.left.reference.name'
+        expect node ast('&"hello oli": "hola"'), 'expression.left.id.argument.value'
           .to.be.equal 'hello oli'
 
       describe 'negation', (_) ->
 
         it 'should parse "!&hello oli" as reference identifier', ->
-          expect node ast('!&hello oli: "hola"'), 'expression.left.reference.name'
+          expect node ast('!&hello oli: "hola"'), 'expression.left.id.argument.name'
             .to.be.equal 'hello oli'
 
         it 'should parse "!&\'hello oli\'" as reference identifier', ->
-          expect node ast('!&"hello oli": "hola"'), 'expression.left.reference.name'
+          expect node ast('!&"hello oli": "hola"'), 'expression.left.id.argument.value'
             .to.be.equal 'hello oli'
 
     describe 'clone', (_) ->
 
       it 'should parse "yaml" as clone identifier', ->
-        expect node ast('oli >> yaml: "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >> yaml: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml'
 
       it 'should parse "yaml also rules" as clone identifier', ->
-        expect node ast('oli >> yaml also rules: "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >> yaml also rules: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
       it 'should parse "\'yaml also rules\'" as clone identifier', ->
-        expect node ast('oli >> "yaml also rules": "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >> "yaml also rules": "hola"'), 'expression.left.expression.argument.value'
           .to.be.equal 'yaml also rules'
 
       it 'should parse "{yaml also rules}" as clone identifier', ->
-        expect node ast('oli >> {yaml also rules}: "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >> {yaml also rules}: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
     describe 'merge', (_) ->
 
       it 'should parse "yaml" as merge identifier', ->
-        expect node ast('oli >>> yaml: "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >>> yaml: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml'
 
       it 'should parse "yaml also rules" as merge identifier', ->
-        expect node ast('oli >>> yaml also rules: "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >>> yaml also rules: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
       it 'should parse "\'yaml also rules\'" as merge identifier', ->
-        expect node ast('oli >>> "yaml also rules": "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >>> "yaml also rules": "hola"'), 'expression.left.expression.argument.value'
           .to.be.equal 'yaml also rules'
 
       it 'should parse "{yaml also rules}" as merge identifier', ->
-        expect node ast('oli >>> {yaml also rules}: "hola"'), 'expression.left.operation.name'
+        expect node ast('oli >>> {yaml also rules}: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
     describe 'reference + operation', (_) ->
 
       it 'should parse "oli" as identifier', ->
-        expect node ast('oli >> rules > say: "hola"'), 'expression.left.name'
+        expect node ast('oli >> rules > say: "hola"'), 'expression.left.id.name'
+          .to.be.equal 'oli'
+
+      it 'should parse "oli" as identifier', ->
+        expect node ast('&oli >>> rules > say: "hola"'), 'expression.left.id.argument.name'
           .to.be.equal 'oli'
 
       it 'should parse "say" as reference identifier', ->
-        expect node ast('oli >> rules > say: "hola"'), 'expression.left.reference.name'
-          .to.be.equal 'say'
-
-      it 'should parse "rules" as merge identifier', ->
-        expect node ast('oli >> rules > say: "hola"'), 'expression.left.operation.name'
-          .to.be.equal 'rules'
+        ast-obj = node ast('oli >> rules > say: "hola"'), 'expression.left.expression.right'
+        expect node ast-obj, 'argument.name' .to.be.equal 'say'
+        expect node ast-obj, 'operator' .to.be.equal '>'
 
       it 'should parse "rules" as clone identifier', ->
-        expect node ast('oli >>> rules > say: "hola"'), 'expression.left.operation.name'
-          .to.be.equal 'rules'
+        ast-obj = node ast('oli >> rules > say: "hola"'), 'expression.left.expression.left'
+        expect node ast-obj, 'argument.name' .to.be.equal 'rules'
+        expect node ast-obj, 'operator' .to.be.equal '>>'
 
-      it 'should parse "oli" as clone identifier', ->
-        expect node ast('&oli >>> rules > say: "hola"'), 'expression.left.reference.name'
-          .to.be.equal 'oli'
+      it 'should parse "rules" as merge identifier', ->
+        ast-obj = node ast('oli >>> rules > say: "hola"'), 'expression.left.expression.left'
+        expect node ast-obj, 'argument.name' .to.be.equal 'rules'
+        expect node ast-obj, 'operator' .to.be.equal '>>>'
 
   # To do: replace with string raw blocks
   xdescribe 'raw string blocks', (_) ->
@@ -270,29 +275,29 @@ describe 'Expressions', ->
     describe 'in-line', (_) ->
 
       it 'should parse "hello" as identifier', ->
-        expect node ast('hello:- oli'), 'expression.left.name'
+        expect node ast('hello:- oli'), 'expression.left.name.name'
           .to.be.equal 'hello'
 
       it 'should parse "oli" as source identifier', ->
-        expect node ast('hello:- oli'), 'source.name'
+        expect node ast('hello:- oli'), 'source.name.name'
           .to.be.equal 'oli'
 
       it 'should parse "use this language" as reference identifier', ->
-        expect node ast('hello:- use this language'), 'source.name'
+        expect node ast('hello:- use this language'), 'source.name.name'
           .to.be.equal 'use this language'
 
       it 'should parse "\'this language rules\'" as reference identifier', ->
-        expect node ast('hello:- "this language rules"'), 'source.name'
+        expect node ast('hello:- "this language rules"'), 'source.name.name'
           .to.be.equal 'this language rules'
 
   describe 'attributes declaration', (_) ->
 
     it 'should parse "key" as unique attribute identifier', ->
-      expect node ast('hello (key): oli'), 'expression.left.attributes.0.left.value'
+      expect node ast('hello (key): oli'), 'expression.left.attributes.0.left.name'
         .to.be.equal 'key'
 
     it 'should parse "key" as attribute identifier', ->
-      expect node ast('hello(key: value): oli'), 'expression.left.attributes.0.left.value'
+      expect node ast('hello(key: value): oli'), 'expression.left.attributes.0.left.name'
         .to.be.equal 'key'
 
     it 'should parse "value" as attribute value', ->
@@ -314,13 +319,15 @@ describe 'Expressions', ->
     describe 'list', (_) ->
 
       it 'should parse "super key" as unique attribute identifier', ->
-        expect node ast('hello (key, super key): oli'), 'expression.left.attributes.1.left.value'
+        expect node ast('hello (key, super key): oli'), 'expression.left.attributes.1.left.name'
           .to.be.equal 'super key'
 
       it 'should parse "super key" as attribute identifier', ->
-        expect node ast('hello(key: value, super key: super value): oli'), 'expression.left.attributes.1.left.value'
+        expect node ast('hello(key: value, super key: super value): oli'), 'expression.left.attributes.1.left.name'
           .to.be.equal 'super key'
 
-      it 'should parse "super value" as attribute identifier', ->
+      it 'should parse "super value" as attribute assignment value', ->
         expect node ast('hello (key: value, super key: super value): oli'), 'expression.left.attributes.1.right.value'
           .to.be.equal 'super value'
+
+

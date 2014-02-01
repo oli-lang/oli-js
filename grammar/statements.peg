@@ -6,7 +6,7 @@ PrimitiveTypeStatement
 
 MainStatement
   = Comment
-  / ValueBlockStatement
+  / ValueStatement
   / BlockStatement
 
 Statement
@@ -24,7 +24,8 @@ ListElementStatement
   / UnquotedStringListLiteral
 
 BlockAsignmentOperator
-  = operator:(AsignRawOperator
+  = operator:(
+    AsignRawOperator
   / VariableAssignOperator
   / StartToken) {
     return operator[0];
@@ -48,7 +49,7 @@ BlockElementStatement
     return result;
   }
 
-ValueBlockStatement
+ValueStatement
   = id:IdentifierExpression _ operator:BlockAsignmentOperator
       _ !LineTerminatorSequence
       _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; })
@@ -56,7 +57,7 @@ ValueBlockStatement
       return astNode({
         type:    'ExpressionStatement',
         expression: astNode({
-          type:     'ValueBlockStatement',
+          type:     'ValueStatement',
           operator: operator,
           left:     id,
           right:    body
