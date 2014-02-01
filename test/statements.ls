@@ -232,16 +232,23 @@ describe 'Statements', ->
           expect node ast-obj, 'expression.right.body.0.body.elements.2.value' .to.be.equal 3
           expect node ast-obj, 'expression.right.body.1.body.elements.1.value' .to.be.equal 'oli!'
 
-        describe 'interpolated', (_) ->
+        it 'should parse "block: | yes block: true" as interpolated pipe statement', ->
+          ast-obj = ast '''
+            block:
+              | yes
+            another: true
+          '''
+          expect node ast-obj, '0.expression.right.body.0.body.value' .to.be.true
+          expect node ast-obj, '1.expression.right.value' .to.be.true
 
-          it 'should parse "block: | yes block: true" as  statement', ->
-            ast-obj = ast '''
-              block:
-                | yes
-              another: true
-            '''
-            expect node ast-obj, '0.expression.right.body.0.body.value' .to.be.true
-            expect node ast-obj, '1.expression.right.value' .to.be.true
+        it 'should parse "block: another: | true" as nested pipe statement', ->
+          ast-obj = ast '''
+            block:
+              another:
+                | true
+            end
+          '''
+          expect node ast-obj, 'expression.right.body.0.expression.right.body.0.body.value' .to.be.true
 
       describe 'multi-statement', (_) ->
 

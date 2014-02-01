@@ -6,8 +6,8 @@ PrimitiveTypeStatement
 
 MainStatement
   = Comment
-  / ValueStatement
   / BlockPipeStatement
+  / ValueStatement
   / BlockStatement
 
 Statement
@@ -85,7 +85,7 @@ PipeStatement
   }
 
 BlockPipeStatement
-  = id:IdentifierExpression __ operator:BlockAsignmentOperator
+  = PipeOperator? __ id:IdentifierExpression __ operator:BlockAsignmentOperator
     __ head:PipeStatement __ tail:(__ PipeStatement)* {
       var body = [ head ];
       for (var i = 0, l = tail.length; i < l; i+=1) {
