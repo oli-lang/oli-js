@@ -10,16 +10,13 @@ describe 'Statements', ->
   describe 'variables', (_) ->
 
     it 'should parse "value = hello oli!" as string', ->
-      expect node ast('value = hello oli!'), 'expression.right.value'
-        .to.be.equal 'hello oli!'
+      expect node ast('value = hello oli!'), 'expression.right.value' .to.be.equal 'hello oli!'
 
     it 'should parse "value = true" as boolean', ->
-      expect node ast('value = true'), 'expression.right.value'
-        .to.be.equal true
+      expect node ast('value = true'), 'expression.right.value' .to.be.equal true
 
     it 'should parse "value = -12.3 end" as number', ->
-      expect node ast('value = -12.3 end'), 'expression.right.value'
-        .to.be.equal -12.3
+      expect node ast('value = -12.3 end'), 'expression.right.value' .to.be.equal -12.3
 
     it 'should parse "value = -12.3 end" as multi-line statement', ->
       ast-obj = ast '''
@@ -27,18 +24,33 @@ describe 'Statements', ->
         -12.3
       end
       '''
-      expect node ast-obj, 'expression.right.body.0.value'
-        .to.be.equal -12.3
+      expect node ast-obj, 'expression.right.body.0.value' .to.be.equal -12.3
 
   describe 'blocks', ->
+
+    describe 'first level list', (_) ->
+
+      it 'should parse "-- yes" as list', ->
+        expect node ast('-- yes'), 'elements.0.value' .to.be.true
+
+      it 'should parse "-- block: nested: hello!" as list', ->
+        ast-obj = ast '''
+        --
+        block:
+          nested:
+            hello!
+          end
+        end
+        '''
+        expect node ast-obj, 'elements.0.expression.right.body.0.expression.right.body.0.value'
+          .to.be.equal 'hello!'
 
     describe 'primitives types', ->
 
       describe 'string', (_) ->
 
         it 'should parse "hello oli!" as string', ->
-          expect node ast('string: "hello oli!"'), 'expression.right.value'
-            .to.be.equal 'hello oli!'
+          expect node ast('string: "hello oli!"'), 'expression.right.value' .to.be.equal 'hello oli!'
 
         it 'should parse "hello oli!" as string with single quotes', ->
           expect node ast("string: 'hello oli!'"), 'expression.right.value' .to.be.equal 'hello oli!'

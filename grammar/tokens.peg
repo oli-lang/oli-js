@@ -45,6 +45,12 @@ AsignPipeOperator
 AsignPipeNotOperator
   = "|!"
 
+DashOperator
+  = "-"
+
+DuobleDashOperator
+  = "--"
+
 RelationalOperator
   = ">"
 
