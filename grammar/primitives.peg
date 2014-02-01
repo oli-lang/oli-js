@@ -23,7 +23,7 @@ DecimalLiteral
     parts:$(DecimalIntegerLiteral "." DecimalDigits? ExponentPart?) {
       return parts;
     }
-  / parts:$("." DecimalDigits ExponentPart?)     { return parts; }
+  / parts:$("." DecimalDigits ExponentPart?) { return parts; }
   / parts:$(SignedInteger "." DecimalDigits ExponentPart?) { return parts; }
   ) {
       return astNode({

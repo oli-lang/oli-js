@@ -39,10 +39,10 @@ AsignUnfoldOperator
 AsignFoldOperator
   = ":-"
 
-AsignPipeOperator
+PipeOperator
   = "|"
 
-AsignPipeNotOperator
+PipeNotOperator
   = "|!"
 
 DashOperator

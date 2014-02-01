@@ -200,8 +200,48 @@ describe 'Statements', ->
           end
           '''
           path = 'expression.right.body.0.expression.right.body.0.expression.right.body.3.elements.4.value'
-          expect node code, path
-            .to.be.equal 'pretty'
+          expect node code, path .to.be.equal 'pretty'
+
+      describe 'pipe statement', (_) ->
+
+        it 'should parse "block: | hello" as pipe statement', ->
+          ast-obj = ast '''
+            block:
+              | hello
+          '''
+          expect node ast-obj, 'expression.right.body.0.body.value' .to.be.equal 'hello'
+
+        it 'should parse "block: | hello | yes ..." as pipe statement', ->
+          ast-obj = ast '''
+            block:
+              | hello
+              | yes
+              | 12.401
+          '''
+          expect node ast-obj, 'expression.right.body.0.body.value' .to.be.equal 'hello'
+          expect node ast-obj, 'expression.right.body.1.body.value' .to.be.true
+          expect node ast-obj, 'expression.right.body.2.body.value' .to.be.equal 12.401
+
+        it 'should parse "block: | - 1, 2, 3 ..." as pipe statement', ->
+          ast-obj = ast '''
+            block:
+              | - 1, 2, 3
+              | [ 'hello', 'oli!' ]
+          '''
+          expect node ast-obj, 'expression.right.body.0.body.elements.0.value' .to.be.equal 1
+          expect node ast-obj, 'expression.right.body.0.body.elements.2.value' .to.be.equal 3
+          expect node ast-obj, 'expression.right.body.1.body.elements.1.value' .to.be.equal 'oli!'
+
+        describe 'interpolated', (_) ->
+
+          it 'should parse "block: | yes block: true" as  statement', ->
+            ast-obj = ast '''
+              block:
+                | yes
+              another: true
+            '''
+            expect node ast-obj, '0.expression.right.body.0.body.value' .to.be.true
+            expect node ast-obj, '1.expression.right.value' .to.be.true
 
       describe 'multi-statement', (_) ->
 

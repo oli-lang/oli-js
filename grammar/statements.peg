@@ -7,16 +7,12 @@ PrimitiveTypeStatement
 MainStatement
   = Comment
   / ValueStatement
+  / BlockPipeStatement
   / BlockStatement
 
 Statement
   = MainStatement
   / PrimitiveTypeStatement
-
-StatementList
-  = Statement
-  / PrimitiveValueExpression
-  / UnquotedStringLiteral
 
 ListElementStatement
   = MainStatement
@@ -44,7 +40,7 @@ ListBlockStatement
   }
 
 BlockElementStatement
-  = head:StatementList tail:(__ ElementSeparator? __ StatementList)* {
+  = head:Statement tail:(__ ElementSeparator? __ Statement)* {
     var result = [ head ];
     for (var i = 0, l = tail.length; i < l; i+=1) {
       result.push(tail[i][3]);
@@ -75,6 +71,36 @@ ValueStatement
           operator: operator,
           left:     id,
           right:    operator === ':!' ? null : body
+        })
+      });
+    }
+
+PipeStatement
+  = operator:PipeOperator _ body:PrimitiveTypeStatement {
+    return astNode({
+      type:     'PipeStatement',
+      operator: operator,
+      body:     body !== null ? body : []
+    });
+  }
+
+BlockPipeStatement
+  = id:IdentifierExpression __ operator:BlockAsignmentOperator
+    __ head:PipeStatement __ tail:(__ PipeStatement)* {
+      var body = [ head ];
+      for (var i = 0, l = tail.length; i < l; i+=1) {
+        body.push(tail[i][1]);
+      }
+      return astNode({
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'BlockStatement',
+          operator: operator,
+          left:     id,
+          right:    operator === ':!' ? null : {
+            type: 'BodyStatement',
+            body: body !== null ? body : []
+          }
         })
       });
     }
