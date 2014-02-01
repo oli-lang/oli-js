@@ -34,6 +34,16 @@ describe 'Primitive types', ->
     it 'should parse "-99.123" as float signed off literal', ->
       expect node ast('-99.123'), 'value' .to.be.equal -99.123
 
+    describe 'hexadecimal', (_) ->
+
+      it 'should parse "0xFFFFFFFF" as number', ->
+        expect node ast('0xFFFFFFFF'), 'value' .to.be.equal 0xFFFFFFFF
+        expect node ast('0xFFFFFFFF'), 'raw' .to.be.equal 'FFFFFFFF'
+
+      it 'should parse "0x696969" as number', ->
+        expect node ast('0x696969'), 'value' .to.be.equal 0x696969
+        expect node ast('0x696969'), 'raw' .to.be.equal '696969'
+
   describe 'string', (_) ->
 
     it 'should parse "hello oli!" as string', ->

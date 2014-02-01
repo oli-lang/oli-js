@@ -292,45 +292,6 @@ describe 'Expressions', ->
         expect node ast-obj, 'argument.name' .to.be.equal 'rules'
         expect node ast-obj, 'operator' .to.be.equal '>>>'
 
-  # To do: replace with string raw blocks
-  xdescribe 'raw string blocks', (_) ->
-
-    describe 'in-line', (_) ->
-
-      it 'should parse "hello" as identifier', ->
-        expect node ast('hello:- oli'), 'expression.left.name.name'
-          .to.be.equal 'hello'
-
-      it 'should parse "oli" as source identifier', ->
-        expect node ast('hello:- oli'), 'source.name.name'
-          .to.be.equal 'oli'
-
-      it 'should parse "use this language" as reference identifier', ->
-        expect node ast('hello:- use this language'), 'source.name.name'
-          .to.be.equal 'use this language'
-
-      it 'should parse "\'this language rules\'" as reference identifier', ->
-        expect node ast('hello:- "this language rules"'), 'source.name.name'
-          .to.be.equal 'this language rules'
-
-    describe 'folded line feeds', (_) ->
-
-      it 'should parse "hello" as identifier', ->
-        expect node ast('hello:= oli'), 'expression.left.name.name'
-          .to.be.equal 'hello'
-
-      it 'should parse "oli" as source identifier', ->
-        expect node ast('hello:= oli'), 'source.name.name'
-          .to.be.equal 'oli'
-
-      it 'should parse "use this language" as reference identifier', ->
-        expect node ast('hello:= use this language'), 'source.name.name'
-          .to.be.equal 'use this language'
-
-      it 'should parse "\'this language rules\'" as reference identifier', ->
-        expect node ast('hello:= "this language rules"'), 'source.name.name'
-          .to.be.equal 'this language rules'
-
   describe 'attributes declaration', (_) ->
 
     it 'should parse "key" as unique attribute identifier', ->

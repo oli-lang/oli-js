@@ -33,6 +33,15 @@ DecimalLiteral
       });
     }
 
+HexIntegerLiteral
+  = "0" [xX] digits:$HexDigit+ {
+    return astNode({
+      type:  'HexadecimalLiteral',
+      value: parseInt(digits, 16),
+      raw:   digits
+    })
+  }
+
 DecimalIntegerLiteral
   = "0" / NonZeroDigit DecimalDigits?
 
@@ -53,9 +62,6 @@ ExponentIndicator
 
 SignedInteger
   = [-+] DecimalDigits
-
-HexIntegerLiteral
-  = "0" [xX] digits:$HexDigit+ { return parseInt(digits, 16); }
 
 HexDigit
   = [0-9a-fA-F]
