@@ -6,7 +6,7 @@ __
 
 PrimitiveValueExpression
   = BooleanLiteral
-  / ReferenceExpression
+  / ReferenceExpression _ ("," / &EOS)
   / NumberLiteral
   / StringLiteral
   / ListExpression
