@@ -64,7 +64,7 @@ module.exports = (grunt) ->
 
     uglify:
       options:
-        banner: '/*! Oli language parser and compiler for browsers - v<%= pkg.version %> - https://github.com/oli-lang/oli-js ' +
+        banner: '/*! oli.js - v<%= pkg.version %> - MIT License - https://github.com/oli-lang/oli-js ' +
           '| Generated <%= grunt.template.today("yyyy-mm-dd hh:MM") %> */\n'
       oli:
         files:
