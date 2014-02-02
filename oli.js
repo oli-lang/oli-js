@@ -62,7 +62,6 @@ module.exports = function (oli) {
         oli.load(script.src, execute)
       } else {
         oli.scripts = oli.scripts || []
-        console.log(oli.scripts)
         oli.scripts.push({
           id: script.src || index,
           source: oli.parse(script.innerHTML || src)
@@ -88,6 +87,7 @@ module.exports = function compile(ast) {
 
     walk(node)(traversal)
   }
+  return ast
 }
 
 function traversal(node, parent) {
@@ -256,7 +256,7 @@ function Oli(code, options) {
   Oli.parse(code, options)
 }
 
-Oli.parse = function (code, options) {
+Oli.parse = Oli.eval = function (code, options) {
   var ast = Oli.ast(code, options)
 
   if (!ast) {
@@ -269,14 +269,18 @@ Oli.parse = function (code, options) {
     options = { locals: null }
   }
 
+  return Oli.compile(ast, options, code)
+}
+
+Oli.compile = function (ast, options, code) {
   try {
-    return compiler(ast.body, options)
+    return compiler(ast, options)
   } catch (err) {
     handleError(err, code)
   }
 }
 
-Oli.ast = function (code, options) {
+Oli.ast = Oli.parseAST = function (code, options) {
   var ast
 
   if (typeof code !== 'string') {
@@ -304,7 +308,7 @@ Oli.ast = function (code, options) {
   return ast
 }
 
-Oli.tokens = function (code, options) {
+Oli.tokens = Oli.parseTokens = function (code, options) {
   return Oli.ast(code, options)
 }
 

@@ -12,7 +12,7 @@
 
 ## Installation
 
-**For node.js**
+**node.js**
 ```
 $ npm install oli
 ```
@@ -21,7 +21,7 @@ For CLI usage only, it's recommented you install it as global package
 $ npm install -g oli
 ```
 
-For the browser
+**Browser**
 ```
 $ bower install oli
 ```
@@ -29,6 +29,12 @@ Or load the script remotely (just for testing or development)
 ```html
 <script src="//rawgithub.com/oli-lang/oli-js/master/oli.js"></script>
 ```
+Then you can create scripts tag using `text/oli` MIME types
+```html
+<script type="text/oli" src="path/to/file.oli"></script>
+```
+It will automatically fetch and parse the oli sources, and make it available from `oli.scripts`
+
 ## Milestones
 
 - Parser
