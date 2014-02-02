@@ -36,6 +36,11 @@ describe 'Parser', ->
             end
             yes
           end
+          another:
+            block:
+              for::
+            end
+          end
         end
       ''')
       expect parse('block: value') .to.be.null
