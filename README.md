@@ -46,8 +46,6 @@ It will automatically fetch and parse the oli sources, and make it available fro
   - Math operations
   - Structure types
 - Serializer
-  - Type inference
-  - Nested structures with type expressions determination
 
 ## Features
 
@@ -82,10 +80,12 @@ Please, be aware with that in order to prevent possible inconsistencies if your 
 
 #### tokens(code [, options])
 
+<!--
 #### stringify(object)
 
 #### serialize(object)
 Alias to `stringify()` method
+-->
 
 #### load(path, callback)
 Context: `browser`
