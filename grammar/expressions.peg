@@ -4,10 +4,11 @@ _
 __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
 
+// to do: separate rule in especific expressions contexts
 PrimitiveValueExpression
-  = exp:BooleanLiteral !PrimitiveValueExpression { return exp; }
-  / exp:ReferenceExpression _ &("," / ")" / EOS) { return exp; }
-  / exp:NumberLiteral !PrimitiveValueExpression { return exp; }
+  = exp:BooleanLiteral _ &("," / "]" / ")" / EOS) { return exp; }
+  / exp:ReferenceExpression _ !PrimitiveValueExpression _ &("," / "]" / ")" / EOS) { return exp; }
+  / exp:NumberLiteral _ !PrimitiveValueExpression _ &("," / "]" / ")" / EOS) { return exp; }
   / StringLiteral
   / ListExpression
 

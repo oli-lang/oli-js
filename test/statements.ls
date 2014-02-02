@@ -98,6 +98,11 @@ describe 'Statements', ->
           expect node ast-tree, '0.value' .to.be.equal false
           expect node ast-tree, '1.value' .to.be.equal true
 
+      describe 'mixed', (_) ->
+
+        it 'should parse "1.1.3, true" as unquoted string', ->
+          expect node ast('block: 1.2.1, true'), 'expression.right.value' .to.be.equal '1.2.1, true'
+
     describe 'assignment', ->
 
       describe 'in-line', (_) ->
@@ -255,13 +260,15 @@ describe 'Statements', ->
         it 'first level primitives types', ->
           ast-obj = ast '''
           true no
+          yes
           123.2313
           'hello oli!'
           string literal
           [ 1, 2, 'hello' ]
           '''
-          expect node ast-obj, '0.value' .to.be.equal true
-          expect node ast-obj, '1.value' .to.be.equal false
+          expect node ast-obj, '0.value' .to.be.equal 'true no'
+          expect node ast-obj, '1.value' .to.be.equal true
+          expect node ast-obj, '2.value' .to.be.equal 123.2313
           expect node ast-obj, '3.value' .to.be.equal 'hello oli!'
           expect node ast-obj, '4.value' .to.be.equal 'string literal'
           expect node ast-obj, '5.elements.2.value' .to.be.equal 'hello'
