@@ -338,14 +338,25 @@ describe 'Expressions', ->
 
     describe 'reference', (_) ->
 
-      it 'should parse "hello (*key)" as attribute reference value', ->
-        inspect ast('hello (*key): oli')
+      it 'should parse "hello (*key)" as attribute identifier reference', ->
         expect node ast('hello (*key): oli'), 'expression.left.attributes.0.left.name'
           .to.be.equal 'key'
 
-      it 'should parse "hello (*{key}: value)" as attribute reference value', ->
+      it 'should parse "hello (*{key}: value)" as attribute identifier reference', ->
         expect node ast('hello (*{key}: value): oli'), 'expression.left.attributes.0.left.name'
           .to.be.equal 'key'
+
+      it 'should parse "hello (key: *value)" as attribute reference value', ->
+        expect node ast('hello (key: *value): oli'), 'expression.left.attributes.0.right.name'
+          .to.be.equal 'value'
+
+      it 'should parse "hello (key: *\'value\')" as attribute reference value', ->
+        expect node ast('hello (key: *"value"): oli'), 'expression.left.attributes.0.right.name'
+          .to.be.equal 'value'
+
+      it 'should parse "hello (key: value, another: *one)" as attribute reference value', ->
+        expect node ast('hello (key: value, another: *one): oli'), 'expression.left.attributes.1.right.name'
+          .to.be.equal 'one'
 
     describe 'list', (_) ->
 

@@ -5,9 +5,9 @@ __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
 
 PrimitiveValueExpression
-  = test:BooleanLiteral !PrimitiveValueExpression { return test; }
-  / exp:ReferenceExpression _ ("," / EOS) { return exp; }
-  / test:NumberLiteral !PrimitiveValueExpression { return test; }
+  = exp:BooleanLiteral !PrimitiveValueExpression { return exp; }
+  / exp:ReferenceExpression _ &("," / ")" / EOS) { return exp; }
+  / exp:NumberLiteral !PrimitiveValueExpression { return exp; }
   / StringLiteral
   / ListExpression
 
