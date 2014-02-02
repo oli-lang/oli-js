@@ -29,11 +29,12 @@ Or load the script remotely (just for testing or development)
 ```html
 <script src="//rawgithub.com/oli-lang/oli-js/master/oli.js"></script>
 ```
-Then you can create scripts tag using `text/oli` MIME types
+Then you can create script tags with `text/oli` MIME type
 ```html
 <script type="text/oli" src="path/to/file.oli"></script>
 ```
-It will automatically fetch and parse the oli sources, and make it available from `oli.scripts`
+It will automatically fetch and parse the oli sources and make it available from `oli.scripts`.
+To disable the automatic parsing, just add `data-ignore` attribute in the script tag
 
 ## Milestones
 
