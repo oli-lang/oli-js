@@ -64,6 +64,7 @@ console.log(json)
 Alias: `eval`
 
 #### ast(code [, options])
+Alias: `parseAST`
 
 This is the most low-level API method.
 It returns an object that represent the parsed abstract-syntax tree
