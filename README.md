@@ -12,7 +12,7 @@
 
 ## Installation
 
-**node.js**
+**Node.js**
 ```
 $ npm install oli
 ```
@@ -86,6 +86,17 @@ Please, be aware with that in order to prevent possible inconsistencies if your 
 
 #### serialize(object)
 Alias to `stringify()` method
+
+#### load(path, callback)
+Context: `browser`
+
+Performs a XHR request and returns the response body as plain text.
+It will throw an `Error` exception if cannot perform the request
+```js
+oli.load('path/to/file.oli', function (text) {
+  console.log(oli.parse(text))
+})
+```
 
 ## Contributing
 
