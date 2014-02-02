@@ -16,7 +16,7 @@ module.exports = (grunt) ->
     livescript:
       options:
         bare: true
-        prelude: true
+        prelude: false
       src:
         expand: true
         cwd: 'src/'
