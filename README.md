@@ -25,9 +25,9 @@ For the browser
 ```
 $ bower install oli
 ```
-Or load the script remotely
+Or load the script remotely (just for testing or development)
 ```html
-<script src="//raw.github.com/oli-lang/oli-js/master/oli.js"></script>
+<script src="//rawgithub.com/oli-lang/oli-js/master/oli.js"></script>
 ```
 ## Milestones
 

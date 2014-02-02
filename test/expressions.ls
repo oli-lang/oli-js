@@ -177,6 +177,16 @@ describe 'Expressions', ->
         expect node ast('"hello world oli": "hola"'), 'expression.left.id.value'
           .to.be.equal 'hello world oli'
 
+    describe 'reference', (_) ->
+
+      it 'should parse "*{block}: value" as block identifier', ->
+        expect node ast('*{block}: value'), 'expression.left.id.name' .to.be.equal 'block'
+        expect node ast('*{block}: value'), 'expression.right.value' .to.be.equal 'value'
+
+      it 'should parse "*block: value" as block identifier', ->
+        expect node ast('*block: value'), 'expression.left.id.name' .to.be.equal 'block'
+        expect node ast('*block: value'), 'expression.right.value' .to.be.equal 'value'
+
     describe 'reference alias', (_) ->
 
       it 'should parse "oli" as reference identifier', ->
@@ -298,25 +308,44 @@ describe 'Expressions', ->
       expect node ast('hello (key): oli'), 'expression.left.attributes.0.left.name'
         .to.be.equal 'key'
 
+    it 'should parse "{key}" as unique attribute identifier', ->
+      expect node ast('hello ({key}): oli'), 'expression.left.attributes.0.left.name'
+        .to.be.equal 'key'
+
+    it 'should parse "\'key\'" as unique attribute identifier', ->
+      expect node ast('hello ("key"): oli'), 'expression.left.attributes.0.left.value'
+        .to.be.equal 'key'
+
     it 'should parse "key" as attribute identifier', ->
-      expect node ast('hello(key: value): oli'), 'expression.left.attributes.0.left.name'
+      expect node ast('hello (key: value): oli'), 'expression.left.attributes.0.left.name'
         .to.be.equal 'key'
 
     it 'should parse "value" as attribute value', ->
-      expect node ast('hello(key: value): oli'), 'expression.left.attributes.0.right.value'
+      expect node ast('hello (key: value): oli'), 'expression.left.attributes.0.right.value'
         .to.be.equal 'value'
 
     it 'should parse "yes" as attribute boolean value', ->
-      expect node ast('hello(key: yes): oli'), 'expression.left.attributes.0.right.value'
+      expect node ast('hello (key: yes): oli'), 'expression.left.attributes.0.right.value'
         .to.be.equal true
 
     it 'should parse "-12.2931" as attribute number value', ->
-      expect node ast('hello(key: -12.2931): oli'), 'expression.left.attributes.0.right.value'
+      expect node ast('hello (key: -12.2931): oli'), 'expression.left.attributes.0.right.value'
         .to.be.equal -12.2931
 
     it 'should parse "[ 1, no, 3 ]" as attribute number value', ->
-      expect node ast('hello(key: [ 1, no, 3 ]): oli'), 'expression.left.attributes.0.right.elements.1.value'
+      expect node ast('hello (key: [ 1, no, 3 ]): oli'), 'expression.left.attributes.0.right.elements.1.value'
         .to.be.equal false
+
+    describe 'reference', (_) ->
+
+      it 'should parse "hello (*key)" as attribute reference value', ->
+        inspect ast('hello (*key): oli')
+        expect node ast('hello (*key): oli'), 'expression.left.attributes.0.left.name'
+          .to.be.equal 'key'
+
+      it 'should parse "hello (*{key}: value)" as attribute reference value', ->
+        expect node ast('hello (*{key}: value): oli'), 'expression.left.attributes.0.left.name'
+          .to.be.equal 'key'
 
     describe 'list', (_) ->
 
@@ -325,11 +354,11 @@ describe 'Expressions', ->
           .to.be.equal 'super key'
 
       it 'should parse "super key" as attribute identifier', ->
-        expect node ast('hello(key: value, super key: super value): oli'), 'expression.left.attributes.1.left.name'
+        expect node ast('hello (key: value, super key: super value): oli'), 'expression.left.attributes.1.left.name'
           .to.be.equal 'super key'
 
       it 'should parse "super value" as attribute assignment value', ->
-        expect node ast('hello (key: value, super key: super value): oli'), 'expression.left.attributes.1.right.value'
+        expect node ast('hello (key: value, super key: "super value"): oli'), 'expression.left.attributes.1.right.value'
           .to.be.equal 'super value'
 
 

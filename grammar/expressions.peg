@@ -5,9 +5,9 @@ __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
 
 PrimitiveValueExpression
-  = BooleanLiteral
-  / ReferenceExpression
-  / NumberLiteral
+  = test:BooleanLiteral !PrimitiveValueExpression { return test; }
+  / exp:ReferenceExpression _ ("," / EOS) { return exp; }
+  / test:NumberLiteral !PrimitiveValueExpression { return test; }
   / StringLiteral
   / ListExpression
 
@@ -97,10 +97,10 @@ ReferenceLiteralExpression
     }
 
 ReferenceExpression
-  = ReferenceOperator id:ReferenceLiteralExpression _ ("," / EOS) {
+  = ReferenceOperator name:ReferenceLiteralExpression {
     return astNode({
       type: 'ReferenceExpression',
-      name: id
+      name: name
     })
   }
 
@@ -114,7 +114,7 @@ IdentifierLiteralExpression
   / Identifier
 
 IdentifierNameExpression
-  = IdentifierReferenceExpression / IdentifierLiteralExpression
+  = ReferenceExpression / IdentifierReferenceExpression / IdentifierLiteralExpression
 
 IdentifierOperationExpression
   = IdentifierBinaryExpression / IdentifierUnaryExpression

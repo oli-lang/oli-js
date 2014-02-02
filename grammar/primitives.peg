@@ -1,8 +1,12 @@
 /* Primitives types */
 
 BooleanLiteral
-  = TrueToken  { return astNode({ type: "BooleanLiteral", value: true  }) }
-  / FalseToken { return astNode({ type: "BooleanLiteral", value: false }) }
+  = TrueToken {
+    return astNode({ type: "BooleanLiteral", value: true  })
+  }
+  / FalseToken {
+    return astNode({ type: "BooleanLiteral", value: false })
+  }
 
 NumberLiteral "number"
   = number:(HexIntegerLiteral / DecimalLiteral / IntegerLiteral) {
