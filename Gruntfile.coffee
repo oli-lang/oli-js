@@ -62,6 +62,14 @@ module.exports = (grunt) ->
         files:
           'oli.js': ['lib/oli.js']
 
+    uglify:
+      options:
+        banner: '/*! Oli language parser and compiler for browsers - v<%= pkg.version %> - https://github.com/oli-lang/oli-js ' +
+          '| Generated <%= grunt.template.today("yyyy-mm-dd hh:MM") %> */\n'
+      oli:
+        files:
+          'oli.js': ['oli.js']
+
     watch:
       options:
         spawn: false
@@ -106,6 +114,7 @@ module.exports = (grunt) ->
     'test'
     'clean'
     'browserify'
+    'uglify'
     'release'
   ]
 
