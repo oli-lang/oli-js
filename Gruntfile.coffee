@@ -56,9 +56,11 @@ module.exports = (grunt) ->
         src: [ 'benchmarks/*.js' ]
 
     browserify:
-      dist:
+      oli:
+        options:
+          standalone: 'oli'
         files:
-          'dist/oli.js': ['lib/oli.js']
+          'oli.js': ['lib/oli.js']
 
     watch:
       options:
