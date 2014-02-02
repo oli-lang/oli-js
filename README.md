@@ -90,7 +90,7 @@ Alias to `stringify()` method
 #### load(path, callback)
 Context: `browser`
 
-Performs a XHR request and returns the response body as plain text.
+Performs an asynchronous XHR request and pass to the callback the response body as plain text.
 It will throw an `Error` exception if cannot perform the request
 ```js
 oli.load('path/to/file.oli', function (text) {
