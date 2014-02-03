@@ -26,7 +26,7 @@ describe 'Parser', ->
   describe 'testing', (_) ->
 
     xit 'should parse property', ->
-      inspect parse('''
+      /*inspect parse '''
         block:
           another:
             nested:
@@ -42,5 +42,26 @@ describe 'Parser', ->
             end
           end
         end
-      ''')
+      ''' */
+      inspect parse '''
+        message > Person:
+          required > string: name: 1
+          required > int32: id: 2
+          optional > string: email: 3
+
+          enum > PhoneType:
+            MOBILE: 0
+            HOME:: 1
+            WORK: 2
+          end
+
+          message > PhoneNumber:
+            required string: number: 1
+            optional PhoneType: type (default: HOME): 2
+          end
+          repeated > PhoneNumber: phone: 4
+        end
+      '''
+      process.exit!
       expect parse('block: value') .to.be.null
+
