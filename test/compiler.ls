@@ -1,6 +1,5 @@
 {
-  ast
-  node
+  oli
   parse
   expect
   inspect
@@ -8,60 +7,22 @@
 
 describe 'Compiler', ->
 
-  describe 'API', ->
+  describe 'basic', (_) ->
 
-    describe 'ast()', (_) ->
+    it 'should compile "value" as string', ->
+      expect parse('value') .to.be.equal 'value'
 
-      it 'should have the proper AST object', ->
-        expect (ast 'oli rules!').body[0] .to.have.property 'value' .and.be.equal 'oli rules!'
+    it 'should compile "12" as number', ->
+      expect parse('12') .to.be.equal 12
 
-      it 'should have an object with number of code', ->
-        expect (ast 'oli rules!').body[0] .to.have.property 'loc' .and.be.an.object
+    it 'should compile "12.3412" as decimal number', ->
+      expect parse('12.3412') .to.be.equal 12.3412
 
-      describe 'options', (_) ->
+    it 'should compile "-9.1" as signed off number', ->
+      expect parse('-9.1') .to.be.equal -9.1
 
-        it 'should omit the lines of code AST node', ->
-          expect (ast 'oli rules!', { loc: false }).body[0] .to.not.have.property 'loc'
+    it 'should compile "true" as boolean', ->
+      expect parse('true') .to.be.true
 
-  describe 'testing', (_) ->
-
-    xit 'should parse property', ->
-      /*inspect parse '''
-        block:
-          another:
-            nested:
-              list:
-                - 1, 2, 3
-              end
-            end
-            yes
-          end
-          another:
-            block:
-              for::
-            end
-          end
-        end
-      '''
-      inspect parse '''
-        message > Person:
-          required > string: name: 1
-          required > int32: id: 2
-          optional > string: email: 3
-
-          enum > PhoneType:
-            MOBILE: 0
-            HOME:: 1
-            WORK: 2
-          end
-
-          message > PhoneNumber:
-            required string: number: 1
-            optional PhoneType: type (default: HOME): 2
-          end
-          repeated > PhoneNumber: phone: 4
-        end
-      '''
-      */
-      expect parse('block: value') .to.be.null
-
+    it 'should compile "no" as boolean', ->
+      expect parse('no') .to.be.false
