@@ -6,7 +6,7 @@
   inspect
 } = require './lib/helper'
 
-describe 'Parser', ->
+describe 'Compiler', ->
 
   describe 'API', ->
 
@@ -42,7 +42,7 @@ describe 'Parser', ->
             end
           end
         end
-      ''' */
+      '''
       inspect parse '''
         message > Person:
           required > string: name: 1
@@ -62,6 +62,6 @@ describe 'Parser', ->
           repeated > PhoneNumber: phone: 4
         end
       '''
-      process.exit!
+      */
       expect parse('block: value') .to.be.null
 

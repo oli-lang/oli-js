@@ -255,6 +255,30 @@ describe 'Statements', ->
           '''
           expect node ast-obj, 'expression.right.body.0.expression.right.body.0.body.value' .to.be.true
 
+        it 'should parse "block: | another: | true" as block nested pipe statements', ->
+          ast-obj = ast '''
+            block:
+              | another:
+                | true
+                | cool
+          '''
+          expect node ast-obj, 'expression.right.body.0.body.expression.right.body.0.body.value' .to.be.true
+          expect node ast-obj, 'expression.right.body.0.body.expression.right.body.1.body.value' .to.be.equal 'cool'
+
+        it 'should parse "block: | another: | nested: true end" as block nested pipe statements', ->
+          ast-obj = ast '''
+            block:
+              | another:
+                | nested:
+                    true
+                  end
+              | cool
+            final: block
+          '''
+          expect node ast-obj, '0.expression.right.body.0.body.expression.right.body.0.body.expression.right.body.0.value' .to.be.true
+          expect node ast-obj, '0.expression.right.body.0.body.expression.right.body.1.body.value' .to.be.equal 'cool'
+          expect node ast-obj, '1.expression.right.value' .to.be.equal 'block'
+
       describe 'multi-statement', (_) ->
 
         it 'first level primitives types', ->

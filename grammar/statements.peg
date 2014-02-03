@@ -60,8 +60,7 @@ ValueStatement
         })
       });
     }
-  / id:IdentifierExpression _ operator:BlockAsignmentOperator
-      _ !LineTerminatorSequence
+  / id:IdentifierExpression _ operator:BlockAsignmentOperator _ !LineTerminatorSequence
       _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; })
     {
       return astNode({
@@ -76,9 +75,9 @@ ValueStatement
     }
 
 PipeStatement
-  = operator:PipeOperator _ body:PrimitiveTypeStatement {
+  = operator:PipeOperator _ body:(MainStatement / PrimitiveTypeStatement) {
     return astNode({
-      type:     'PipeStatement',
+      type:     'ValueStatement',
       operator: operator,
       body:     body !== null ? body : []
     });
