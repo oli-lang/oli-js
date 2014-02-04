@@ -7,7 +7,7 @@
     "name": "Tomas Aparicio"
   },
   "homepage": "https://github.com/h2non/oli.js",
-  "main": "./dist/oli.js",
+  "main": "./oli.js",
   "keywords": [
     "parser",
     "config",
