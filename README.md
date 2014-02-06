@@ -134,7 +134,7 @@ Only node.js is required for development
 
 Clone/fork this repository
 ```
-$ git clone git@github.com:h2non/oli.js.git && cd oli.js
+$ git clone https://github.com/oli-lang/oli-js.git && cd oli-js
 ```
 
 Install package dependencies
