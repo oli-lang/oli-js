@@ -11,13 +11,21 @@ describe 'Compiler', ->
   describe 'basic', (_) ->
 
     xit 'should compile block properly', ->
+      inspect parse '''
+        # comment
+        block >>> "pepe" > hola (hola: mundo):
+          | "hola *'mundo' como estas?"
+          | block: *hola
+        test: hola
+        block: jajajaja
+      '''
       expect parse '''
         # comment
         block >>> "pepe" > hola (hola: mundo):
           | "hola *'mundo' como estas?"
           | *hola
         test: hola
-      ''', {comments: true} .to.be.deep.equal [ 1, 2, 3 ]
+      ''', { comments: true } .to.be.deep.equal [ 1, 2, 3 ]
 
     it 'should compile "value" as string', ->
       expect parse('value') .to.be.equal 'value'

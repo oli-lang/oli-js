@@ -1,8 +1,11 @@
 # oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
 
-> [Oli][1] language parser and compiler for node and the browser
+> Oli minimal language parser and compiler for node.js and the browser
 
-> **Spoiler! work in progress**
+> **SPOILER! WORK IN PROGRESS**
+<!--
+> **Note that it is still a preview beta version!**
+-->
 
 <table>
 <tr>
@@ -15,14 +18,43 @@
 
 ## About
 
+Multi-purpose high level [Oli language][1] parser and compiler for node.js and the browser,
+which implements the latest [language specification][oli-docs]
 
+oli.js provides a general parsing infraestructure to be consumed from other applications that uses Oli for specific purposes,
+like parsing own domain-spacific languages based on the language syntax
 
-## Features
+It can be easily integrated with existent applications and it provides a rich featured [programmatic API](#api)
 
-- Powerful type inference and pattern matching
-- Heavily tested (see code coverage)
-- Good performance (run `grunt bench`)
-- Oli official implementation from the language creator
+## Milestones
+
+- **Parser**
+  - [x] Top-down parsing (based on PEG strategy)
+  - [x] AST
+  - [x] Configurable parsing options
+  - [x] Errors
+  - [?] Unicode
+  - Enhancements
+    - [_] Indentation based parsing
+- **Compiler**
+  - [x] AST walker
+  - [x] Memory register
+  - [x] Tranpiler pre-processors
+  - [x] Intermediate code post-processors
+  - [x] References
+  - [x] Clone and inheritance
+  - [_] Errors
+  - [_] Optimiser
+  - [_] RELP
+- **Serializer**
+  - [_] JSON to Oli
+  - [_] Concret Sintax Tree to Oli
+- Environments
+  - [X] Node.js
+  - [X] Browser
+  - [?] Rhino
+
+For more information about milestones, discussion and future enhancements, see the opened [issues][issues-enhancement]
 
 ## Installation
 
@@ -50,27 +82,16 @@ Then you can create script tags with `text/oli` MIME type
 It will automatically fetch and parse the oli sources and make it available from `oli.scripts`.
 To disable the automatic parsing, just add `data-ignore` attribute in the script tag
 
-## Milestones
+## Environments
 
-- **Parser**
-  - [x] Top-down parsing (based on PEG strategy)
-  - [x] AST
-  - [x] Parsing options
-  - [x] Errors
-  - **Enhancements**
-    - [_] Indentation based parsing
-- Compiler
-  - [x] AST walker
-  - [x] Memory
-  - [x] Tranpiler pre-processors
-  - [x] Intermediate code post-processors
-  - [x] References
-  - [x] Clone and inheritance
-  - [_] Errors
-  - [_] Optimizer
-- Serializer
-  - [_] JSON to Oli
-  - [_] Concret Sintax Tree to Oli
+- Node.js >= 0.8.0
+- Chrome
+- Firefox
+- Opera
+- Safari
+- IE >= 9
+
+**Note**: pending tests in embebed JavaScript engines
 
 ## API
 
@@ -166,7 +187,10 @@ Released under the MIT license
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/h2non/oli.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-[1]: https://github.com/oli-lang/oli
+[1]: http://oli-lang.org
 [2]: http://travis-ci.org/oli-lang/oli-js
 [3]: https://gemnasium.com/oli-lang/oli-js
 [4]: http://badge.fury.io/js/oli
+
+[oli-docs]: http://docs.oli-lang.org
+[issues-enhancement]: https://github.com/oli-lang/oli-js/issues?labels=enhancement&milestone=1&page=1&state=open
