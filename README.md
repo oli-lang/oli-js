@@ -130,7 +130,7 @@ You should follow the LiveScript language conventions defined in the [coding sty
 
 ### Development
 
-Only node.js is required for development
+Only [node.js](http://nodejs.org) and [Grunt](http://gruntjs.com) are required for development
 
 Clone/fork this repository
 ```
