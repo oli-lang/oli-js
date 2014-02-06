@@ -6,7 +6,7 @@
 
 <table>
 <tr>
-<td>Supported language version</td><td>0.1</td>
+<td>Language version</td><td>0.1</td>
 </tr>
 <tr>
 <td>Stage</td><td>beta</td>
@@ -50,12 +50,13 @@ Then you can create script tags with `text/oli` MIME type
 It will automatically fetch and parse the oli sources and make it available from `oli.scripts`.
 To disable the automatic parsing, just add `data-ignore` attribute in the script tag
 
-## Milestones stages
+## Milestones
 
 - **Parser**
   - [x] Top-down parsing (based on PEG strategy)
   - [x] AST
   - [x] Parsing options
+  - [x] Errors
   - **Enhancements**
     - [_] Indentation based parsing
 - Compiler
@@ -65,8 +66,8 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Intermediate code post-processors
   - [x] References
   - [x] Clone and inheritance
+  - [_] Errors
   - [_] Optimizer
-  - [_] Custom errors
 - Serializer
   - [_] JSON to Oli
   - [_] Concret Sintax Tree to Oli
