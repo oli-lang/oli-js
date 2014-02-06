@@ -57,7 +57,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] AST
   - [x] Parsing options
   - **Enhancements**
-    - [_] Indentation based support
+    - [_] Indentation based parsing
 - Compiler
   - [x] AST walker
   - [x] Memory
