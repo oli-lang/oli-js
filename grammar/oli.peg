@@ -1,6 +1,9 @@
 {
-  //var indentStack = [];
-  //var indent = "";
+  // parsing options
+  var includeLOC = options.loc;
+  var includeComments = options.comment
+
+  var comments = includeComments ? comments : null;
 
   function loc() {
     var start = offset();
@@ -21,8 +24,23 @@
   }
 
   function astNode(tree) {
-    tree.loc = loc();
+    if (includeLOC) {
+      tree.loc = loc();
+    }
     return tree;
+  }
+
+  function registerComment(node) {
+    var exists = false
+    for (var i = 0, l = comments.length; i < l; i += 1) {
+      if (JSON.stringify(node) === JSON.stringify(comments[i])) {
+        exists = true
+        break
+      }
+    }
+    if (!exists) {
+      comments.push(node)
+    }
   }
 }
 
@@ -33,7 +51,8 @@ Program
   = body:SourceElements? {
       return {
         type:     "Program",
-        body:     body !== null ? body : []
+        body:     body !== null ? body : [],
+        comments: comments
       };
     }
 

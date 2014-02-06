@@ -17,7 +17,7 @@ describe 'API', ->
       expect (ast 'oli rules!').body[0] .to.have.property 'value' .and.be.equal 'oli rules!'
 
     it 'should have an object with number of code', ->
-      expect (ast 'oli rules!').body[0] .to.have.property 'loc' .and.be.an.object
+      expect (ast 'oli rules!', { loc: true }).body[0] .to.have.property 'loc' .and.be.an.object
 
     describe 'options', (_) ->
 
@@ -34,7 +34,7 @@ describe 'API', ->
       expect (ast 'oli rules!').body[0] .to.have.property 'value' .and.be.equal 'oli rules!'
 
     it 'should have an object with number of code', ->
-      expect (ast 'oli rules!').body[0] .to.have.property 'loc' .and.be.an.object
+      expect (ast 'oli rules!', { loc: true }).body[0] .to.have.property 'loc' .and.be.an.object
 
     describe 'options', (_) ->
 

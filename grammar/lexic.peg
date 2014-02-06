@@ -7,8 +7,9 @@ WhiteSpace "whitespace"
   = [\t\v\f \u00A0\uFEFF]
   / Zs
 
+// use [\w|\W]
 IdentifierLetter
-  = [a-zA-Z0-9\-\\/\\\_\^\|\º\¨\ç\¡\¿\.\$\@\?\%\+\;]
+  = [a-zA-Z0-9\-\\/\\\_\^\º\¨\ç\¡\¿\.\$\@\€\?\%\+\;]
 
 ElementSeparator
   = EOSNoLineTerminator
@@ -39,17 +40,36 @@ EOSNoLineTerminator
 /* Comments */
 
 Comment "comment"
-  = MultiLineComment
-  / SingleLineComment
+  = comment:(MultiLineComment
+  / SingleLineComment) {
+    if (includeComments) {
+      registerComment(comment)
+    }
+  }
 
 MultiLineComment
-  = "##" (!"##" SourceCharacter)* "##"
+  = "##" comment:(!"##" c:SourceCharacter { return c; })* "##" {
+    return astNode({
+      type: 'Block',
+      value: comment.join('').trim()
+    })
+  }
 
 MultiLineCommentNoLineTerminator
-  = "##" (!("##" / LineTerminator) SourceCharacter)* "##"
+  = "##" comment:(!("##" / LineTerminator) c:SourceCharacter { return c; })* "##" {
+    return astNode({
+      type: 'Block',
+      value: comment.join('').trim()
+    })
+  }
 
 SingleLineComment
-  = "#" (!LineTerminator SourceCharacter)*
+  = "#" comment:(!LineTerminator c:SourceCharacter { return c })* {
+    return astNode({
+      type: 'Line',
+      value: comment.join('').trim()
+    })
+  }
 
 /* Experimental dent-based parsing, todo!
 

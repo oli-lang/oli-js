@@ -77,7 +77,7 @@ ValueStatement
 PipeStatement
   = operator:PipeOperator _ body:(MainStatement / PrimitiveTypeStatement) {
     return astNode({
-      type:     'ValueStatement',
+      type:     'PipeStatement',
       operator: operator,
       body:     body !== null ? body : []
     });
