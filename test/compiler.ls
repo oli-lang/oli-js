@@ -1,5 +1,6 @@
 {
   oli
+  ast
   parse
   expect
   inspect
@@ -11,11 +12,12 @@ describe 'Compiler', ->
 
     xit 'should compile block properly', ->
       expect parse '''
+        # comment
         block >>> "pepe" > hola (hola: mundo):
           | "hola *'mundo' como estas?"
           | *hola
         test: hola
-      ''' .to.be.deep.equal [ 1, 2, 3 ]
+      ''', {comments: true} .to.be.deep.equal [ 1, 2, 3 ]
 
     it 'should compile "value" as string', ->
       expect parse('value') .to.be.equal 'value'

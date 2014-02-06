@@ -2,13 +2,24 @@
 
 > [Oli][1] language parser and compiler for node and the browser
 
-> Spoiler! work in progress!!
+> **Spoiler! work in progress**
 
 <table>
 <tr>
-<td>Oli spec version</td><td>0.1</td>
+<td>Supported language version</td><td>0.1</td>
 </tr>
 </table>
+
+## About
+
+
+
+## Features
+
+- Powerful type inference and pattern matching
+- Heavily tested (see code coverage)
+- Good performance (run `grunt bench`)
+- Oli official implementation from the language creator
 
 ## Installation
 
@@ -48,12 +59,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - Structure types
 - Serializer
 
-## Features
-
-- Powerful type inference and pattern matching
-- Heavily tested (see code coverage)
-- Good performance (run `grunt bench`)
-- Oli official implementation from the language creator
+## Roadmap 0.2
 
 ## API
 
@@ -81,12 +87,6 @@ Please, be aware with that in order to prevent possible inconsistencies if your 
 
 #### tokens(code [, options])
 
-<!--
-#### stringify(object)
-
-#### serialize(object)
-Alias to `stringify()` method
--->
 
 #### load(path, callback)
 Context: `browser`
@@ -114,40 +114,30 @@ You should follow the LiveScript language conventions defined in the [coding sty
 
 Only node.js is required for development
 
-1. Clone/fork this repository
+Clone/fork this repository
 ```
 $ git clone git@github.com:h2non/oli.js.git && cd oli.js
 ```
 
-2. Install package dependencies
+Install package dependencies
 ```
 $ npm install
 ```
 
-3. Run tests
+Run tests
 ```
 $ npm test
 ```
 
-4. Run benchmarks
+Run benchmarks
 ```
 grunt bench
 ```
 
-5. Coding zen mode
+Coding zen mode
 ```
 $ grunt dev [--force]
 ```
-
-## To Do/Wish list
-
-- Browser support
-- Compiler to JSON
-- Serialization support
-- Built-in operators
-- Online parser (github pages)
-
-Do you miss something? Feel free to open an issue or make a PR!
 
 ## License
 
