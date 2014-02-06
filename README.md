@@ -78,8 +78,15 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 
 ```js
 var oli = require('oli')
-var json = oli.parse('message: hello, oli!')
+
+try {
+  var json = oli.parse('message: - hello, oli!')
+} catch (e) {
+  console.error('Cannot parse:', e.fullMessage)
+}
+
 console.log(json)
+// { message: body: [ "hello", "oli!" ] } }
 ```
 
 #### parse(code [, options])
