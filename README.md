@@ -56,21 +56,20 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Top-down parsing (based on PEG strategy)
   - [x] AST
   - [x] Parsing options
-  - [x] Unicode
   - **Enhancements**
-    - [ ] Indentation based support
+    - [_] Indentation based support
 - Compiler
   - [x] AST walker
   - [x] Memory
   - [x] Tranpiler pre-processors
   - [x] Intermediate code post-processors
-  - [x] Referential support
-  - [x] Clone and block inheritance operations
-  - [ ] Optimizer
-  - [ ] Custom errors
+  - [x] References
+  - [x] Clone and inheritance
+  - [_] Optimizer
+  - [_] Custom errors
 - Serializer
-  - [ ] JSON to Oli
-  - [ ] Concret Sintax Tree to Oli
+  - [_] JSON to Oli
+  - [_] Concret Sintax Tree to Oli
 
 ## API
 
