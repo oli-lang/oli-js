@@ -9,7 +9,7 @@
 
 <table>
 <tr>
-<td>Language version</td><td>0.1</td>
+<td>Language version</td><td>0.1 (unclosed)</td>
 </tr>
 <tr>
 <td>Stage</td><td>beta</td>
@@ -21,10 +21,10 @@
 Multi-purpose high level [Oli language][1] parser and compiler for node.js and the browser,
 which implements the latest [language specification][oli-docs]
 
-oli.js provides a general parsing infraestructure to be consumed from other applications that uses Oli for specific purposes,
-like parsing own domain-spacific languages based on the language syntax
+Oli.js provides a general parsing infraestructure to be consumed from other applications
+that uses Oli sintax for specific purposes, like parsing own DSL
 
-It can be easily integrated with existent applications and it provides a rich featured [programmatic API](#api)
+It provides a rich featured [programmatic API](#api)
 
 ## Milestones
 
