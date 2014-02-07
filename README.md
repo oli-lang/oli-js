@@ -54,7 +54,7 @@ It can be easily integrated with existent applications and it provides a rich fe
   - [X] Browser
   - [?] Rhino
 
-For more information about milestones, discussion and future enhancements, see the opened [issues][issues-enhancement]
+For more information about milestones, discussion and future enhancements, see the open [issues][issues-enhancement]
 
 ## Installation
 
