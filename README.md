@@ -24,44 +24,18 @@ which implements the latest [language specification][oli-docs]
 Oli.js provides a general parsing infraestructure to be consumed from other applications
 that uses the Oli sintax for specific purposes, like parsing own DSL
 
-It provides a rich featured [programmatic API](#api)
+It provides a rich featured [programmatic API](#programmatic-api)
 
 ## Features
 
-- Powerful paser based on parsing expression grammar
-- Usable from node.js and the browser
-- High-level and medium level API
-- Official Oli language spec implementation
+- Powerful parser based on parsing grammar expressions
+- Smart compiler based on type checking and more
+- Detailed error reports
+- Runs on node.js and the browser
+- High and intermediate level featured API
+- Official language specification implementation
 - Heavily tested
-- Good performance
-
-## Milestones
-
-- **Parser**
-  - [x] Top-down parsing (based on PEG strategy)
-  - [x] AST
-  - [x] Configurable parsing options
-  - [x] Errors
-  - [?] Unicode
-  - Enhancements
-    - [_] Indentation based parsing
-- **Compiler**
-  - [x] AST walker
-  - [x] Memory register
-  - [x] Tranpiler pre-processors
-  - [x] Intermediate code post-processors
-  - [x] References
-  - [x] Clone and inheritance
-  - [_] Errors
-  - [_] Optimiser
-  - [_] RELP
-- **Serializer**
-  - [_] JSON to Oli
-  - [_] Concret Sintax Tree to Oli
-- **Environments**
-  - [X] Node.js
-  - [X] Browser
-  - [?] Rhino
+- Good performance (run `grunt bench`)
 
 For more information about milestones, discussion and future enhancements, see the open [issues][issues-enhancement]
 
@@ -102,7 +76,60 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 
 **Note**: pending tests in embebed JavaScript engines
 
-## API
+## Milestones
+
+- **Parser**
+  - [x] Top-down parsing (based on PEG strategy)
+  - [x] AST
+  - [x] Configurable parsing options
+  - [x] Errors
+  - [?] Unicode
+  - Enhancements
+    - [_] Indentation based parsing
+- **Compiler**
+  - [x] AST walker
+  - [x] Memory register
+  - [x] Tranpiler pre-processors
+  - [x] Intermediate code post-processors
+  - [x] References
+  - [x] Clone and inheritance
+  - [_] Errors
+  - [_] Optimiser
+  - [_] RELP
+- **Serializer**
+  - [_] JSON to Oli
+  - [_] Concret Sintax Tree to Oli
+- **Environments**
+  - [X] Node.js
+  - [X] Browser
+  - [?] Rhino
+
+## Command-line interface
+
+```
+Usage: oli [options] path/to/file.oli
+
+Options:
+
+  -h, --help           output usage information
+  -V, --version        output the version number
+  -p, --parse          Parse and return the result as JSON
+  -t, --tokens         Parse and return the result as JSON
+  -o, --output <file>  Write output into a file instead of stdout
+  -a, --ast            Return the parsed AST serialized as JSON
+  -i, --in-line        Parse in-line argument as string
+
+Examples:
+
+  $ oli file.oli > file.result.json
+  $ oli file.oli --output file.result.json
+  $ oli --ast file.oli
+  $ oli --tokens file.oli
+  $ oli --in-line "hello: oli!" > result.json
+
+```
+
+## Programmatic API
 
 ### Example
 
