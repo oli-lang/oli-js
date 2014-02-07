@@ -49,11 +49,14 @@ start
 
 Program
   = body:SourceElements? {
-      return {
+      var program = {
         type:     "Program",
-        body:     body !== null ? body : [],
-        comments: comments
+        body:     body !== null ? body : []
       };
+      if (includeComments) {
+        program.comments = comments;
+      }
+      return program;
     }
 
 SourceElements
