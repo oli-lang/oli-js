@@ -26,6 +26,15 @@ that uses the Oli sintax for specific purposes, like parsing own DSL
 
 It provides a rich featured [programmatic API](#api)
 
+## Features
+
+- Powerful paser based on parsing expression grammar
+- Usable from node.js and the browser
+- High-level and medium level API
+- Official Oli language spec implementation
+- Heavily tested
+- Good performance
+
 ## Milestones
 
 - **Parser**

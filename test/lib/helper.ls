@@ -5,8 +5,6 @@ require! {
   chai
   grunt
   sinon
-  mkdirp
-  rimraf
   suppose
   traverse
   child_process.spawn
@@ -35,8 +33,6 @@ module.exports =
   expect: chai.expect
   should: chai.should
   assert: chai.assert
-  rm: rimraf.sync
-  mkdirp: mkdirp.sync
   chdir: process.chdir
   env: process.env
   join: path.join

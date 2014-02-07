@@ -3,6 +3,7 @@
   ast
   node
   expect
+  inspect
 } = require './lib/helper'
 
 describe 'API', ->
@@ -49,6 +50,12 @@ describe 'API', ->
 
   describe 'tokens()', (_) ->
 
-    it 'should expose the methods', ->
-      expect oli.compile .to.be.a 'function'
-      expect oli.run .to.be.a 'function'
+    it 'should expose the tokens methods', ->
+      expect oli.tokens .to.be.a 'function'
+      expect oli.parseTokens .to.be.a 'function'
+
+    it 'should return the property tokens', ->
+      tokens = oli.tokens 'hello > world: "oli"'
+      expect tokens[0] .to.be.deep.equal { type: 'ValueStatement', value: ':' }
+      expect tokens[1] .to.be.deep.equal { type: 'UnaryExpression', value: '>' }
+
