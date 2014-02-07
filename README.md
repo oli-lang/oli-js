@@ -22,7 +22,7 @@ Multi-purpose high level [Oli language][1] parser and compiler for node.js and t
 which implements the latest [language specification][oli-docs]
 
 Oli.js provides a general parsing infraestructure to be consumed from other applications
-that uses Oli sintax for specific purposes, like parsing own DSL
+that uses the Oli sintax for specific purposes, like parsing own DSL
 
 It provides a rich featured [programmatic API](#api)
 
