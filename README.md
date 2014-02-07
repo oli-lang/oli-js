@@ -49,7 +49,7 @@ It can be easily integrated with existent applications and it provides a rich fe
 - **Serializer**
   - [_] JSON to Oli
   - [_] Concret Sintax Tree to Oli
-- Environments
+- **Environments**
   - [X] Node.js
   - [X] Browser
   - [?] Rhino
