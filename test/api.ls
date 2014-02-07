@@ -57,5 +57,5 @@ describe 'API', ->
     it 'should return the property tokens', ->
       tokens = oli.tokens 'hello > world: "oli"'
       expect tokens[0] .to.be.deep.equal { type: 'ValueStatement', value: ':' }
-      expect tokens[1] .to.be.deep.equal { type: 'UnaryExpression', value: '>' }
+      expect tokens[1] .to.be.deep.equal { type: 'Identifier', value: 'hello' }
 
