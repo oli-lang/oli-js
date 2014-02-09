@@ -1,2 +1,7 @@
 #!/usr/bin/env node
-require('../lib/cli')
+
+if (process.argv.length <= 2) {
+  require('../lib/repl')
+} else {
+  require('../lib/cli')
+}

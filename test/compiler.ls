@@ -10,15 +10,23 @@ describe 'Compiler', ->
 
   describe 'basic', (_) ->
 
+    # testing
     xit 'should compile block properly', ->
       inspect parse '''
         # comment
-        block >>> "pepe" > hola (hola: mundo):
-          | "hola *'mundo' como estas?"
-          | block: *hola
-        test: hola
+        &pepe:
+          mundo: feliz
+          says: 'oli'
+        end
+        block >>> pepe > hola (hola: mundo):
+          | universo: "hola como estas?: *name"
+          | block: 'MUNDO'
+          | mundo: 'grande'
+        test: *hola
         block: jajajaja
+        &name: oli
       '''
+      process.exit!
       expect parse '''
         # comment
         block >>> "pepe" > hola (hola: mundo):

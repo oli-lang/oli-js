@@ -1,17 +1,32 @@
 {
   "name": "oli",
-  "description": "Oli language parser",
+  "description": "Oli language parser and compiler for the browser",
   "version": "0.1.0",
   "license": "MIT",
   "author": {
     "name": "Tomas Aparicio"
   },
-  "homepage": "https://github.com/h2non/oli.js",
   "main": "./oli.js",
+  "homepage": "https://github.com/oli-lang/oli-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oli-lang/oli-js.git"
+  },
   "keywords": [
     "parser",
+    "peg",
+    "ast",
+    "compiler",
+    "language",
     "config",
-    "ast"
+    "json",
+    "yaml",
+    "ini",
+    "toml",
+    "cson",
+    "dsl",
+    "minimal",
+    "markup"
   ],
   "ignore": [
     "**/.*",

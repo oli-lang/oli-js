@@ -150,7 +150,7 @@ IdentifierUnaryExpression
 IdentifierReferenceExpression
   = operator:(AnchorNotOperator / AnchorOperator) __ argument:IdentifierLiteralExpression {
     return astNode({
-      type:     'UnaryOperator',
+      type:     'UnaryExpression',
       operator: operator,
       argument: argument
     })

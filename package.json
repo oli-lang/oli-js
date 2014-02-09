@@ -1,15 +1,15 @@
 {
   "name": "oli",
   "version": "0.1.0",
-  "description": "Oli language parser",
-  "homepage": "http://github.com/h2non/oli.js",
-  "bugs": "https://github.com/h2non/oli.js/issues",
+  "description": "Oli language parser and compiler for node",
+  "homepage": "http://github.com/oli-lang/oli-js",
+  "bugs": "https://github.com/oli-lang/oli-js/issues",
   "author": {
     "name": "Tomas Aparicio"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/h2non/oli.js.git"
+    "url": "https://github.com/oli-lang/oli-js.git"
   },
   "licenses": "MIT",
   "main": "lib/oli",
@@ -27,6 +27,7 @@
   },
   "keywords": [
     "parser",
+    "peg",
     "ast",
     "compiler",
     "language",
@@ -37,7 +38,8 @@
     "toml",
     "cson",
     "dsl",
-    "rspec"
+    "minimal",
+    "markup"
   ],
   "dependencies": {
     "commander": "~2.1.0"

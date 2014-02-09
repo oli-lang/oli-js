@@ -9,6 +9,7 @@ require! {
   traverse
   child_process.spawn
   '../../lib/oli'
+  '../../lib/helpers'
   '../../package.json'.version
 }
 
@@ -22,6 +23,7 @@ module.exports =
   ast: oli.ast
   parse: oli.parse
   tokens: oli.tokens
+  h: helpers
   generate-parser: oli.generate-parser
   oli-bin: oli-bin
 

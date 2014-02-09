@@ -30,14 +30,14 @@ It provides a rich featured [programmatic API](#programmatic-api)
 
 - Powerful parser based on parsing grammar expressions
 - Smart compiler based on type checking and more
-- Detailed error reports
+- Detailed parse and compilation errors
 - Runs on node.js and the browser
 - High and intermediate level featured API
-- Official language specification implementation
+- Easily usable from command-line and RELP playground
 - Heavily tested
 - Good performance (run `grunt bench`)
-
-For more information about milestones, discussion and future enhancements, see the open [issues][issues-enhancement]
+- No third party dependencies
+- Official language specification implementation
 
 ## Installation
 
@@ -93,9 +93,9 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Intermediate code post-processors
   - [x] References
   - [x] Clone and inheritance
-  - [_] Errors
+  - [*] Errors
   - [_] Optimiser
-  - [_] RELP
+  - [*] RELP
 - **Serializer**
   - [_] JSON to Oli
   - [_] Concret Sintax Tree to Oli
@@ -127,6 +127,16 @@ Examples:
   $ oli --tokens file.oli
   $ oli --in-line "hello: oli!" > result.json
 
+```
+
+### RELP
+
+Run oli without arguments to play with the REPL interface
+```
+$ oli
+Oli experimental REPL interface
+Type "examples" to see code examples
+oli> - oli, rules, yes
 ```
 
 ## Programmatic API
