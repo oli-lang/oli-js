@@ -233,7 +233,7 @@ IdentifierExpression
 
 ListExpression
   = elements:(
-    "-" _ elements:ListBlockStatement { return elements; }
+    "-" _ elements:ListBlockStatement _ EOS { return elements; }
   / "[" __ elements:ListBlockStatement __ "]" { return elements; }) {
     return astNode({
       type:  'ListExpression',
