@@ -75,6 +75,7 @@ describe 'Compiler', ->
     it 'should compile "-- [1, 2, 3]" as first level list', ->
       expect parse('-- [ 1, 2, 3 ]') .to.be.deep.equal [ [ 1, 2, 3 ] ]
 
+    # pending support
     xit 'should compile first level list with blocks', ->
         code = '''
         --

@@ -1,11 +1,8 @@
 # oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
 
-> Oli minimal language parser and compiler for node.js and the browser
+> Oli minimal language parser and compiler for node and the browser
 
 > **SPOILER! WORK IN PROGRESS**
-<!--
-> **Note that it is still a preview beta version!**
--->
 
 <table>
 <tr>
@@ -118,6 +115,8 @@ Options:
   -o, --output <file>  Write output into a file instead of stdout
   -a, --ast            Return the parsed AST serialized as JSON
   -i, --in-line        Parse in-line argument as string
+  -d, --indent <size>  JSON output indent size. Default to 2
+  -r, --repl           Use the Read-eval-print Loop interface
 
 Examples:
 
@@ -131,7 +130,7 @@ Examples:
 
 ### REPL
 
-Run oli without arguments to play with the REPL interface
+Run `$ oli` without arguments to play with the REPL interface
 ```
 $ oli
 Oli experimental REPL interface
