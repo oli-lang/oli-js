@@ -105,3 +105,16 @@ describe 'Compiler', ->
         '''
         expect parse(code).full .to.be.equal 'oli (language) - http://oli-lang.org'
 
+  describe 'blocks', ->
+
+    describe 'in-line', (_) ->
+
+      it 'should compile a block in line', ->
+        expect parse('block: yes') .to.be.deep.equal block: yes
+
+    describe 'attributes', (_) ->
+
+      it 'should compile attributes properly', ->
+        result = parse('block(name, surname: none): yes')
+        expect result.block['@attributes'] .to.be.deep.equal [ { name: 'name', value: undefined }, { name: 'surname', value: 'none' } ]
+
