@@ -21,7 +21,7 @@ which implements the latest [language specification][oli-docs]
 Oli.js provides a general parsing infraestructure to be consumed from other applications
 that uses the Oli sintax for specific purposes, like parsing own DSL
 
-It provides a rich featured [programmatic API](#programmatic-api) and [command-line interface][#command-line-interface]
+It provides a rich featured [programmatic API](#programmatic-api) and [command-line interface](#command-line-interface)
 
 ## Features
 
