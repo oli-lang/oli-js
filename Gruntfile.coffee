@@ -110,11 +110,15 @@ module.exports = (grunt) ->
     'watch'
   ]
 
+  grunt.registerTask 'browser', [
+    'browserify'
+    'uglify'
+  ]
+
   grunt.registerTask 'publish', [
     'test'
     'clean'
-    'browserify'
-    'uglify'
+    'browser'
     'release'
   ]
 
