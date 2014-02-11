@@ -24,7 +24,7 @@ which implements the latest [language specification][oli-docs]
 Oli.js provides a general parsing infraestructure to be consumed from other applications
 that uses the Oli sintax for specific purposes, like parsing own DSL
 
-It provides a rich featured [programmatic API](#programmatic-api)
+It provides a rich featured [programmatic API](#programmatic-api) and [command-line interface][#command-line-interface]
 
 ## Features
 
@@ -33,7 +33,7 @@ It provides a rich featured [programmatic API](#programmatic-api)
 - Detailed parse and compilation errors
 - Runs on node.js and the browser
 - High and intermediate level featured API
-- Easily usable from command-line and RELP playground
+- Easily usable from command-line and REPL
 - Heavily tested
 - Good performance (run `grunt bench`)
 - No third party dependencies
@@ -95,7 +95,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Clone and inheritance
   - [*] Errors
   - [_] Optimiser
-  - [*] RELP
+  - [*] REPL
 - **Serializer**
   - [_] JSON to Oli
   - [_] Concret Sintax Tree to Oli
@@ -129,7 +129,7 @@ Examples:
 
 ```
 
-### RELP
+### REPL
 
 Run oli without arguments to play with the REPL interface
 ```

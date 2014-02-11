@@ -13,6 +13,14 @@ describe 'Compiler', ->
     # testing
     xit 'should compile block properly', ->
       inspect parse '''
+      &name: oli
+      &type: language
+      &site: 'http://oli-lang.org'
+      full > alias: *name (*type) - *site
+      full > pepe: *name *site
+      '''
+      process.exit!
+      inspect parse '''
         # comment
         &pepe:
           mundo: feliz
@@ -26,7 +34,7 @@ describe 'Compiler', ->
         block: jajajaja
         &name: oli
       '''
-      process.exit!
+      #process.exit!
       expect parse '''
         # comment
         block >>> "pepe" > hola (hola: mundo):
@@ -61,7 +69,38 @@ describe 'Compiler', ->
     it 'should compile "- 1, 2, 3" as in-line list', ->
       expect parse('- 1, 2, 3') .to.be.deep.equal [ 1, 2, 3 ]
 
-    it 'should compile "[ "test" ]" as in-line list', ->
-      expect parse('block: - 1 ,2, 3').block.body .to.be.deep.equal [ 1, 2, 3 ]
+    it 'should compile "block: - 1, 2, 3" as in-line list', ->
+      expect parse('block: - 1, 2, 3').block .to.be.deep.equal [ 1, 2, 3 ]
 
+    it 'should compile "-- [1, 2, 3]" as first level list', ->
+      expect parse('-- [ 1, 2, 3 ]') .to.be.deep.equal [ [ 1, 2, 3 ] ]
+
+    xit 'should compile first level list with blocks', ->
+        code = '''
+        --
+        name: oli
+        type: language
+        site: 'http://oli-lang.org'
+        '''
+        expect parse(code).full .to.be.equal 'oli (language) - http://oli-lang.org'
+
+  describe 'references', ->
+
+    describe 'string', (_) ->
+
+      it 'should replace string references', ->
+        code = '''
+        &name: oli
+        surname: *name language
+        '''
+        expect parse(code).surname .to.be.equal 'oli language'
+
+      it 'should replace multiple interpolated string references', ->
+        code = '''
+        &name: oli
+        &type: language
+        &site: 'http://oli-lang.org'
+        full: *name (*type) - *site
+        '''
+        expect parse(code).full .to.be.equal 'oli (language) - http://oli-lang.org'
 

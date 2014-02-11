@@ -121,7 +121,13 @@ IdentifierNameExpression
   = ReferenceExpression / IdentifierReferenceExpression / IdentifierLiteralExpression
 
 IdentifierOperationExpression
-  = IdentifierBinaryExpression / IdentifierUnaryExpression
+  = id:(IdentifierBinaryExpression / IdentifierUnaryExpression)+ {
+    if (id.length <= 1) {
+      return id[0];
+    } else {
+      return id;
+    }
+  }
 
 IdentifierBinaryExpression
   = left:IdentifierCloneExpression

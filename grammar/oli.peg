@@ -62,7 +62,7 @@ Program
 SourceElements
   = DuobleDashOperator __ elements:SourceElements {
     return [ astNode({
-      type:     'ListExpression',
+      type:     'TopListExpression',
       elements: elements
     }) ];
   }
