@@ -1,6 +1,6 @@
 {
   "name": "oli",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.1",
   "description": "Oli language parser and compiler for node",
   "homepage": "http://github.com/oli-lang/oli-js",
   "bugs": "https://github.com/oli-lang/oli-js/issues",
