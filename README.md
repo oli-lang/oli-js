@@ -92,8 +92,8 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Clone and inheritance
   - [*] Errors
   - [_] Optimiser
-  - [*] Event-driven
-- Interfaces
+  - [_] Event-driven
+- **Interfaces**
   - [x] API
   - [x] CLI
   - [x] REPL
