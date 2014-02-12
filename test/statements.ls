@@ -98,10 +98,31 @@ describe 'Statements', ->
           expect node ast-tree, '0.value' .to.be.equal false
           expect node ast-tree, '1.value' .to.be.equal true
 
+      describe 'nil', (_) ->
+
+        it 'should parse "null: nil" as nil literal', ->
+          expect node ast('null: nil'), 'expression.right.value' .to.be.null
+
       describe 'mixed', (_) ->
 
         it 'should parse "1.1.3, true" as unquoted string', ->
           expect node ast('block: 1.2.1, true'), 'expression.right.value' .to.be.equal '1.2.1, true'
+
+        it 'should parse "null: nil, 123" as interpolated literal', ->
+          expect node ast('null: nil 123'), 'expression.right.value' .to.be.equal 'nil 123'
+
+    describe 'identifier attributes only', (_) ->
+
+      it 'should parse a multi-line attributes identifier', ->
+        ast-obj = ast '''
+          init: yes
+          block (one: yes, another: no)
+          final: yes
+        '''
+        expect node ast-obj, '0.expression.left.id.name' .to.be.equal 'init'
+        expect node ast-obj, '1.expression.attributes.0.left.name' .to.be.equal 'one'
+        expect node ast-obj, '1.expression.attributes.1.left.name' .to.be.equal 'another'
+        expect node ast-obj, '2.expression.left.id.name' .to.be.equal 'final'
 
     describe 'assignment', ->
 
@@ -120,12 +141,14 @@ describe 'Statements', ->
         it 'should parse "hello: [ 1, 2 ] end"', ->
           expect node ast('hello: [ 1, 2 ] end'), 'expression.right.elements.0.value' .to.be.equal 1
 
-      describe 'nested', (_) ->
+        describe 'nested', (_) ->
 
-        it 'should parse "hello: from: oli: lang: oli!"', ->
-          path = 'expression.right.expression.right.expression.right.expression.right.value'
-          expect node ast('hello: from: oli: lang: oli!'), path
-            .to.be.equal 'oli!'
+          it 'should parse "hello: from: oli: lang: oli!"', ->
+            path = 'expression.right.expression.right.expression.right.expression.right.value'
+            expect node ast('hello: from: oli: lang: oli!'), path
+              .to.be.equal 'oli!'
+
+      describe 'multi-line', (_) ->
 
         it 'should parse "hello: form: oli: lang: ..." as indented blocks', ->
           code = ast '''
@@ -327,11 +350,24 @@ describe 'Statements', ->
           love it: yes
           '''
           expect node ast-obj, '0.expression.right.body.0.expression.right.value' .to.be.equal 'string'
+          expect node ast-obj, '1.expression.right.expression.right.value' .to.be.equal 'hello!'
           expect node ast-obj, '2.expression.right.value' .to.be.equal true
           expect node ast-obj, '3.value' .to.be.equal false
           expect node ast-obj, '4.value' .to.be.equal 123.41
-          expect node ast-obj, '1.expression.right.expression.right.value' .to.be.equal 'hello!'
           expect node ast-obj, '5.expression.right.value' .to.be.equal true
+
+        describe 'interpolated lists', (_) ->
+
+          it 'should parser property a list with blocks', ->
+            ast-obj = ast '''
+            hello: world
+            list: - this, is, a, list
+            another: block
+            '''
+            expect node ast-obj, '0.expression.right.value' .to.be.equal 'world'
+            expect node ast-obj, '1.expression.right.elements.0.value' .to.be.equal 'this'
+            expect node ast-obj, '1.expression.right.elements.3.value' .to.be.equal 'list'
+            expect node ast-obj, '2.expression.right.value' .to.be.equal 'block'
 
     describe 'assignment operators', ->
 

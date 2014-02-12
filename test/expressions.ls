@@ -66,7 +66,7 @@ describe 'Expressions', ->
           .to.be.equal 'cool'
 
       it 'should parse a list of booleans', ->
-        expect node ast('[ yes, true, no ]'), 'elements.2.value'
+        expect node ast('[ yes, true, no, nil ]'), 'elements.2.value'
           .to.be.equal false
 
       it 'should parse a list with inner blocks', ->
@@ -259,6 +259,13 @@ describe 'Expressions', ->
         expect node ast('oli >> {yaml also rules}: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
+      describe 'multiple expressions', (_) ->
+
+        it 'should should parse ">> language >> markup"', ->
+          ast-obj = ast('oli >> language >> markup: cool')
+          expect node ast-obj, 'expression.left.expression.0.argument.name' .to.be.equal 'language'
+          expect node ast-obj, 'expression.left.expression.1.argument.name' .to.be.equal 'markup'
+
     describe 'merge', (_) ->
 
       it 'should parse "yaml" as merge identifier', ->
@@ -276,6 +283,13 @@ describe 'Expressions', ->
       it 'should parse "{yaml also rules}" as merge identifier', ->
         expect node ast('oli >>> {yaml also rules}: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
+
+      describe 'multiple expressions', (_) ->
+
+        it 'should should parse ">>> language >>> markup"', ->
+          ast-obj = ast('oli >>> language >>> markup: cool')
+          expect node ast-obj, 'expression.left.expression.0.argument.name' .to.be.equal 'language'
+          expect node ast-obj, 'expression.left.expression.1.argument.name' .to.be.equal 'markup'
 
     describe 'reference + operation', (_) ->
 
@@ -372,4 +386,10 @@ describe 'Expressions', ->
         expect node ast('hello (key: value, super key: "super value"): oli'), 'expression.left.attributes.1.right.value'
           .to.be.equal 'super value'
 
+    describe 'block attributes', (_) ->
+
+      it 'should parse in-line block attributes', ->
+        ast-obj = ast 'block (one: yes, another: false)'
+        expect node ast-obj, 'expression.attributes.0.left.name' .to.be.equal 'one'
+        expect node ast-obj, 'expression.attributes.1.left.name' .to.be.equal 'another'
 

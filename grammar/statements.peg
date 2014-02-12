@@ -7,6 +7,7 @@ PrimitiveTypeStatement
 MainStatement
   = Comment
   / BlockPipeStatement
+  / BlockAttributeStatement
   / ValueStatement
   / BlockStatement
 
@@ -19,22 +20,27 @@ ListElementStatement
   / PrimitiveValueExpression
   / UnquotedStringListLiteral
 
-BlockAsignmentOperator
-  = operator:(
-    VariableAssignOperator
-  / AsignNotOperator
-  / AsignRawOperator
-  / AsignUnfoldOperator
-  / AsignFoldOperator
-  / StartToken) {
-    return Array.isArray(operator) ? operator.join('') : operator;
-  }
+InLineListElementsStatement
+  = Comment
+  / ValueStatement
+  / BlockAttributeStatement
+  / PrimitiveValueExpression
+  / UnquotedStringListLiteral
 
 ListBlockStatement
   = head:ListElementStatement tail:(__ ElementSeparator? __ ListElementStatement)* {
     var result = [ head ];
-    for (var i = 0, l = tail.length; i < l; i+=1) {
+    for (var i = 0, l = tail.length; i < l; i += 1) {
       result.push(tail[i][3]);
+    }
+    return result;
+  }
+
+InLineListBlockStatement
+  = head:InLineListElementsStatement tail:(_ "," _ el:InLineListElementsStatement { return el; })* {
+    var result = [ head ];
+    for (var i = 0, l = tail.length; i < l; i += 1) {
+      result.push(tail[i]);
     }
     return result;
   }
@@ -42,7 +48,7 @@ ListBlockStatement
 BlockElementStatement
   = head:Statement tail:(__ ElementSeparator? __ Statement)* {
     var result = [ head ];
-    for (var i = 0, l = tail.length; i < l; i+=1) {
+    for (var i = 0, l = tail.length; i < l; i += 1) {
       result.push(tail[i][3]);
     }
     return result;
@@ -87,7 +93,7 @@ BlockPipeStatement
   = PipeOperator? __ id:IdentifierExpression __ operator:BlockAsignmentOperator
     __ head:PipeStatement __ tail:(__ PipeStatement)* {
       var body = [ head ];
-      for (var i = 0, l = tail.length; i < l; i+=1) {
+      for (var i = 0, l = tail.length; i < l; i += 1) {
         body.push(tail[i][1]);
       }
       return astNode({
@@ -103,6 +109,14 @@ BlockPipeStatement
         })
       });
     }
+
+BlockAttributeStatement
+  = expr:IdenfitierAttributeExpression _ EOS {
+    return astNode({
+      type:       'ExpressionStatement',
+      expression: expr
+    })
+  }
 
 BlockStatement
   = id:IdentifierExpression __ operator:BlockAsignmentOperator

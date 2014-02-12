@@ -17,6 +17,11 @@ describe 'Primitive types', ->
       expect node ast('no'), 'value' .to.be.false
       expect node ast('false'), 'value' .to.be.false
 
+  describe 'nil', (_) ->
+
+    it 'should parse "nil" as nil literal', ->
+      expect node ast('nil'), 'value' .to.be.null
+
   describe 'number', (_) ->
 
     it 'should parse "12" as numeric integer', ->

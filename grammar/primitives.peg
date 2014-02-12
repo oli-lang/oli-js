@@ -14,6 +14,15 @@ BooleanLiteral
     })
   }
 
+NilLiteral "nil"
+  = NilToken {
+    return astNode({
+      type:   'NilLiteral',
+      value:  null,
+      raw:    'nil'
+    })
+  }
+
 NumberLiteral "number"
   = number:(HexIntegerLiteral / DecimalLiteral / IntegerLiteral) {
     return number;

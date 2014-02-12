@@ -1,4 +1,6 @@
 {
+  var toString = Object.prototype.toString;
+
   // parsing options
   var includeLOC = options.loc;
   var includeComments = options.comments;
@@ -40,6 +42,14 @@
     }
     if (!exists) {
       comments.push(node)
+    }
+  }
+
+  function isArray(obj) {
+    if (Array.isArray) {
+      return Array.isArray(obj)
+    } else {
+      return toString.call(obj) === '[object Array]'
     }
   }
 }

@@ -10,6 +10,7 @@ PrimitiveTerminatorSequence
 // to do: separate rule in especific expressions contexts
 PrimitiveValueExpression
   = exp:BooleanLiteral _ PrimitiveTerminatorSequence { return exp; }
+  / exp:NilLiteral _ PrimitiveTerminatorSequence { return exp; }
   / exp:ReferenceExpression _ PrimitiveTerminatorSequence { return exp; }
   / exp:NumberLiteral _ PrimitiveTerminatorSequence { return exp; }
   / StringLiteral
@@ -35,7 +36,7 @@ UnquotedStringLiteral "unquoted literal"
   }
 
 UnquotedStringListLiteral "unquoted literal"
-  = !"-" _ chars:LiteralSequenceListCharacters+ _ ("," / &EOS) {
+  = !"-" _ chars:LiteralSequenceListCharacters+ {
     return astNode({
       type: 'StringLiteral',
       value: chars.join('').trim(),
@@ -219,22 +220,38 @@ IdentifierAttributesExpression
 
 IdentifierExpression
   = !"-" _ id:IdentifierNameExpression
-  __ expression:IdentifierOperationExpression?
+  __ expr:IdentifierOperationExpression?
   __ attrs:IdentifierAttributesExpression? {
     return astNode({
       type:       'IdentifierExpression',
       id:         id,
-      expression: expression,
+      expression: expr,
       attributes: attrs
     });
   }
 
-/* List */
+IdenfitierAttributeExpression
+  = !"-" _ id:IdentifierNameExpression
+  __ attrs:IdentifierAttributesExpression {
+    return astNode({
+      type:       'IdentifierExpression',
+      id:         id,
+      attributes: attrs
+    });
+  }
+
+/* Lists */
+
+InLineListExpression
+  = "-" _ elements:InLineListBlockStatement { return elements; }
+
+BracketListExpression
+  = "[" __ elements:ListBlockStatement __ "]" { return elements; }
 
 ListExpression
   = elements:(
-    "-" _ elements:ListBlockStatement _ EOS { return elements; }
-  / "[" __ elements:ListBlockStatement __ "]" { return elements; }) {
+    InLineListExpression
+  / BracketListExpression) {
     return astNode({
       type:  'ListExpression',
       elements: elements !== null ? elements : []

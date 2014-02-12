@@ -92,14 +92,30 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Clone and inheritance
   - [*] Errors
   - [_] Optimiser
-  - [*] REPL
+  - [*] Event-driven
+- Interfaces
+  - [x] API
+  - [x] CLI
+  - [x] REPL
 - **Serializer**
   - [_] JSON to Oli
   - [_] Concret Sintax Tree to Oli
 - **Environments**
-  - [X] Node.js
-  - [X] Browser
+  - [x] Node.js
+  - [x] Browser
   - [?] Rhino
+
+#### Upcoming features
+
+There are important features in Oli language spec 0.2. You can see the future features discussion [here](https://github.com/oli-lang/oli/issues?labels=discussion&milestone=1&page=1&state=open)
+
+A summary about most important features applied to oli.js
+
+- Support for interpolated code expressions (https://github.com/oli-lang/oli/issues/3)
+- Support for generic helper functions (random, string format, date format...)
+- Helpers functions extension via API
+- Support for control flow structures
+- Indent-based blocks
 
 ## Command-line interface
 

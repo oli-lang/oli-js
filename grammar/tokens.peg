@@ -7,13 +7,27 @@ StartToken              = AsignOperator          !IdentifierPart
 TrueToken               = "true"  / "yes"        !IdentifierPart
 FalseToken              = "false" / "no"         !IdentifierPart
 EndToken "end of block" = "end"                  !IdentifierPart
+NilToken "nil"          = "nil"                  !IdentifierPart
 
 Keyword
   = (
       StartToken
+    / EndToken
+    / NilToken
     / RelationalNotOperator
   )
   !IdentifierPart
+
+BlockAsignmentOperator
+  = operator:(
+    VariableAssignOperator
+  / AsignNotOperator
+  / AsignRawOperator
+  / AsignUnfoldOperator
+  / AsignFoldOperator
+  / StartToken) {
+    return isArray(operator) ? operator.join('') : operator;
+  }
 
 ReservedWord
   = Keyword
