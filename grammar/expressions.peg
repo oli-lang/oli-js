@@ -5,7 +5,7 @@ __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
 
 PrimitiveTerminatorSequence
- = &("," / "]" / ")" / EOS)
+ = &("," / "]" / ")" / "}" / EOS)
 
 // to do: separate rule in especific expressions contexts
 PrimitiveValueExpression
@@ -17,7 +17,12 @@ PrimitiveValueExpression
   / ListExpression
 
 LiteralReservedTokens
-  = ":" / RelationalNotOperator / LineTerminator / CommentToken / EndToken / "[" / "]"
+  = ":"
+  / RelationalNotOperator
+  / LineTerminator
+  / CommentToken
+  / EndToken
+  / "[" / "]" / "}" / "{"
 
 LiteralSequenceCharacters
   = !LiteralReservedTokens char:SingleStringCharacter { return char; }
@@ -113,7 +118,7 @@ ReferenceExpression
 
 IdentifierLiteralExpression
   = StringLiteral
-  / "{" __ id:(Identifier / StringLiteral)__ "}" {
+  / "(" __ id:(Identifier / StringLiteral)__ ")" {
       return id;
     }
   / Identifier

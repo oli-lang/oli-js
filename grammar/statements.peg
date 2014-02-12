@@ -55,7 +55,7 @@ BlockElementStatement
   }
 
 ValueStatement
-  = id:IdentifierExpression _ operator:AsignNotOperator _ EOS {
+  = "{"? _ id:IdentifierExpression _ operator:AsignNotOperator _ ("}" / EOS) {
       return astNode({
         type:    'ExpressionStatement',
         expression: astNode({
@@ -66,8 +66,8 @@ ValueStatement
         })
       });
     }
-  / id:IdentifierExpression _ operator:BlockAsignmentOperator _ !LineTerminatorSequence
-      _ body:(MainStatement / body:PrimitiveTypeStatement _ EOS { return body; })
+  / "{"? _ id:IdentifierExpression _ operator:BlockAsignmentOperator _ !LineTerminatorSequence
+      _ body:(MainStatement / body:PrimitiveTypeStatement _ ("}" / EOS) { return body; })
     {
       return astNode({
         type:    'ExpressionStatement',

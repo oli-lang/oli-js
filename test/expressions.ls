@@ -95,9 +95,15 @@ describe 'Expressions', ->
         expect node ast('- yes, true, no'), 'elements.2.value'
           .to.be.equal false
 
-      it 'should parse a list of booleans', ->
+      it 'should parse a list with a value block statement', ->
         expect node ast('- hello: world'), 'elements.0.expression.right.value'
           .to.be.equal 'world'
+
+      it 'should parse a list of multiple value statements', ->
+        ast-obj = ast '- { hello: world }, { using: oli }, yes'
+        expect node ast-obj, 'elements.0.expression.right.value' .to.be.equal 'world'
+        expect node ast-obj, 'elements.1.expression.right.value' .to.be.equal 'oli'
+        expect node ast-obj, 'elements.2.value' .to.be.true
 
   describe 'comments', ->
 
@@ -165,12 +171,16 @@ describe 'Expressions', ->
         expect node ast('hello - world . oli: "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello - world . oli'
 
-      it 'should parse "{hello world oli}" as reference identifier ', ->
-        expect node ast('{hello world oli}: "hola"'), 'expression.left.id.name'
+      it 'should parse "%hello world oli%" as reference identifier ', ->
+        expect node ast('%hello world oli%: "hola"'), 'expression.left.id.name'
+          .to.be.equal '%hello world oli%'
+
+      it 'should parse "(hello world oli)" as reference identifier ', ->
+        expect node ast('(hello world oli): "hola"'), 'expression.left.id.name'
           .to.be.equal 'hello world oli'
 
-      it 'should parse "{\'hello world oli\'}" as reference identifier ', ->
-        expect node ast('{ "hello world oli" }: "hola"'), 'expression.left.id.value'
+      it 'should parse "(\'hello world oli\')" as reference identifier ', ->
+        expect node ast('("hello world oli"): "hola"'), 'expression.left.id.value'
           .to.be.equal 'hello world oli'
 
       it 'should parse "\'hello world oli\'" as reference identifier ', ->
@@ -198,8 +208,8 @@ describe 'Expressions', ->
         expect node ast('hello > oli rules: "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'oli rules'
 
-      it 'should parse "{oli rules}" as reference identifier', ->
-        expect node ast('hello > {oli rules}: "hola"'), 'expression.left.expression.argument.name'
+      it 'should parse "(oli rules)" as reference identifier', ->
+        expect node ast('hello > (oli rules): "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'oli rules'
 
       it 'should parse "\'oli rules\'" as reference identifier', ->
@@ -255,8 +265,8 @@ describe 'Expressions', ->
         expect node ast('oli >> "yaml also rules": "hola"'), 'expression.left.expression.argument.value'
           .to.be.equal 'yaml also rules'
 
-      it 'should parse "{yaml also rules}" as clone identifier', ->
-        expect node ast('oli >> {yaml also rules}: "hola"'), 'expression.left.expression.argument.name'
+      it 'should parse "(yaml also rules)" as clone identifier', ->
+        expect node ast('oli >> (yaml also rules): "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
       describe 'multiple expressions', (_) ->
@@ -280,8 +290,8 @@ describe 'Expressions', ->
         expect node ast('oli >>> "yaml also rules": "hola"'), 'expression.left.expression.argument.value'
           .to.be.equal 'yaml also rules'
 
-      it 'should parse "{yaml also rules}" as merge identifier', ->
-        expect node ast('oli >>> {yaml also rules}: "hola"'), 'expression.left.expression.argument.name'
+      it 'should parse "(yaml also rules)" as merge identifier', ->
+        expect node ast('oli >>> (yaml also rules): "hola"'), 'expression.left.expression.argument.name'
           .to.be.equal 'yaml also rules'
 
       describe 'multiple expressions', (_) ->
@@ -322,8 +332,8 @@ describe 'Expressions', ->
       expect node ast('hello (key): oli'), 'expression.left.attributes.0.left.name'
         .to.be.equal 'key'
 
-    it 'should parse "{key}" as unique attribute identifier', ->
-      expect node ast('hello ({key}): oli'), 'expression.left.attributes.0.left.name'
+    it 'should parse "(key)" as unique attribute identifier', ->
+      expect node ast('hello (key): oli'), 'expression.left.attributes.0.left.name'
         .to.be.equal 'key'
 
     it 'should parse "\'key\'" as unique attribute identifier', ->

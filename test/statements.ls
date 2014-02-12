@@ -358,7 +358,7 @@ describe 'Statements', ->
 
         describe 'interpolated lists', (_) ->
 
-          it 'should parser property a list with blocks', ->
+          it 'should parser property a list of strings', ->
             ast-obj = ast '''
             hello: world
             list: - this, is, a, list
@@ -367,6 +367,18 @@ describe 'Statements', ->
             expect node ast-obj, '0.expression.right.value' .to.be.equal 'world'
             expect node ast-obj, '1.expression.right.elements.0.value' .to.be.equal 'this'
             expect node ast-obj, '1.expression.right.elements.3.value' .to.be.equal 'list'
+            expect node ast-obj, '2.expression.right.value' .to.be.equal 'block'
+
+          it 'should parser property a list of values blocks', ->
+            ast-obj = ast '''
+            hello: world
+            list: - this, { oli: rules }, yes
+            another: block
+            '''
+            expect node ast-obj, '0.expression.right.value' .to.be.equal 'world'
+            expect node ast-obj, '1.expression.right.elements.0.value' .to.be.equal 'this'
+            expect node ast-obj, '1.expression.right.elements.1.expression.right.value' .to.be.equal 'rules'
+            expect node ast-obj, '1.expression.right.elements.2.value' .to.be.true
             expect node ast-obj, '2.expression.right.value' .to.be.equal 'block'
 
     describe 'assignment operators', ->
