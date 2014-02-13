@@ -1,5 +1,5 @@
 {
-  oli
+  exec
   suppose
   expect
   inspect
@@ -7,6 +7,26 @@
 
 describe 'CLI', ->
 
-  describe 'parse', (_) ->
+  describe '--parse', (_) ->
 
-    # todo
+    it 'should parse reading from file', (done) ->
+      exec 'data', ['--parse' "#{__dirname}/fixtures/list.oli"], ->
+        expect it .to.be.equal '[\n  1,\n  2,\n  3\n]\n'
+        done!
+
+    it 'should parse with custom indent', (done) ->
+      exec 'data', ['--parse' '--indent=0' "#{__dirname}/fixtures/list.oli"], ->
+        expect it .to.be.equal '[1,2,3]\n'
+        done!
+
+  describe '--in-line', (_) ->
+
+    it 'should parse in-line string', (done) ->
+      exec 'data', ['-i' 'hello'], ->
+        expect it .to.match /\"hello"\n/
+        done!
+
+    it 'should parse in-line block', (done) ->
+      exec 'data', ['-i' 'hello: world'], ->
+        expect it .to.match /\"hello": "world"/
+        done!

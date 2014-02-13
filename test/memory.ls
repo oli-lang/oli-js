@@ -72,20 +72,20 @@ describe 'Memory', ->
       data = 'oli'
 
       it 'should allocate data', ->
-        expect memory.allocate 'hello', data .to.be.instanceof Memory 
+        expect memory.allocate 'hello', data .to.be.instanceof Memory
 
       it 'should have a memory pool with one registered node', ->
         expect memory.size! .to.be.equal 1
 
       it 'should fetch data by its address', ->
-        expect memory.fetch 'hello' .to.be.equal data 
+        expect memory.fetch 'hello' .to.be.equal data
 
       it 'should check if an address is allocated', ->
-        expect memory.isAllocated 'hello' .to.be.true 
+        expect memory.isAllocated 'hello' .to.be.true
 
       it 'should free node pool address', ->
         memory.free 'hello'
         expect memory.fetch 'hello' .to.be.undefined
-      
+
       it 'should have an empty pool size', ->
         expect memory.size! .to.be.equal 0

@@ -111,6 +111,16 @@ describe 'Statements', ->
         it 'should parse "null: nil, 123" as interpolated literal', ->
           expect node ast('null: nil 123'), 'expression.right.value' .to.be.equal 'nil 123'
 
+    describe 'curly braces', (_) ->
+
+      it 'should parse a braces block property', ->
+        expect node ast('block: { another: value }'), 'expression.right.expression.right.value'
+          .to.be.equal 'value'
+
+      xit 'should parse a braces nested block property', ->
+        expect node ast('block: { another: { sub: value } }'), 'expression.right.expression.right.expression.right.value'
+          .to.be.equal 'value'
+
     describe 'identifier attributes only', (_) ->
 
       it 'should parse a multi-line attributes identifier', ->
