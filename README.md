@@ -111,7 +111,7 @@ There are important features in Oli language spec 0.2. You can see the future fe
 
 A summary about most important features applied to oli.js
 
-- Support for interpolated code expressions (https://github.com/oli-lang/oli/issues/3)
+- Support for interpolated code expressions ([oli/#3](https://github.com/oli-lang/oli/issues/3))
 - Support for generic helper functions (random, string format, date format...)
 - Helpers functions extension via API
 - Support for control flow structures
@@ -126,18 +126,18 @@ Options:
 
   -h, --help           output usage information
   -V, --version        output the version number
-  -p, --parse          Parse and return the result as JSON
-  -t, --tokens         Parse and return the result as JSON
-  -o, --output <file>  Write output into a file instead of stdout
-  -a, --ast            Return the parsed AST serialized as JSON
-  -i, --in-line        Parse in-line argument as string
+  -p, --parse          parse and return the result as JSON
+  -t, --tokens         parse and return a collection of the tokens as JSON
+  -o, --output <file>  write output into a file instead of stdout
+  -a, --ast            return the parsed AST serialized as JSON
+  -i, --in-line        parse in-line argument as string
   -d, --indent <size>  JSON output indent size. Default to 2
-  -r, --repl           Use the interactive read-eval-print loop interface
+  -r, --repl           use the interactive read-eval-print loop interface
 
 Examples:
 
   $ oli file.oli > file.result.json
-  $ oli file.oli --output file.result.json
+  $ oli file.oli -o file.result.json
   $ oli --ast file.oli
   $ oli --tokens file.oli
   $ oli --in-line "hello: oli!" > result.json

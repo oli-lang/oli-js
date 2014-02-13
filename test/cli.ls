@@ -1,11 +1,23 @@
 {
   exec
-  suppose
   expect
-  inspect
+  suppose
+  version
 } = require './lib/helper'
 
 describe 'CLI', ->
+
+  describe '--version', (_) ->
+
+    it 'should return the version with --version flag', (done) ->
+      exec 'data', ['--version'], ->
+        expect it .to.be.equal "#{version}\n"
+        done!
+
+    it 'should return the version with -V flag', (done) ->
+      exec 'data', ['-V'], ->
+        expect it .to.be.equal "#{version}\n"
+        done!
 
   describe '--parse', (_) ->
 
