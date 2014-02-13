@@ -132,7 +132,7 @@ Options:
   -a, --ast            Return the parsed AST serialized as JSON
   -i, --in-line        Parse in-line argument as string
   -d, --indent <size>  JSON output indent size. Default to 2
-  -r, --repl           Use the Read-eval-print Loop interface
+  -r, --repl           Use the interactive read-eval-print loop interface
 
 Examples:
 
