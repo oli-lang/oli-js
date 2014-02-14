@@ -105,6 +105,34 @@ describe 'Expressions', ->
         expect node ast-obj, 'elements.1.expression.right.value' .to.be.equal 'oli'
         expect node ast-obj, 'elements.2.value' .to.be.true
 
+      describe 'multi-line', (_) ->
+
+        it 'should parse a list with pipe statement', ->
+          ast-obj = ast '''
+            - using:
+              | oli
+          '''
+          expect node ast-obj, 'elements.0.expression.right.body.0.body.value' .to.be.equal 'oli'
+
+        it 'should parse a list with block statement', ->
+          ast-obj = ast '''
+            - using:
+                oli
+              end
+          '''
+          expect node ast-obj, 'elements.0.expression.right.body.0.value' .to.be.equal 'oli'
+
+        it 'should parse a list of multi-line value statements', ->
+          ast-obj = ast '''
+            - hello: world
+            - using:
+              | oli
+            - yes
+          '''
+          expect node ast-obj, '0.elements.0.expression.right.value' .to.be.equal 'world'
+          expect node ast-obj, '1.elements.0.expression.right.body.0.body.value' .to.be.equal 'oli'
+          expect node ast-obj, '2.elements.0.value' .to.be.true
+
   describe 'comments', ->
 
     describe 'in-line', (_) ->

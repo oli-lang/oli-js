@@ -21,9 +21,7 @@ ListElementStatement
   / UnquotedStringListLiteral
 
 InLineListElementsStatement
-  = Comment
-  / ValueStatement
-  / BlockAttributeStatement
+  = MainStatement
   / PrimitiveValueExpression
   / UnquotedStringListLiteral
 

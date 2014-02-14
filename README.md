@@ -6,7 +6,7 @@
 
 <table>
 <tr>
-<td>Language version</td><td>0.1 (unclosed)</td>
+<td>Language version</td><td>0.1</td>
 </tr>
 <tr>
 <td>Stage</td><td>beta</td>
@@ -210,7 +210,22 @@ oli.load('path/to/file.oli', function (text) {
 
 ### Options
 
-- ``
+#### meta
+Type: `boolean`
+Default: `false`
+
+Return an intermediate level object with metadata properties.
+This is useful when you need to process an intermediate object that includes tokens, operators, expressions and more, instead of process a cutted resultant object
+
+#### loc
+Type: `boolean`
+Default: `false`
+
+#### locals
+Type: `object`
+Default: `null`
+
+Set of local variables context to be passed to the compilation sandbox
 
 ### Errors
 
