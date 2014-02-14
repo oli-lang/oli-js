@@ -6,7 +6,7 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON 'package.json'
 
-    clean: ['dist', 'test/*.js', 'lib/parser.js', 'test/fixtures/.tmp/**']
+    clean: ['dist', 'test/*.js', 'lib/parser.js', 'test/fixtures/.tmp/**', 'docs/**']
 
     peg:
       example:
@@ -70,6 +70,13 @@ module.exports = (grunt) ->
         files:
           'oli.js': ['oli.js']
 
+     jsdoc:
+        dist:
+          src: ['lib/**/*.js']
+          options:
+            destination: 'docs'
+            template: 'united'
+
     watch:
       options:
         spawn: false
@@ -118,8 +125,14 @@ module.exports = (grunt) ->
   grunt.registerTask 'publish', [
     'test'
     'clean'
+    'jsdoc'
     'browser'
     'release'
+  ]
+
+  grunt.registerTask 'docs', [
+    'clean'
+    'jsdoc'
   ]
 
   grunt.registerTask 'default', [

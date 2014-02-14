@@ -81,15 +81,13 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Configurable parsing options
   - [x] Errors
   - [?] Unicode
-  - Enhancements
-    - [_] Indentation based parsing
+  - [_] Indentation based parsing
 - **Compiler**
   - [x] AST walker
   - [x] Memory register
-  - [x] Tranpiler pre-processors
-  - [x] Intermediate code post-processors
-  - [x] References
-  - [x] Clone and inheritance
+  - [x] Intermediate code transpiler
+  - [x] Expressions interpreter
+  - [x] Code generator
   - [*] Errors
   - [_] Optimiser
   - [_] Event-driven
@@ -109,13 +107,14 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 
 There are important features in Oli language spec 0.2. You can see the future features discussion [here](https://github.com/oli-lang/oli/issues?labels=discussion&milestone=1&page=1&state=open)
 
-A summary about most important features applied to oli.js
+A summary about most important features that will be implemented
 
-- Support for interpolated code expressions ([oli/#3](https://github.com/oli-lang/oli/issues/3))
-- Support for generic helper functions (random, string format, date format...)
+- Interpolated code expressions ([oli/#3](https://github.com/oli-lang/oli/issues/3))
+- Generic helper functions (random, string format, date format...)
 - Helpers functions extension via API
 - Support for control flow structures
-- Indent-based blocks
+- Indentation-based parsing
+- Date primitive type
 
 ## Command-line interface
 
@@ -156,7 +155,7 @@ oli> - oli, rules, yes
 
 ## Programmatic API
 
-### Example
+### Basic example
 
 ```js
 var oli = require('oli')
@@ -164,29 +163,39 @@ var oli = require('oli')
 try {
   var json = oli.parse('message: - hello, oli!')
 } catch (e) {
-  console.error('Cannot parse:', e.fullMessage)
+  console.error('Error while parsing:', e.fullMessage)
+  console.error(e.errorLines)
 }
 
 console.log(json)
 // { message: body: [ "hello", "oli!" ] } }
 ```
 
-#### parse(code [, options])
+#### parse(code, options)
 Alias: `eval`
+Return: `mixed`
 
-#### ast(code [, options])
+#### ast(code, options)
 Alias: `parseAST`
+Return: `object`
 
 This is the most low-level API method.
 It returns an object that represent the parsed abstract-syntax tree
 
-**Note**: AST nodes types or inner data structures can change between minor versions, as the parser is still beta.
-Please, be aware with that in order to prevent possible inconsistencies if your implementation is coupled to the parsed AST
+> **Note**: AST node types or tree data structures can change between minor versions, as the parser is still beta.
+> Please be aware with that in order to prevent possible inconsistencies if your implementation is coupled to the parsed AST
+
+#### parseMeta(code, options)
+Alias: `meta`
+Return: `mixed`
 
 #### compile(ast)
+Alias: `run`
 
-#### tokens(code [, options])
+#### tokens(code, options)
+Alias: `parseTokens`
 
+Returns a one-level collection of the existent tokens
 
 #### load(path, callback)
 Context: `browser`
@@ -198,6 +207,33 @@ oli.load('path/to/file.oli', function (text) {
   console.log(oli.parse(text))
 })
 ```
+
+### Options
+
+- ``
+
+### Errors
+
+oli.js provides detailed errors. Usually it will be throwed as exception
+
+#### Types
+
+- SintaxError
+- CompileError
+- TypeError
+- ReferenceError
+
+#### Members
+
+Each error object instance will have the following members
+
+- message
+- fullMessage
+- line
+- column
+- offset
+- expect (SyntaxError only)
+- found (SyntaxError only)
 
 ## Contributing
 
