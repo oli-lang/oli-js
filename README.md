@@ -86,8 +86,8 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] AST walker
   - [x] Memory register
   - [x] Intermediate code transpiler
-  - [x] Expressions interpreter
   - [x] Code generator
+  - [*] Interpreter
   - [*] Errors
   - [_] Optimiser
   - [_] Event-driven
