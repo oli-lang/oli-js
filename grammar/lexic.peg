@@ -9,7 +9,7 @@ WhiteSpace "whitespace"
 
 // use [\w|\W]
 IdentifierLetter
-  = [a-zA-Z0-9\-\\/\\\_\^\º\¨\ç\¡\¿\.\$\@\€\?\%\+\;]
+  = [a-zA-Z0-9\-\\/\\\_\^\º\¨\ç\.\$\@\€\?\%\+\;]
 
 ElementSeparator
   = EOSNoLineTerminator

@@ -223,6 +223,10 @@ describe 'Expressions', ->
         expect node ast('"hello world oli": "hola"'), 'expression.left.id.value'
           .to.be.equal 'hello world oli'
 
+      it 'should use "anoth0er ^ $block" as identitier', ->
+        expect node ast('anoth0er ^ $block: "hola"'), 'expression.left.id.name'
+          .to.be.equal 'anoth0er ^ $block'
+
       describe 'reserved keywords', (_) ->
 
         it 'should not use "nil" as identitier', ->
