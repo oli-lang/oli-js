@@ -7,16 +7,19 @@
 
 describe 'Statements', ->
 
-  describe 'variables', (_) ->
+  describe 'hidden variables', (_) ->
 
     it 'should parse "value = hello oli!" as string', ->
       expect node ast('value = hello oli!'), 'expression.right.value' .to.be.equal 'hello oli!'
 
+    it 'should parse "value = hello oli!" as quoted string', ->
+      expect node ast('value = "hello oli!"'), 'expression.right.value' .to.be.equal 'hello oli!'
+
     it 'should parse "value = true" as boolean', ->
       expect node ast('value = true'), 'expression.right.value' .to.be.equal true
 
-    it 'should parse "value = -12.3 end" as number', ->
-      expect node ast('value = -12.3 end'), 'expression.right.value' .to.be.equal -12.3
+    it 'should parse "value = -12.3" as number', ->
+      expect node ast('value = -12.3'), 'expression.right.value' .to.be.equal -12.3
 
     it 'should parse "value = -12.3 end" as multi-line statement', ->
       ast-obj = ast '''
@@ -25,6 +28,14 @@ describe 'Statements', ->
       end
       '''
       expect node ast-obj, 'expression.right.body.0.value' .to.be.equal -12.3
+
+    it 'should parse "value = name: oli end" as multi-line statement', ->
+      ast-obj = ast '''
+      value:
+        name: oli
+      end
+      '''
+      expect node ast-obj, 'expression.right.body.0.expression.right.value' .to.be.equal 'oli'
 
   describe 'blocks', ->
 
@@ -440,3 +451,13 @@ describe 'Statements', ->
           expect node ast-obj, 'operator' .to.be.equal ':-'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.value' .to.be.equal 'string'
+
+      describe 'raw (:>)', (_) ->
+
+        it 'should parse "block:> hello!" as raw block', ->
+          ast-obj = node ast('block:> hello!'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':>'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.value' .to.be.equal 'hello!'
+
+

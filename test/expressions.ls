@@ -28,11 +28,11 @@ describe 'Expressions', ->
       expect node ast('block: *value'), 'expression.right.name' .to.be.equal 'value'
 
     it 'should parse "block: *value end" as reference expression', ->
-      ast-obj = ast('''
+      ast-obj = ast '''
         block:
           *value
         end
-      ''')
+      '''
       expect node ast-obj, 'expression.right.body.0.name' .to.be.equal 'value'
 
     describe 'interpolated expression', (_) ->
@@ -50,6 +50,14 @@ describe 'Expressions', ->
       it 'should parse "block: *value hello!" as string literal', ->
         expect node ast('block: *value hello!'), 'expression.right.value'
           .to.be.equal '*value hello!'
+
+      it 'should parse "block: my name is *{name} end" as interpolated reference expression', ->
+        ast-obj = ast '''
+          block:
+            my name is *name
+          end
+        '''
+        expect node ast-obj, 'expression.right.body.0.value' .to.be.equal 'my name is *name'
 
   describe 'list', ->
 
@@ -100,9 +108,9 @@ describe 'Expressions', ->
           .to.be.equal 'world'
 
       it 'should parse a list of multiple value statements', ->
-        ast-obj = ast '- { hello: world }, { using: oli }, yes'
+        ast-obj = ast '- { hello: world }, { using: [ oli ] }, yes'
         expect node ast-obj, 'elements.0.expression.right.value' .to.be.equal 'world'
-        expect node ast-obj, 'elements.1.expression.right.value' .to.be.equal 'oli'
+        expect node ast-obj, 'elements.1.expression.right.elements.0.value' .to.be.equal 'oli'
         expect node ast-obj, 'elements.2.value' .to.be.true
 
       describe 'multi-line', (_) ->
@@ -214,6 +222,14 @@ describe 'Expressions', ->
       it 'should parse "\'hello world oli\'" as reference identifier ', ->
         expect node ast('"hello world oli": "hola"'), 'expression.left.id.value'
           .to.be.equal 'hello world oli'
+
+      describe 'reserved keywords', (_) ->
+
+        it 'should not use "nil" as identitier', ->
+          expect (-> node ast('nil: no')) .to.throw!
+
+        it 'should not use "end" as identifer', ->
+          expect (-> node ast('end: no')) .to.throw!
 
     describe 'reference', (_) ->
 

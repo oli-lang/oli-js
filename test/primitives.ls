@@ -51,6 +51,9 @@ describe 'Primitive types', ->
 
   describe 'string', (_) ->
 
+    it 'should parse "" as empty quoted string', ->
+      expect node ast('""'), 'value' .to.be.equal ''
+
     it 'should parse "hello oli!" as string', ->
       expect node ast('"hello oli!"'), 'value' .to.be.equal 'hello oli!'
       expect node ast('"hello oli!"'), 'template' .to.be.true

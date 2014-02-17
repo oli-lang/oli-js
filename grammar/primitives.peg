@@ -91,7 +91,7 @@ StringLiteral "quoted string"
   = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'") {
       return astNode({
         type:  'StringLiteral',
-        value: parts[1].trim(),
+        value: parts[1] ? parts[1].trim() : '',
         raw:   parts.join(''),
         template: parts[0] === '"'
       });

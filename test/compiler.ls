@@ -312,13 +312,64 @@ describe 'Compiler', (_) ->
         '''
         expect parse(code).full .to.be.equal '*name - *site'
 
-      xit 'should reference in mixed string with doble-quotes', ->
+      it 'should reference in mixed string with doble-quotes', ->
         code = '''
         &name: oli
         &site: 'http://oli-lang.org'
-        full: *name - "*{site}"
+        full: *name - "*site"
         '''
         expect parse(code).full .to.be.equal 'oli - "http://oli-lang.org"'
+
+      it 'should reference in mixed string with doble escaped quotes', ->
+        code = '''
+        &name: oli
+        &site: 'http://oli-lang.org'
+        full: *name - \"*site\"
+        '''
+        expect parse(code).full .to.be.equal 'oli - "http://oli-lang.org"'
+
+    describe 'hidden', (_) ->
+
+      it 'should use hidden string references', ->
+        code = '''
+        name = oli
+        site = 'http://oli-lang.org'
+        full: *name - *site
+        '''
+        expect parse code .to.be.deep.equal full: 'oli - http://oli-lang.org'
+
+      it 'should extend from a hidden block reference', ->
+        code = '''
+        name =
+          oli: rules
+          site: 'http://oli-lang.org'
+        end
+        result >> name:
+          oli: yes
+        end
+        '''
+        expect parse code .to.be.deep.equal { 
+          result:
+            oli: yes
+            site: 'http://oli-lang.org'
+        }
+
+      it 'should merge from a hidden block reference', ->
+        code = '''
+        name =
+          oli: rules
+          site: 'http://oli-lang.org'
+        end
+        result >>> name:
+          open: yes
+        end
+        '''
+        expect parse code .to.be.deep.equal { 
+          result:
+            oli: 'rules'
+            site: 'http://oli-lang.org'
+            open: yes
+        }
 
     describe 'blocks inheritance', (_) ->
 
@@ -450,7 +501,6 @@ describe 'Compiler', (_) ->
             end
           end
           '''
-          inspect result.name
           expect result.name .to.be.deep.equal {
             name:
               featured:
