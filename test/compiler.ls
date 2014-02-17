@@ -320,7 +320,7 @@ describe 'Compiler', (_) ->
         '''
         expect parse(code).full .to.be.equal 'oli - "http://oli-lang.org"'
 
-    describe 'blocks', (_) ->
+    describe 'blocks inheritance', (_) ->
 
       describe 'extend', (_) ->
 
@@ -432,7 +432,34 @@ describe 'Compiler', (_) ->
             ]
           }
 
-      describe 'errors', (_) ->
+      describe 'multiple', (_) ->
+
+        it 'should multiple extend from nested block', ->
+          result = parse '''
+          &oli:
+            says: hello
+          end
+          &rules:
+            cool: yes
+          end
+          name:
+            name >> oli >> rules:
+              featured:
+                language: yes
+              end
+            end
+          end
+          '''
+          inspect result.name
+          expect result.name .to.be.deep.equal {
+            name:
+              featured:
+                language: yes
+              says: 'hello'
+              cool: yes
+          }
+
+      describe 'type errors', (_) ->
 
         it 'should throw an exception if cannot extend', ->
           code = '''
