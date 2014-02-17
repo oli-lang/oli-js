@@ -64,6 +64,12 @@ module.exports = (grunt) ->
 
     uglify:
       options:
+        beautify:
+          beautify: yes
+          indent_level: 2
+        mangle: no
+        compress: no
+        report: 'min'
         banner: '/*! oli.js - v<%= pkg.version %> - MIT License - https://github.com/oli-lang/oli-js ' +
           '| Generated <%= grunt.template.today("yyyy-mm-dd hh:MM") %> */\n'
       oli:

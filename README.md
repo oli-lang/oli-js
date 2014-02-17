@@ -23,7 +23,7 @@ that uses the Oli syntax for specific purposes, like parsing own DSL
 
 It provides a rich featured [programmatic API](#programmatic-api) and [command-line interface](#command-line-interface)
 
-**Note**: oli.js is still an alpha (fast) implementation! A full compiler re-designing process is pending
+**Note**: oli.js is still an initial alpha implementation! A full compiler re-designing process is pending
 
 ## Features
 
