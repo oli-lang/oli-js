@@ -61,6 +61,24 @@ describe 'Helpers', ->
     it 'should add new nested object', ->
       expect _.extend(target, origin).prop.obj.another.obj .to.be.true
 
+  describe 'extendKeep', (e) ->
+
+    target = obj: nested: yes
+    origin = obj: nested: no
+    extended = _.extend-keep target, origin
+
+    it 'should bundle object in an array', ->
+      expect extended.obj .to.be.an 'array'
+
+    it 'should have the expect length', ->
+      expect extended.obj .to.have.length 2
+
+    it 'should have the expected first item', ->
+      expect extended.obj[0] .to.be.deep.equal nested: yes
+
+    it 'should have the expected second item', ->
+      expect extended.obj[1] .to.be.deep.equal nested: no
+
   describe 'merge', (e) ->
 
     target = prop:

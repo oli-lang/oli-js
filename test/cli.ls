@@ -1,5 +1,8 @@
 {
+  md
   exec
+  read
+  exist
   expect
   suppose
   version
@@ -27,7 +30,7 @@ describe 'CLI', ->
         done!
 
     it 'should parse with custom indent', (done) ->
-      exec 'data', ['--parse' '--indent=0' "#{__dirname}/fixtures/list.oli"], ->
+      exec 'data', ['--parse' '--indent' '0' "#{__dirname}/fixtures/list.oli"], ->
         expect it .to.be.equal '[1,2,3]\n'
         done!
 
@@ -41,4 +44,28 @@ describe 'CLI', ->
     it 'should parse in-line block', (done) ->
       exec 'data', ['-i' 'hello: world'], ->
         expect it .to.match /\"hello": "world"/
+        done!
+
+  describe '--ast', (_) ->
+
+    it 'should parse and return the AST', (done) ->
+      exec 'data', ['-i' '--ast' 'hello'], ->
+        expect it .to.match /"type": "Program",/
+        done!
+
+  describe '--output', (_) ->
+    file = "#{__dirname}/../.tmp"
+
+    before -> md file
+
+    it 'should parse and write file on disk', (done) ->
+      exec 'data', ['-i' '--output' "#{file}/hello.oli" 'hello'], ->
+        expect read "#{file}/hello.oli" .to.be.equal '"hello"'
+        done!
+
+  describe 'errors', (_) ->
+
+    it 'should return exit code 1 if parse fails', (done) ->
+      exec 'data', ['-i' 'hello:'], (it, code) ->
+        expect code .to.be.equal 1
         done!

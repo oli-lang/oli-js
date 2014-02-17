@@ -9,7 +9,7 @@
 <td>Language version</td><td>0.1</td>
 </tr>
 <tr>
-<td>Stage</td><td>beta</td>
+<td>Stage</td><td>alpha</td>
 </tr>
 </table>
 
@@ -22,6 +22,8 @@ Oli.js provides a general parsing infraestructure to be consumed from other appl
 that uses the Oli syntax for specific purposes, like parsing own DSL
 
 It provides a rich featured [programmatic API](#programmatic-api) and [command-line interface](#command-line-interface)
+
+**Note**: oli.js is still an alpha (fast) implementation! A full compiler re-designing process is pending
 
 ## Features
 
@@ -67,8 +69,8 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 - Node.js >= 0.8.0
 - Chrome
 - Firefox
-- Opera
-- Safari
+- Safari 5
+- Opera >= 11.6
 - IE >= 9
 
 **Note**: pending tests in embebed JavaScript engines

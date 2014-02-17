@@ -42,7 +42,6 @@
     ".gitignore",
     ".travis.yml",
     ".npmignore",
-    "package.json",
-    "bower_components"
+    "package.json"
   ]
 }

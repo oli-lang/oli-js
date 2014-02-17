@@ -16,7 +16,6 @@ require! {
 
 node-bin = process.execPath
 oli-bin = path.join __dirname, '/../../', 'bin/oli'
-cwd = process.cwd!
 
 module.exports =
 
@@ -29,16 +28,12 @@ module.exports =
   generate-parser: oli.generate-parser
   oli-bin: oli-bin
 
-  cwd: cwd
-  node-bin: node-bin
   version: version
   sinon: sinon
   traverse: traverse
   expect: chai.expect
   should: chai.should
   assert: chai.assert
-  chdir: process.chdir
-  env: process.env
   join: path.join
 
   node: (ast, path) ->
@@ -51,7 +46,7 @@ module.exports =
     traverse ast .get parent ++ path
 
   inspect: ->
-    util.inspect(it, { depth: null, loc: true }) |> console.log
+    util.inspect(it, { depth: null }) |> console.log
 
   createWriteStream: ->
     fs.createWriteStream ...
@@ -59,7 +54,10 @@ module.exports =
   exists: ->
     fs.exists-sync it
 
-  read: fs.read-file-sync
+  read: -> (it |> fs.read-file-sync).to-string!
+
+  md: ->
+    try it |> fs.mkdir-sync
 
   exec: (type, args, callback) ->
     command = spawn node-bin, [ oli-bin ] ++ args

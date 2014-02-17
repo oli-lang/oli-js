@@ -103,7 +103,7 @@ ReferenceLiteralExpression
       return id.value ? id.value : id.name.trim();
     }
   / id:ReferenceIdentifier {
-      return id.name.trim();
+      return id.name.trim()
     }
 
 ReferenceExpression

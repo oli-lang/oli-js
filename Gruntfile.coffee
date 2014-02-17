@@ -6,7 +6,7 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON 'package.json'
 
-    clean: ['dist', 'test/*.js', 'lib/parser.js', 'test/fixtures/.tmp/**', 'docs/**']
+    clean: ['dist', 'test/*.js', 'lib/parser.js', 'test/fixtures/.tmp/**', '.tmp', 'docs/**']
 
     peg:
       example:
