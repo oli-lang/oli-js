@@ -1,5 +1,9 @@
 /* Statements */
 
+Statement
+  = MainStatement
+  / PrimitiveTypeStatement
+
 PrimitiveTypeStatement
   = PrimitiveValueExpression
   / UnquotedStringLiteral
@@ -8,12 +12,9 @@ MainStatement
   = Comment
   / BlockPipeStatement
   / BlockAttributeStatement
+  / BlockRawStatement
   / ValueStatement
   / BlockStatement
-
-Statement
-  = MainStatement
-  / PrimitiveTypeStatement
 
 ListElementStatement
   = MainStatement
@@ -115,6 +116,42 @@ BlockAttributeStatement
       expression: expr
     })
   }
+
+BlockRawStatement
+  = id:IdentifierExpression __ operator:AsignRawOperator
+    __ body:(!EndToken c:SourceCharacter { return c; })* __ EndToken
+    {
+      return astNode({
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'BlockStatement',
+          operator: operator,
+          left:     id,
+          right:    operator === ':!' ? null : {
+            type: 'BodyStatement',
+            raw:  true,
+            body: body !== null ? body.join('').trim() : null
+          }
+        })
+      });
+    }
+  / id:IdentifierExpression __ operator:AsignRawOperator
+    _ body:(!EOS c:SourceCharacter { return c; })* _ EOS
+    {
+      return astNode({
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'BlockStatement',
+          operator: operator,
+          left:     id,
+          right:    operator === ':!' ? null : {
+            type: 'BodyStatement',
+            raw:  true,
+            body: body !== null ? body.join('').trim() : null
+          }
+        })
+      });
+    }
 
 BlockStatement
   = id:IdentifierExpression __ operator:BlockAsignmentOperator

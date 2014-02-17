@@ -22,7 +22,6 @@ BlockAsignmentOperator
   = operator:(
     VariableAssignOperator
   / AsignNotOperator
-  / AsignRawOperator
   / AsignUnfoldOperator
   / AsignFoldOperator
   / StartToken) {
