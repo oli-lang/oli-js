@@ -235,6 +235,14 @@ describe 'Expressions', ->
         it 'should not use "end" as identifer', ->
           expect (-> node ast('end: no')) .to.throw!
 
+      describe 'invalid characters', (_) ->
+
+        it 'should not use "!" character as identifer', ->
+          expect (-> node ast('can!use: no')) .to.throw!
+
+        it 'should not use "*" character as identifer', ->
+          expect (-> node ast('cannot*use: no')) .to.throw!
+
     describe 'reference', (_) ->
 
       it 'should parse "*{block}: value" as block identifier', ->
