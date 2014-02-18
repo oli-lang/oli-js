@@ -187,8 +187,6 @@ describe 'Compiler', (_) ->
               * language: 'oli'
         }
 
-      xit 'exit', -> process.exit!
-
     describe 'pipe statement', (_) ->
 
       it 'should compile nested blocks', ->
@@ -219,30 +217,6 @@ describe 'Compiler', (_) ->
             'cool'
           ]
         }
-
-    # testing
-    xit 'should compile block properly', ->
-      parse '''
-        # comment
-        &pepe:
-          mundo: feliz
-          says: 'oli'
-        end
-        block >>> pepe > hola (hola: mundo):
-          | universo: "hola como estas?: *name"
-          | block: 'MUNDO'
-          | mundo: 'grande'
-        test: *hola
-        block: jajajaja
-        &name: oli
-      '''
-      expect parse '''
-        # comment
-        block >>> "pepe" > hola (hola: mundo):
-          | "hola *'mundo' como estas?"
-          | *hola
-        test: hola
-      ''', { comments: true } .to.be.deep.equal [ 1, 2, 3 ]
 
   describe 'references', ->
 
