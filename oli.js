@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-17 11:53 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-18 08:45 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -267,7 +267,7 @@
     4: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
-      var errors = require("./errors");
+      var e = require("./errors");
       var replacePattern = /[\$]{3}([^\${3}]*)[\$]{3}/g;
       exports = module.exports = generator;
       function generator(obj, memory) {
@@ -277,10 +277,10 @@
         }
         result = mapReferences(findBlockReferences(obj, processBlockExpression), processStringReferences);
         if (_.isMutable(result)) {
-          result = bodyTopNormalize(transformer(result));
+          result = bodyNormalize(transformer(result));
         }
         return result;
-        function bodyTopNormalize(obj) {
+        function bodyNormalize(obj) {
           var tmp;
           if (!_.canIterate(obj) || _.isObject(obj)) {
             return obj;
@@ -329,13 +329,13 @@
             if (expr.type === "extend" || expr.type === "merge") {
               ref = fetchFromMemory(expr.value);
               if (!_.isMutable(ref)) {
-                throw new errors.TypeError('Cannot extend "' + node.$$name + '" block because "' + expr.value + '" reference is not a block');
+                throw new e.TypeError('Cannot extend "' + node.$$name + '" block because "' + expr.value + '" reference is not a block');
               }
               if (!_.isMutable(node.$$body)) {
-                throw new errors.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": both must be blocks');
+                throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": both must be blocks');
               }
               if (_.isType(node.$$body) !== _.isType(ref)) {
-                throw new errors.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": blocks types are mismatched');
+                throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": blocks types are mismatched');
               }
               switch (expr.type) {
                case "extend":
@@ -556,10 +556,10 @@
           if (match) {
             _.forEach(match, function(ref) {
               var data = fetchFromMemory(removeDollars(ref));
-              str = str.replace(ref, data);
-              if (_.isMutable(data) && match.length > 1) {
-                throw errors.CompileError("Interpolated strings references cannot be a block: " + ref);
+              if (_.isMutable(data)) {
+                throw new e.TypeError("Interpolated strings references cannot to blocks: " + ref);
               }
+              str = str.replace(ref, String(data));
             });
           }
           return str;
@@ -567,7 +567,7 @@
         function fetchFromMemory(ref) {
           var data = memory.fetch(ref);
           if (data === undefined) {
-            throw new errors.ReferenceError(ref);
+            throw new e.ReferenceError(ref);
           }
           return data;
         }
@@ -1078,7 +1078,7 @@
       }
       function stringReferenceReplace(value) {
         var alphanumeric = "a-zA-Z0-9";
-        var symbols = "\\-\\/\\\\_\\^\\º\\¨\\ç\\.\\$\\@\\€\\?\\%\\+\\;";
+        var symbols = "\\-\\_\\^\\º\\ç\\.\\$\\@\\€\\?\\%\\+\\;";
         var rawExpression = new RegExp("\\*([" + alphanumeric + symbols + "]+)", "gi");
         var bracesExpression = new RegExp("\\*[{]([" + alphanumeric + symbols + "]+)[}]", "gi");
         var quotesExpression = new RegExp("\\*['|\"|\\'|\\\"]([" + alphanumeric + symbols + "]+)['|\"|\\'|\\\"]", "gi");
@@ -1107,7 +1107,7 @@
       var addErrorLines = require("./errors").addErrorLines;
       var empty = "";
       var oli = exports = module.exports = {};
-      oli.version = "0.1.0";
+      oli.version = "0.1.0-rc.1";
       oli.parser = parser;
       oli.Compiler = Compiler;
       oli.Memory = Memory;
@@ -1196,8 +1196,7 @@
         return token;
       }
       function rethrow(error, code) {
-        error = addErrorLines(error, code);
-        throw error;
+        throw addErrorLines(error, code);
       }
     }, {
       "./browser": 1,
@@ -1263,10 +1262,10 @@
             type: "class",
             value: "[\\t\\x0B\\f \\xA0\\uFEFF]",
             description: "[\\t\\x0B\\f \\xA0\\uFEFF]"
-          }, peg$c11 = /^[a-zA-Z0-9\-\\\/\\_\^\xBA\xA8\xE7.$@\u20AC?%+;]/, peg$c12 = {
+          }, peg$c11 = /^[a-zA-Z0-9\-_\^\xBA\xE7.$@\u20AC?%+;]/, peg$c12 = {
             type: "class",
-            value: "[a-zA-Z0-9\\-\\\\\\/\\\\_\\^\\xBA\\xA8\\xE7.$@\\u20AC?%+;]",
-            description: "[a-zA-Z0-9\\-\\\\\\/\\\\_\\^\\xBA\\xA8\\xE7.$@\\u20AC?%+;]"
+            value: "[a-zA-Z0-9\\-_\\^\\xBA\\xE7.$@\\u20AC?%+;]",
+            description: "[a-zA-Z0-9\\-_\\^\\xBA\\xE7.$@\\u20AC?%+;]"
           }, peg$c13 = ",", peg$c14 = {
             type: "literal",
             value: ",",
