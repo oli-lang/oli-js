@@ -328,6 +328,14 @@ describe 'Compiler', (_) ->
         '''
         expect parse(code).full .to.be.equal 'oli - "http://oli-lang.org"'
 
+      it 'should reference a string intepolated in a path-like expression', ->
+        code = '''
+        &name: oli
+        &site: 'http://oli-lang.org'
+        full: /home/*name/*site
+        '''
+        expect parse(code).full .to.be.equal '/home/oli/http://oli-lang.org'
+
     describe 'hidden', (_) ->
 
       it 'should use hidden string references', ->
@@ -511,6 +519,22 @@ describe 'Compiler', (_) ->
 
       describe 'type errors', (_) ->
 
+        it 'should throw an exception if string references points to a block', ->
+          code = '''
+          &oli:
+            hello
+          end
+          name: my name is *oli
+          '''
+          expect (-> parse code) .to.throw /strings references cannot/
+
+        it 'should throw an exception if string references points to a list', ->
+          code = '''
+          &oli: - hello
+          name: my name is *oli
+          '''
+          expect (-> parse code) .to.throw /strings references cannot/
+
         it 'should throw an exception if cannot extend', ->
           code = '''
           &oli: hello
@@ -528,4 +552,3 @@ describe 'Compiler', (_) ->
           end
           '''
           expect (-> parse code) .to.throw /mismatched/
-

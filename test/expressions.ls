@@ -243,6 +243,12 @@ describe 'Expressions', ->
         it 'should not use "*" character as identifer', ->
           expect (-> node ast('cannot*use: no')) .to.throw!
 
+        it 'should not use "/" character as identifer', ->
+          expect (-> node ast('cannot/use: no')) .to.throw!
+
+        it 'should not use "\\" character as identifer', ->
+          expect (-> node ast('cannot\\use: no')) .to.throw!
+
     describe 'reference', (_) ->
 
       it 'should parse "*{block}: value" as block identifier', ->
