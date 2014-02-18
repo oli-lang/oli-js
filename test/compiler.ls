@@ -353,6 +353,45 @@ describe 'Compiler', (_) ->
             open: yes
         }
 
+    describe 'context binding', (_) ->
+
+      it 'should use a string reference from options locals context', ->
+        context = name: 'oli'
+        code = '''
+        result:
+          name: *name
+        end
+        '''
+        expect parse code, locals: context .to.be.deep.equal { 
+          result: name: 'oli'
+        }
+
+      it 'should use a block reference from options locals context', ->
+        context =
+          name:
+            oli: 'rules'
+            site: 'http://oli-lang.org'
+        code = '''
+        result >>> name:
+          open: yes
+        end
+        '''
+        expect parse code, locals: context .to.be.deep.equal { 
+          result:
+            oli: 'rules'
+            site: 'http://oli-lang.org'
+            open: yes
+        }
+
+      it 'should throw an error if the types are mismatched using options locals context', ->
+        context = name: 'oli'
+        code = '''
+        result >> name:
+          name: 'oli'
+        end
+        '''
+        expect (-> parse code, locals: context ) .to.throw /is not a bloc/
+
     describe 'blocks inheritance', (_) ->
 
       describe 'extend', (_) ->

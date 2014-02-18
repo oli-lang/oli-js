@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-18 08:45 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-18 08:53 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -557,7 +557,7 @@
             _.forEach(match, function(ref) {
               var data = fetchFromMemory(removeDollars(ref));
               if (_.isMutable(data)) {
-                throw new e.TypeError("Interpolated strings references cannot to blocks: " + ref);
+                throw new e.TypeError("Interpolated strings references cannot point to blocks: " + removeDollars(ref));
               }
               str = str.replace(ref, String(data));
             });

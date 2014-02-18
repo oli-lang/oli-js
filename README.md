@@ -6,10 +6,10 @@
 
 <table>
 <tr>
-<td>Language version</td><td>0.1</td>
+<td><b>Language version</b></td><td>0.1</td>
 </tr>
 <tr>
-<td>Stage</td><td>alpha</td>
+<td><b>Stage</b></td><td>alpha</td>
 </tr>
 </table>
 
@@ -114,9 +114,10 @@ A summary about most important features that will be implemented
 - Interpolated code expressions ([oli/#3](https://github.com/oli-lang/oli/issues/3))
 - Generic helper functions (random, string format, date format...)
 - Helpers functions extension via API
-- Support for control flow structures
-- Indentation-based parsing
-- Date primitive type
+- Interpolated code with control flow structures
+- Block scope variables ([oli/#18](https://github.com/oli-lang/oli/issues/18))
+- Indentation-based parsing ([oli/#5](https://github.com/oli-lang/oli/issues/5))
+- Date as first-class primitive type ([oli/#2](https://github.com/oli-lang/oli/issues/2))
 
 ## Command-line interface
 

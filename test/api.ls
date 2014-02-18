@@ -8,6 +8,17 @@
 
 describe 'API', ->
 
+  describe 'members', (_) ->
+
+    it 'should expose the Compile function',  ->
+      expect oli.Compiler .to.be.a 'function'
+
+    it 'should expose the Memory function',  ->
+      expect oli.Memory .to.be.a 'function'
+
+    it 'should expose the parser object',  ->
+      expect oli.parser .to.be.a 'function'
+
   describe 'ast()', (_) ->
 
     it 'should expose the methods', ->
