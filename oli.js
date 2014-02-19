@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-20 12:20 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-20 12:46 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -961,6 +961,23 @@
     8: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
+      var operator = {
+        ASSIGN: ":",
+        EQUAL: "=",
+        ASSIGN_RAW: ":>",
+        ASSIGN_NOT: "!:",
+        ASSIGN_UNFOLD: ":-",
+        ASSIGN_FOLD: "!=",
+        PIPE: "|",
+        DASH: "-",
+        DOUBLEDASH: "--",
+        RELATIONAL: ">",
+        RELATIONAL_NOT: "!>",
+        AMPERSAND: "&",
+        AMPERSAND_NOT: "!&",
+        EXTEND: ">>",
+        MERGE: ">>>"
+      };
       var nodes = exports = module.exports = {};
       nodes.Literal = function literal(node) {
         return node.value;
@@ -999,11 +1016,11 @@
         var left = traverse(node.left);
         var body = traverse(node.right);
         var duplicateKeys;
-        if (node.operator === "!:") {
+        if (node.operator === operator.ASSIGN_NOT) {
           value[left.name] = null;
           return value;
         }
-        if (_.isArray(body) && (node.operator === ":" || node.operator === "=")) {
+        if (_.isArray(body) && (node.operator === operator.ASSIGN || node.operator === operator.EQUAL)) {
           var objBody = {};
           var hasPrimitive = false;
           body.forEach(function(item) {
@@ -1029,7 +1046,7 @@
             body = objBody;
           }
         }
-        if (node.operator === "=") {
+        if (node.operator === operator.EQUAL) {
           memory.allocate(left.name, body);
           return;
         }
@@ -1114,23 +1131,23 @@
           value: traverse(node.argument, node)
         });
         switch (node.operator) {
-         case ">":
+         case operator.RELATIONAL:
           value.type = "reference";
           value.visible = true;
           break;
 
-         case "&":
-         case "!>":
-         case "!&":
+         case operator.AMPERSAND:
+         case operator.AMPERSAND_NOT:
+         case operator.RELATIONAL_NOT:
           value.type = "reference";
           value.visible = false;
           break;
 
-         case ">>":
+         case operator.EXTEND:
           value.type = "extend";
           break;
 
-         case ">>>":
+         case operator.MERGE:
           value.type = "merge";
           break;
         }
@@ -1169,7 +1186,7 @@
       var parser = require("./parser").parse;
       var Compiler = require("./compiler");
       var Memory = require("./memory");
-      var addErrorLines = require("./errors").addErrorLines;
+      var errors = require("./errors");
       var empty = "";
       var oli = exports = module.exports = {};
       oli.version = "0.1.0-rc.1";
@@ -1213,6 +1230,8 @@
           }
           if (code instanceof Buffer) {
             code = code.toString();
+          } else {
+            throw new errors.TypeError("First argument must be an string or buffer");
           }
         }
         options = _.extend({
@@ -1263,7 +1282,7 @@
         return token;
       }
       function rethrow(error, code) {
-        throw addErrorLines(error, code);
+        throw errors.addErrorLines(error, code);
       }
     }, {
       "./compiler": 1,
@@ -5040,6 +5059,72 @@
             }
             return s0;
           }
+          function peg$parseStringRawCharacter() {
+            var s0, s1, s2;
+            s0 = peg$currPos;
+            s1 = peg$currPos;
+            peg$silentFails++;
+            if (input.charCodeAt(peg$currPos) === 92) {
+              s2 = peg$c66;
+              peg$currPos++;
+            } else {
+              s2 = peg$FAILED;
+              if (peg$silentFails === 0) {
+                peg$fail(peg$c67);
+              }
+            }
+            peg$silentFails--;
+            if (s2 === peg$FAILED) {
+              s1 = peg$c28;
+            } else {
+              peg$currPos = s1;
+              s1 = peg$c0;
+            }
+            if (s1 !== peg$FAILED) {
+              s2 = peg$parseSourceCharacter();
+              if (s2 !== peg$FAILED) {
+                peg$reportedPos = s0;
+                s1 = peg$c127(s2);
+                s0 = s1;
+              } else {
+                peg$currPos = s0;
+                s0 = peg$c0;
+              }
+            } else {
+              peg$currPos = s0;
+              s0 = peg$c0;
+            }
+            if (s0 === peg$FAILED) {
+              s0 = peg$currPos;
+              if (input.charCodeAt(peg$currPos) === 92) {
+                s1 = peg$c66;
+                peg$currPos++;
+              } else {
+                s1 = peg$FAILED;
+                if (peg$silentFails === 0) {
+                  peg$fail(peg$c67);
+                }
+              }
+              if (s1 !== peg$FAILED) {
+                s2 = peg$parseEscapeSequence();
+                if (s2 !== peg$FAILED) {
+                  peg$reportedPos = s0;
+                  s1 = peg$c128(s2);
+                  s0 = s1;
+                } else {
+                  peg$currPos = s0;
+                  s0 = peg$c0;
+                }
+              } else {
+                peg$currPos = s0;
+                s0 = peg$c0;
+              }
+              if (s0 === peg$FAILED) {
+                s0 = peg$parseLineContinuation();
+              }
+            }
+            return s0;
+          }
           function peg$parseLineContinuation() {
             var s0, s1, s2;
             s0 = peg$currPos;
@@ -5912,14 +5997,6 @@
             }
             return s0;
           }
-          function peg$parseStringRawLiteral() {
-            var s0;
-            s0 = peg$parseDoubleStringCharacter();
-            if (s0 === peg$FAILED) {
-              s0 = peg$parseSingleStringCharacters();
-            }
-            return s0;
-          }
           function peg$parseBlockRawStatement() {
             var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
             s0 = peg$currPos;
@@ -5927,7 +6004,7 @@
             if (s1 !== peg$FAILED) {
               s2 = peg$parse__();
               if (s2 !== peg$FAILED) {
-                s3 = peg$parseAsignRawOperator();
+                s3 = peg$parseBlockAsignmentRawOperators();
                 if (s3 !== peg$FAILED) {
                   s4 = peg$parse__();
                   if (s4 !== peg$FAILED) {
@@ -5945,7 +6022,7 @@
                       s8 = peg$c0;
                     }
                     if (s8 !== peg$FAILED) {
-                      s9 = peg$parseStringRawLiteral();
+                      s9 = peg$parseStringRawCharacter();
                       if (s9 !== peg$FAILED) {
                         peg$reportedPos = s7;
                         s8 = peg$c35(s9);
@@ -5972,7 +6049,7 @@
                         s8 = peg$c0;
                       }
                       if (s8 !== peg$FAILED) {
-                        s9 = peg$parseStringRawLiteral();
+                        s9 = peg$parseStringRawCharacter();
                         if (s9 !== peg$FAILED) {
                           peg$reportedPos = s7;
                           s8 = peg$c35(s9);
@@ -6021,7 +6098,7 @@
                         s8 = peg$c0;
                       }
                       if (s8 !== peg$FAILED) {
-                        s9 = peg$parseStringRawLiteral();
+                        s9 = peg$parseStringRawCharacter();
                         if (s9 !== peg$FAILED) {
                           peg$reportedPos = s7;
                           s8 = peg$c35(s9);
@@ -6048,7 +6125,7 @@
                           s8 = peg$c0;
                         }
                         if (s8 !== peg$FAILED) {
-                          s9 = peg$parseStringRawLiteral();
+                          s9 = peg$parseStringRawCharacter();
                           if (s9 !== peg$FAILED) {
                             peg$reportedPos = s7;
                             s8 = peg$c35(s9);
@@ -6481,13 +6558,7 @@
             if (s1 === peg$FAILED) {
               s1 = peg$parseAsignNotOperator();
               if (s1 === peg$FAILED) {
-                s1 = peg$parseAsignUnfoldOperator();
-                if (s1 === peg$FAILED) {
-                  s1 = peg$parseAsignFoldOperator();
-                  if (s1 === peg$FAILED) {
-                    s1 = peg$parseStartToken();
-                  }
-                }
+                s1 = peg$parseStartToken();
               }
             }
             if (s1 !== peg$FAILED) {
@@ -6495,6 +6566,17 @@
               s1 = peg$c164(s1);
             }
             s0 = s1;
+            return s0;
+          }
+          function peg$parseBlockAsignmentRawOperators() {
+            var s0;
+            s0 = peg$parseAsignRawOperator();
+            if (s0 === peg$FAILED) {
+              s0 = peg$parseAsignUnfoldOperator();
+              if (s0 === peg$FAILED) {
+                s0 = peg$parseAsignFoldOperator();
+              }
+            }
             return s0;
           }
           function peg$parseAsignOperator() {
