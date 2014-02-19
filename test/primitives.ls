@@ -73,9 +73,9 @@ describe 'Primitive types', ->
       it 'should parse "hello oli!" as unquoted string', ->
         expect node ast('hello oli!'), 'value' .to.be.equal 'hello oli!'
 
-      it 'should parse "oli, sintax, is pretty!" as unquoted string', ->
-        expect node ast('oli, sintax, is pretty!'), 'value'
-          .to.be.equal 'oli, sintax, is pretty!'
+      it 'should parse "oli, syntax, is pretty!" as unquoted string', ->
+        expect node ast('oli, syntax, is pretty!'), 'value'
+          .to.be.equal 'oli, syntax, is pretty!'
 
   describe 'interporaled', (_) ->
 
