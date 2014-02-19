@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-19 02:38 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-19 02:40 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -972,9 +972,6 @@
         if (node.operator === "!:") {
           value[left.name] = null;
           return value;
-        }
-        if (node.operator === ":>") {
-          console.log("hola", body, node);
         }
         if (_.isArray(body) && (node.operator === ":" || node.operator === "=")) {
           var objBody = {};
