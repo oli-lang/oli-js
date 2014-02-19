@@ -565,3 +565,43 @@ describe 'Compiler', (_) ->
           end
           '''
           expect (-> parse code) .to.throw /mismatched/
+
+  describe 'options', (_) ->
+
+    describe 'meta', (_) ->
+
+      it 'should parse and return an intermediate compilation result with meta data', ->
+        code = '''
+        oli:
+          hello
+        end
+        '''
+        expect parse code, meta: yes .to.be.deep.equal {
+          oli:
+            '$$name': 'oli'
+            '$$operator': ':'
+            '$$body': [ 'hello' ]
+          }
+
+      it 'should parse and return an intermediate compilation result with meta data', ->
+        code = '''
+        oli: [
+          world:
+            using: oli
+          end
+        ]
+        '''
+        expect parse code, meta: yes .to.be.deep.equal {
+          oli:
+            '$$name': 'oli'
+            '$$operator': ':'
+            '$$body':
+              'world':
+                '$$name': 'world'
+                '$$operator': ':'
+                '$$body':
+                  'using':
+                    '$$name': 'using'
+                    '$$operator': ':'
+                    '$$body': 'oli'
+          }

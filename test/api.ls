@@ -69,4 +69,5 @@ describe 'API', ->
       tokens = oli.tokens 'hello > world: "oli"'
       expect tokens[0] .to.be.deep.equal { type: 'ValueStatement', value: ':' }
       expect tokens[1] .to.be.deep.equal { type: 'Identifier', value: 'hello' }
+      expect tokens[4] .to.be.deep.equal { type: 'StringLiteral', value: 'oli' }
 
