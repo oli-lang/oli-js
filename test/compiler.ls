@@ -231,11 +231,11 @@ describe 'Compiler', (_) ->
 
     describe 'raw blocks', (_) ->
 
-      describe 'unfolded :-', (_) ->
+      describe 'unfolded (:=)', (_) ->
 
-      describe 'folded :-', (_) ->
+      describe 'folded (:-)', (_) ->
 
-      describe 'raw :>', (_) ->
+      describe 'raw (:>)', (_) ->
 
         it 'should compile "hello: world" as raw string', ->
           expect parse('raw:> hello: world').raw .to.be.equal 'hello: world'

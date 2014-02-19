@@ -117,11 +117,14 @@ BlockAttributeStatement
     })
   }
 
+StringRawLiteral
+  = DoubleStringCharacter / SingleStringCharacters
+
 BlockRawStatement
-  = id:IdentifierExpression __ operator:AsignRawOperator
+  = id:IdentifierExpression __ operator:BlockAsignmentRawOperators
     __ body:(
-        body:(!EndToken c:SourceCharacter { return c; })* __ EndToken { return body }
-      / body:(!EOS c:SourceCharacter { return c; })* _ EOS { return body }
+        body:(!EndToken c:StringRawLiteral { return c; })* __ EndToken { return body }
+      / body:(!EOS c:StringRawLiteral { return c; })* _ EOS { return body }
     )
     {
       if (body) {

@@ -427,27 +427,38 @@ describe 'Statements', ->
 
       describe 'unfold (:=)', (_) ->
 
-        it 'should parse "block:= hello!" as empty block', ->
+        it 'should parse in-line block', ->
           ast-obj = node ast('block:= hello!'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':='
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.value' .to.be.equal 'hello!'
 
-        it 'should parse "block:= \'string\' end" as empty block', ->
+        it 'should parse in-line block with end terminator', ->
           ast-obj = node ast('block:= "string" end'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':='
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.value' .to.be.equal 'string'
+
+        xit 'should parse multi-line block with end terminator', ->
+          code = '''
+          block:=
+            "string"
+          end
+          '''
+          ast-obj = node ast(), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':='
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.value' .to.be.equal 'string'
 
       describe 'fold (:-)', (_) ->
 
-        it 'should parse "block:- hello!" as empty block', ->
+        it 'should parse in-line block', ->
           ast-obj = node ast('block:- hello!'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':-'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.value' .to.be.equal 'hello!'
 
-        it 'should parse "block:= \'string\' end" as empty block', ->
+        it 'should parse in-line block with end terminator', ->
           ast-obj = node ast('block:- "string" end'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':-'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
@@ -455,8 +466,15 @@ describe 'Statements', ->
 
       describe 'raw (:>)', (_) ->
 
-        it 'should parse as in-line raw block', ->
+        it 'should parse in-line raw block', ->
           ast-obj = node ast('block:> hello!'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':>'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.raw' .to.be.true
+          expect node ast-obj, 'right.body.value' .to.be.equal 'hello!'
+
+        it 'should parse in-line raw block with end terminator', ->
+          ast-obj = node ast('block:> hello! end'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':>'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.raw' .to.be.true
@@ -474,4 +492,17 @@ describe 'Statements', ->
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.raw' .to.be.true
           expect node ast-obj, 'right.body.value' .to.be.equal 'hello: world\n  using: oli'
+
+        it 'should parse multi-line raw block with escape sequences', ->
+          code = '''
+          block:>
+            hello: world
+            using: \\end
+          end
+          '''
+          ast-obj = node ast(code), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal ':>'
+          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'right.raw' .to.be.true
+          expect node ast-obj, 'right.body.value' .to.be.equal 'hello: world\n  using: end'
 

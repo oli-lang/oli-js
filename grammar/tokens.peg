@@ -28,6 +28,9 @@ BlockAsignmentOperator
     return isArray(operator) ? operator.join('') : operator;
   }
 
+BlockAsignmentRawOperators
+  = AsignRawOperator
+
 ReservedWord
   = Keyword
 
