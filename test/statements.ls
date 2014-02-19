@@ -445,24 +445,26 @@ describe 'Statements', ->
           ast-obj = node ast('block:= hello!'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':='
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
-          expect node ast-obj, 'right.value' .to.be.equal 'hello!'
+          expect node ast-obj, 'right.body.value' .to.be.equal 'hello!'
 
         it 'should parse in-line block with end terminator', ->
           ast-obj = node ast('block:= "string" end'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':='
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
-          expect node ast-obj, 'right.value' .to.be.equal 'string'
+          expect node ast-obj, 'right.body.value' .to.be.equal '"string"'
 
-        xit 'should parse multi-line block with end terminator', ->
-          code = '''
+        it 'should parse multi-line string block with end terminator', ->
+          ast-obj = ast '''
           block:=
             "string"
+              this is a
+                multi-line \\end string
           end
           '''
-          ast-obj = node ast(), 'expression'
-          expect node ast-obj, 'operator' .to.be.equal ':='
-          expect node ast-obj, 'left.id.name' .to.be.equal 'block'
-          expect node ast-obj, 'right.value' .to.be.equal 'string'
+          expect node ast-obj, 'expression.operator' .to.be.equal ':='
+          expect node ast-obj, 'expression.left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'expression.right.body.value'
+            .to.be.equal '"string"\n    this is a\n      multi-line end string'
 
       describe 'fold (:-)', (_) ->
 
@@ -470,13 +472,26 @@ describe 'Statements', ->
           ast-obj = node ast('block:- hello!'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':-'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
-          expect node ast-obj, 'right.value' .to.be.equal 'hello!'
+          expect node ast-obj, 'right.body.value' .to.be.equal 'hello!'
 
         it 'should parse in-line block with end terminator', ->
-          ast-obj = node ast('block:- "string" end'), 'expression'
+          ast-obj = node ast('block:- string end'), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':-'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
-          expect node ast-obj, 'right.value' .to.be.equal 'string'
+          expect node ast-obj, 'right.body.value' .to.be.equal 'string'
+
+        it 'should parse multi-line string block with end terminator', ->
+          ast-obj = ast '''
+          block:-
+            "string"
+              this is a
+                multi-line \\end string
+          end
+          '''
+          expect node ast-obj, 'expression.operator' .to.be.equal ':-'
+          expect node ast-obj, 'expression.left.id.name' .to.be.equal 'block'
+          expect node ast-obj, 'expression.right.body.value'
+            .to.be.equal '"string"\n    this is a\n      multi-line end string'
 
       describe 'raw (:>)', (_) ->
 

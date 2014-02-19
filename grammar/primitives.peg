@@ -115,6 +115,11 @@ SingleStringCharacter
   / "\\" sequence:EscapeSequence                         { return sequence;  }
   / LineContinuation
 
+StringRawCharacter
+  = !("\\") char_:SourceCharacter { return char_;     }
+  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / LineContinuation
+
 LineContinuation
   = "\\" sequence:LineTerminatorSequence { return sequence; }
 

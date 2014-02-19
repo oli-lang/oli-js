@@ -22,14 +22,14 @@ BlockAsignmentOperator
   = operator:(
     VariableAssignOperator
   / AsignNotOperator
-  / AsignUnfoldOperator
-  / AsignFoldOperator
   / StartToken) {
     return isArray(operator) ? operator.join('') : operator;
   }
 
 BlockAsignmentRawOperators
   = AsignRawOperator
+  / AsignUnfoldOperator
+  / AsignFoldOperator
 
 ReservedWord
   = Keyword
