@@ -36,6 +36,8 @@
     "lib",
     "bin",
     "test",
+    "report",
+    "docs",
     "grammar",
     "Gruntfile.*",
     ".editorconfig",

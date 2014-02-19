@@ -1,6 +1,8 @@
 src/
 test/
 dist/
+docs/
+report/
 benchmarks/
 *.ls
 *.coffee
