@@ -460,18 +460,18 @@ describe 'Statements', ->
           expect node ast-obj, 'operator' .to.be.equal ':>'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.raw' .to.be.true
-          expect node ast-obj, 'right.body' .to.be.equal 'hello!'
+          expect node ast-obj, 'right.body.value' .to.be.equal 'hello!'
 
         it 'should parse multi-line raw block', ->
           code = '''
           block:>
-            hello world
-            using oli
+            hello: world
+            using: oli
           end
           '''
           ast-obj = node ast(code), 'expression'
           expect node ast-obj, 'operator' .to.be.equal ':>'
           expect node ast-obj, 'left.id.name' .to.be.equal 'block'
           expect node ast-obj, 'right.raw' .to.be.true
-          expect node ast-obj, 'right.body' .to.be.equal 'hello world\n  using oli'
+          expect node ast-obj, 'right.body.value' .to.be.equal 'hello: world\n  using: oli'
 

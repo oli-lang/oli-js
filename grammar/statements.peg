@@ -101,7 +101,7 @@ BlockPipeStatement
           type:     'BlockStatement',
           operator: operator,
           left:     id,
-          right:    operator === ':!' ? null : {
+          right:    operator === '!:' ? null : {
             type: 'BodyStatement',
             body: body !== null ? body : []
           }
@@ -119,35 +119,29 @@ BlockAttributeStatement
 
 BlockRawStatement
   = id:IdentifierExpression __ operator:AsignRawOperator
-    __ body:(!EndToken c:SourceCharacter { return c; })* __ EndToken
+    __ body:(
+        body:(!EndToken c:SourceCharacter { return c; })* __ EndToken { return body }
+      / body:(!EOS c:SourceCharacter { return c; })* _ EOS { return body }
+    )
     {
+      if (body) {
+        body = body.join('').trim()
+      }
       return astNode({
         type:    'ExpressionStatement',
         expression: astNode({
           type:     'BlockStatement',
           operator: operator,
           left:     id,
-          right:    operator === ':!' ? null : {
+          right:    operator === '!:' ? null : {
             type: 'BodyStatement',
             raw:  true,
-            body: body !== null ? body.join('').trim() : null
-          }
-        })
-      });
-    }
-  / id:IdentifierExpression __ operator:AsignRawOperator
-    _ body:(!EOS c:SourceCharacter { return c; })* _ EOS
-    {
-      return astNode({
-        type:    'ExpressionStatement',
-        expression: astNode({
-          type:     'BlockStatement',
-          operator: operator,
-          left:     id,
-          right:    operator === ':!' ? null : {
-            type: 'BodyStatement',
-            raw:  true,
-            body: body !== null ? body.join('').trim() : null
+            body: body ? astNode({
+              type:  'StringLiteral',
+              value: body,
+              raw:   body,
+              template: false
+            }) : null
           }
         })
       });
@@ -163,7 +157,7 @@ BlockStatement
           type:     'BlockStatement',
           operator: operator,
           left:     id,
-          right:    operator === ':!' ? null : {
+          right:    operator === '!:' ? null : {
             type: 'BodyStatement',
             body: body !== null ? body : []
           }

@@ -98,6 +98,17 @@ describe 'Compiler', (_) ->
             $$attributes: attr: yes
       }
 
+    describe 'empty block', (_) ->
+
+      it 'should compile as unassigned empty block', ->
+        expect parse 'hello!:' .to.be.deep.equal hello: null
+
+      it 'should ignore assignment and compile as empty block', ->
+        expect parse 'hello!: oli' .to.be.deep.equal hello: null
+
+      it 'should ignore assignment and compile as empty block', ->
+        expect parse 'hello!: "oli" end' .to.be.deep.equal hello: null
+
     describe 'multi-line', (_) ->
 
       it 'should compile block with nested blocks values', ->
@@ -225,6 +236,18 @@ describe 'Compiler', (_) ->
       describe 'folded :-', (_) ->
 
       describe 'raw :>', (_) ->
+
+        it 'should compile "hello: world" as raw string', ->
+          expect parse('raw:> hello: world').raw .to.be.equal 'hello: world'
+
+        it 'should compile multi-line as raw string', ->
+          code = '''
+            raw:>
+              I'm a
+              raw string
+            end
+          '''
+          expect parse(code).raw .to.be.equal 'I\'m a\n  raw string'
 
   describe 'references', ->
 
