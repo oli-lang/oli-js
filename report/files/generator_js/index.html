@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>generator.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">63.12</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">381</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">77.14</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">3.06</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var _ = require(&#039;./helpers&#039;)
+var e = require(&#039;./errors&#039;)
+
+/**
+ * Code generator
+ * Pending major refactor
+ */
+
+var replacePattern = /[\$]{3}([^\${3}]*)[\$]{3}/g
+
+exports = module.exports = generator
+
+function generator(obj, memory) {
+  var result
+
+  if (!_.canIterate(obj)) {
+    return obj
+  }
+
+  result = mapReferences(
+    findBlockReferences(obj, processBlockExpression),
+    processStringReferences
+  )
+
+  if (_.isMutable(result)) {
+    result = bodyNormalize(transformer(result))
+  }
+
+  return result
+
+  function bodyNormalize(obj) {
+    var tmp
+
+    if (!_.canIterate(obj) || _.isObject(obj)) {
+      return obj
+    }
+
+    if (_.isArray(obj)) {
+      if (hasOnlyBlocks(obj)) {
+        tmp = {}
+        obj.forEach(function (node) {
+          _.extendKeep(tmp, node)
+        })
+        obj = tmp
+      } else if (obj.length === 1) {
+        if (_.isArray(obj[0])) {
+          obj = obj[0]
+        }
+      }
+    }
+
+    return obj
+  }
+
+  function hasOnlyBlocks(arr) {
+    var has = true
+    var i = 0, l = arr.length
+    for (; i &lt; l; i += 1) {
+      if (!has) break;
+      if (!_.isObject(arr[i])) {
+        has = false
+      }
+    }
+    return has
+  }
+
+  function hasMetaData(obj) {
+    return _.has(obj, &#039;$$body&#039;) || _.has(obj, &#039;$$name&#039;)
+  }
+
+  function processBlockExpression(node) {
+    var expr = node.$$expression
+    if (_.isObject(expr)) {
+      extendBlock(node, expr)
+    } else if (_.isArray(expr)) {
+      expr.forEach(function (ex) {
+        extendBlock(node, ex)
+      })
+    }
+
+    return node
+
+    function extendBlock(node, expr) {
+      var ref
+
+      if (expr.type === &#039;extend&#039; || expr.type === &#039;merge&#039;) {
+        ref = fetchFromMemory(expr.value)
+
+        if (!_.isMutable(ref)) {
+          throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block because &quot;&#039; + expr.value + &#039;&quot; reference is not a block&#039;)
+        }
+        if (!_.isMutable(node.$$body)) {
+          throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block with &quot;&#039; + expr.value + &#039;&quot;: both must be blocks&#039;)
+        }
+        if (_.isType(node.$$body) !== _.isType(ref)) {
+          throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block with &quot;&#039; + expr.value + &#039;&quot;: blocks types are mismatched&#039;)
+        }
+
+        switch (expr.type) {
+          case &#039;extend&#039;:
+            node.$$body = _.extend(_.clone(ref), node.$$body)
+            break
+          case &#039;merge&#039;:
+            node.$$body = _.merge(_.clone(ref), node.$$body)
+            break
+        }
+      }
+
+      return node
+    }
+  }
+
+  function transformer(obj) {
+    var buf
+
+    if (!_.isMutable(obj)) {
+      return obj
+    }
+
+    if (_.isArray(obj)) {
+      buf = processArray(obj)
+    } else if (_.isObject(obj)) {
+      buf = {}
+      if (hasMetaData(obj)) {
+        _.extendKeep(buf, processBlock(obj))
+      } else {
+        _.keys(obj).forEach(function (k) {
+          var tmp, child = transformer(obj[k])
+          if (_.isObject(child)) {
+            _.extendKeep(buf, child)
+          } else {
+            buf[k] = child
+          }
+        })
+      }
+    }
+
+    return buf
+  }
+
+  function processBlock(obj) {
+    var attrStore
+    var result = {}
+    var body = obj.$$body
+    var expr = obj.$$expression
+    var attrs = obj.$$attributes
+    var name = obj.$$name
+    var keys = obj.$$duplicateKeys
+    var alias = null
+    var cur = result[name] = {}
+
+    // pending refactor!
+    if (expr) {
+      if (_.isArray(expr)) {
+        expr.forEach(function (expr) {
+          if (expr.type === &#039;reference&#039;) {
+            if (expr.visible) {
+              alias = expr.value
+              cur = cur[expr.value] = {}
+            }
+          }
+        })
+      } else {
+        if (expr.type === &#039;reference&#039;) {
+          if (expr.visible) {
+            alias = expr.value
+            cur = cur[expr.value] = {}
+          }
+        }
+      }
+    }
+
+    if (attrs) {
+      if (_.isArray(attrs)) {
+        attrStore = {}
+        attrs.forEach(function (attr) {
+          if (attr.name) {
+            attrStore[attr.name] = attr.value
+          }
+        })
+      }
+    }
+
+    if (_.isObject(body)) {
+      if (hasMetaData(body)) {
+        body = processBlock(body)
+      } else {
+        if (keys) {
+          keys.forEach(function (k) {
+            var tmp = []
+            if (_.isArray(body[k])) {
+              body[k].forEach(function (node) {
+                tmp.push(node.$$body)
+              })
+              body[k] = tmp
+            }
+          })
+        }
+        body = transformer(body)
+      }
+      if (alias) {
+        if (attrStore) {
+          result[name][alias][&#039;$$attributes&#039;] = attrStore
+          result[name][alias][&#039;$$body&#039;] = body
+        } else {
+          result[name][alias] = body
+        }
+      } else {
+        if (attrStore) {
+          result[name][&#039;$$attributes&#039;] = attrStore
+          result[name][&#039;$$body&#039;] = body
+        } else {
+          result[name] = body
+        }
+      }
+    } else if (_.isArray(body)) {
+      if (alias) {
+        result[name][alias] = processArray(body)
+      } else {
+        result[name] = processArray(body)
+      }
+    } else {
+      if (_.isString(body)) {
+        body = processBodyString(body, obj.$$operator)
+      }
+      if (alias) {
+        if (attrStore) {
+          result[name][alias][&#039;$$body&#039;] = body
+          result[name][alias][&#039;$$attributes&#039;] = attrStore
+        } else {
+          result[name][alias] = body
+        }
+      } else if (attrStore) {
+        result[name][&#039;$$attributes&#039;] = attrStore
+        result[name][&#039;$$body&#039;] = body
+      } else {
+        result[name] = body
+      }
+    }
+
+    return result
+  }
+
+  function processBodyString(str, operator) {
+    switch (operator) {
+      case &#039;:-&#039;:
+        str = str.split(/\n|\r\n/).join(&#039; &#039;)
+        break
+      case &#039;:=&#039;:
+        str = str.split(/\n|\r\n/).join(&#039; &#039;)
+        break
+      default:
+        str = str
+        break
+    }
+    return str
+  }
+
+  function processArray(arr) {
+    var buf = arr.map(transformer)
+
+    if (buf.length === 1) {
+      if (_.isArray(buf[0]) &amp;&amp; buf[0].length === 1) {
+        buf = buf[0]
+      }
+    }
+
+    return buf
+  }
+
+  function findBlockReferences(obj, cb) {
+    if (_.canIterate(obj)) {
+      walker(obj)
+    }
+
+    function walker(obj, parent) {
+      var i, l, key, node
+      var isArr = _.isArray(obj)
+      var keys = _.keys(obj)
+      parent = parent || obj
+
+      if (!keys.length) return;
+
+      for (i = 0, l = keys.length; i &lt; l; i += 1) {
+        key = keys[i]
+        node = obj[key]
+
+        if (!_.canIterate(node)) {
+          continue
+        }
+
+        if (_.isObject(node)) {
+          if (hasMetaData(node)) {
+            if (isArr) {
+              obj[i] = cb(node, obj)
+            } else {
+              obj[key] = cb(node, obj)
+            }
+          }
+        }
+
+        walker(node, parent)
+      }
+    }
+
+    return obj
+  }
+
+  function mapReferences(obj, cb) {
+    if (_.canIterate(obj)) {
+      walker(obj)
+    }
+
+    function walker(obj) { // not chuck norris
+      var i, l, key, node
+      var isArr = _.isArray(obj)
+      var keys = _.keys(obj)
+
+      if (!keys.length) return;
+
+      for (i = 0, l = keys.length; i &lt; l; i += 1) {
+        key = keys[i]
+        node = obj[key]
+        if (typeof node === &#039;string&#039;) {
+          if (isArr) {
+            obj[i] = cb(node)
+          } else {
+            obj[key] = cb(node)
+          }
+        } else if (_.canIterate(node)) {
+          walker(node)
+        }
+      }
+    }
+
+    return obj
+  }
+
+  function processStringReferences(str) {
+    var match = str.match(replacePattern)
+
+    if (match) {
+      _.forEach(match, function (ref) {
+        var data = fetchFromMemory(removeDollars(ref))
+
+        if (_.isMutable(data)) {
+          throw new e.TypeError(&#039;Interpolated strings references cannot point to blocks: &#039; + removeDollars(ref))
+        }
+
+        str = str.replace(ref, String(data))
+      })
+    }
+
+    return str
+  }
+
+  function fetchFromMemory(ref) {
+    var data = memory.fetch(ref)
+    if (data === undefined) {
+      throw new e.ReferenceError(ref)
+    }
+    return data
+  }
+
+  function processStringInterpolated(str) {
+    return str.replace(replacePattern, function (m, ref) {
+      return fetchFromMemory(ref)
+    })
+  }
+
+  function removeDollars(str) {
+    return str.replace(/^\${3}/g, &#039;&#039;).replace(/\${3}$/g, &#039;&#039;)
+  }
+
+  function isReferenceBlock(expr, key) {
+    return _.isObject(expr) &amp;&amp; expr.type === &#039;reference&#039; &amp;&amp; expr.value !== key &amp;&amp; expr.visible
+  }
+
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

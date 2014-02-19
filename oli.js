@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-19 02:40 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-19 09:53 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -5879,6 +5879,14 @@
             }
             return s0;
           }
+          function peg$parseStringRawLiteral() {
+            var s0;
+            s0 = peg$parseDoubleStringCharacter();
+            if (s0 === peg$FAILED) {
+              s0 = peg$parseSingleStringCharacters();
+            }
+            return s0;
+          }
           function peg$parseBlockRawStatement() {
             var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
             s0 = peg$currPos;
@@ -5904,7 +5912,7 @@
                       s8 = peg$c0;
                     }
                     if (s8 !== peg$FAILED) {
-                      s9 = peg$parseSourceCharacter();
+                      s9 = peg$parseStringRawLiteral();
                       if (s9 !== peg$FAILED) {
                         peg$reportedPos = s7;
                         s8 = peg$c35(s9);
@@ -5931,7 +5939,7 @@
                         s8 = peg$c0;
                       }
                       if (s8 !== peg$FAILED) {
-                        s9 = peg$parseSourceCharacter();
+                        s9 = peg$parseStringRawLiteral();
                         if (s9 !== peg$FAILED) {
                           peg$reportedPos = s7;
                           s8 = peg$c35(s9);
@@ -5980,7 +5988,7 @@
                         s8 = peg$c0;
                       }
                       if (s8 !== peg$FAILED) {
-                        s9 = peg$parseSourceCharacter();
+                        s9 = peg$parseStringRawLiteral();
                         if (s9 !== peg$FAILED) {
                           peg$reportedPos = s7;
                           s8 = peg$c35(s9);
@@ -6007,7 +6015,7 @@
                           s8 = peg$c0;
                         }
                         if (s8 !== peg$FAILED) {
-                          s9 = peg$parseSourceCharacter();
+                          s9 = peg$parseStringRawLiteral();
                           if (s9 !== peg$FAILED) {
                             peg$reportedPos = s7;
                             s8 = peg$c35(s9);

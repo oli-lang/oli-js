@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>helpers.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">65.10</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">316</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">84.93</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">2.64</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var toString = Object.prototype.toString
+var hasOwn = Object.prototype.hasOwnProperty
+var isConsole = console &amp;&amp; console.log
+var isBrowser = typeof window !== &#039;undefined&#039;
+
+&#039;use strict&#039;;
+
+var _ = exports = module.exports = {}
+
+_.isBrowser = isBrowser
+
+_.isBoolean = function (obj) {
+  return typeof obj === &#039;boolean&#039;
+}
+
+_.isNumber = function (obj) {
+  return typeof obj === &#039;number&#039;
+}
+
+_.isDate = function (obj) {
+  return toS(obj) === &#039;[object Date]&#039;
+}
+
+_.isError = function (obj) {
+  return toS(obj) === &#039;[object Error]&#039;
+}
+
+_.isString = function (obj) {
+  return toS(obj) === &#039;[object String]&#039;
+}
+
+_.isArray = Array.isArray || function (obj) {
+  return toS(obj) === &#039;[object Array]&#039;
+}
+
+_.isObject = function (obj) {
+  return toS(obj) === &#039;[object Object]&#039;
+}
+
+_.isMutable = function (obj) {
+  return _.isObject(obj) || _.isArray(obj) || _.isDate(obj)
+}
+
+_.isType = function (obj) {
+  var type
+  if (_.isArray(obj)) {
+    type = &#039;array&#039;
+  } else if (_.isObject(obj)) {
+    type = &#039;object&#039;
+  } else if (obj === null) {
+    type = &#039;null&#039;
+  } else {
+    type = typeof obj
+  }
+  return type
+}
+
+_.canIterate = function (obj) {
+  return _.isObject(obj) || _.isArray(obj)
+}
+
+_.has = function (obj, prop) {
+  return hasOwn.call(obj, prop)
+}
+
+_.walk = function (obj, cb) {
+  walk(obj, undefined, cb)
+}
+
+_.forEach = function (obj, fn) {
+  var i, item, keys, length
+
+  if (!obj) return;
+
+  if (typeof obj.forEach === &#039;function&#039;) {
+    obj.forEach(fn)
+  } else {
+    if (_.isObject(obj)) {
+      keys = _.keys(obj)
+      length = keys.length
+      for (i = 0; i &lt; length; i += 1) {
+        item = obj[keys[i]]
+        fn(item, keys[i], obj)
+      }
+    } else {
+      length = obj.length
+      for (i = 0; i &lt; length; i += 1) {
+        item = obj[i]
+        fn(item, i, obj)
+      }
+    }
+  }
+}
+
+_.mapEach = function (obj, fn) {
+  var i, el, length, results = []
+
+  if (!obj) return;
+
+  if (_.isObject(obj)) {
+    length = _.keys(obj).length
+  } else {
+    length = obj.length
+  }
+
+  for (i = 0; i &lt; length; i += 1) {
+    el = fn(obj[i], i, obj)
+    if (el != null) {
+      results.push(el)
+    }
+  }
+
+  return results
+}
+
+_.extend = function (target, origin) {
+  var prop
+  target = target || {}
+
+  if (!_.isObject(origin)) return target;
+
+  for (prop in origin) {
+    if (_.has(origin, prop)) {
+      target[prop] = origin[prop]
+    }
+  }
+
+  return target
+}
+
+_.extendKeep = function (target, origin) {
+  var prop
+  target = target || {}
+
+  if (!_.isObject(origin)) return target;
+
+  for (prop in origin) {
+    if (_.has(origin, prop)) {
+      if (_.has(target, prop)) {
+        if (!_.isArray(target[prop])) {
+          target[prop] = target[prop] != null ? [ target[prop] ] : []
+        }
+        target[prop].push(origin[prop])
+      } else {
+        target[prop] = origin[prop]
+      }
+    }
+  }
+
+  return target
+}
+
+_.merge = function merge(target, src) {
+  var array = _.isArray(src)
+  var dst = array &amp;&amp; [] || {}
+
+  if (array) {
+    target = target || []
+    dst = dst.concat(target)
+    src.forEach(function (e, i) {
+      if (typeof target[i] === &#039;undefined&#039;) {
+        dst[i] = e
+      } else if (_.isMutable(e)) {
+        dst[i] = merge(target[i], e)
+      } else {
+        if (target.indexOf(e) === -1) {
+          dst.push(e)
+        }
+      }
+    })
+  } else {
+    if (target &amp;&amp; _.isMutable(target)) {
+      _.keys(target).forEach(function (key) {
+        dst[key] = target[key]
+      })
+    }
+    _.keys(src).forEach(function (key) {
+      if (!_.isMutable(src[key]) || !src[key]) {
+        dst[key] = src[key]
+      } else {
+        if (!target[key]) {
+          dst[key] = src[key]
+        } else {
+          dst[key] = merge(target[key], src[key])
+        }
+      }
+    })
+  }
+
+  return dst
+}
+
+_.clone = function clone(obj) {
+  var newObj, prop, item
+
+  if (_.isArray(obj)) {
+    newObj = _.mapEach(obj.slice(), clone)
+  } else if (_.isObject(obj)) {
+    newObj = {}
+    for (prop in obj) {
+      if (_.has(obj, prop)) {
+        item = obj[prop]
+        if (_.canIterate(item)) {
+          newObj[prop] = clone(item)
+        } else {
+          newObj[prop] = item
+        }
+      }
+    }
+  } else {
+    newObj = obj
+  }
+
+  return newObj
+}
+
+_.omit = function (obj, omit) {
+  var prop, target = {}
+  for (prop in obj) {
+    if (_.has(obj, prop)) {
+      if (prop !== omit) {
+        target[prop] = obj[prop]
+      }
+    }
+  }
+  return target
+}
+
+_.keys = Object.keys || function (obj) {
+  var k, keys = []
+  for (k in obj) {
+    if (_.has(obj, k)) {
+      keys.push(k)
+    }
+  }
+  return keys
+}
+
+_.clean = function clean(obj) {
+  var buf, val, k, l
+
+  if (_.isObject(obj)) {
+    buf = {}
+    for (k in obj) {
+      if (_.has(obj, k)) {
+        val = obj[k]
+        if (_.canIterate(val)) {
+          buf[k] = clean(val)
+        } else {
+          if (val !== undefined) {
+            buf[k] = val
+          }
+        }
+      }
+    }
+    obj = buf
+  } else if (_.isArray(obj)) {
+    buf = []
+    for (k = 0, l = obj.length; k &lt; l; k += 1) {
+      val = obj[k]
+      if (_.canIterate(val)) {
+        buf.push(clean(val))
+      } else if (val !== undefined) {
+        buf.push(val)
+      }
+    }
+    obj = buf
+  }
+
+  return obj
+}
+
+_.log = function () {
+  if (isConsole) {
+    console.log.apply(console, arguments)
+  }
+}
+
+function walk(node, parent, cb) {
+  var i, l, j, cl, c, keys, key, child
+
+  if (!_.canIterate(node)) {
+    return cb(node, parent)
+  }
+
+  if (!_.isArray(node)) {
+    cb(node, parent)
+  }
+
+  keys = _.keys(node)
+
+  for (i = 0, l = keys.length; i &lt; l; i += 1) {
+    key = keys[i]
+    if (key === &#039;parent&#039;) continue;
+
+    child = node[key]
+    if (_.isArray(child)) {
+      for (j = 0, cl = child.length; j &lt; cl; j += 1) {
+        c = child[j]
+        if (c) {
+          c.parent = node
+          walk(c, node, cb)
+        }
+      }
+    } else if (child) {
+      child.parent = node
+      walk(child, node, cb)
+    }
+  }
+}
+
+function toS(obj) {
+  return toString.call(obj)
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
