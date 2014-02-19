@@ -55,6 +55,13 @@ module.exports = (grunt) ->
           displayResults: true
         src: [ 'benchmarks/*.js' ]
 
+    plato:
+      sources:
+        options:
+          jshint: false
+        files:
+          'report/': ['lib/**/*.js', '!lib/parser.js']
+
     browserify:
       oli:
         options:

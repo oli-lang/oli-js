@@ -8,4 +8,5 @@ test/fixtures/.tmp
 test/lib/*.js
 .tmp
 docs/
+report/
 

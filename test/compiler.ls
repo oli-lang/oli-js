@@ -218,6 +218,14 @@ describe 'Compiler', (_) ->
           ]
         }
 
+    describe 'raw blocks', (_) ->
+
+      describe 'unfolded :-', (_) ->
+
+      describe 'folded :-', (_) ->
+
+      describe 'raw :>', (_) ->
+
   describe 'references', ->
 
     describe 'primitives', (_) ->

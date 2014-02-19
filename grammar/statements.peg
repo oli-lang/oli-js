@@ -54,7 +54,7 @@ BlockElementStatement
   }
 
 ValueStatement
-  = "{"? _ id:IdentifierExpression _ operator:AsignNotOperator _ ("}" / EOS) {
+  = "{"? _ id:IdentifierExpression _ operator:AsignNotOperator _ ("}" / PipeOperator / EOS) {
       return astNode({
         type:    'ExpressionStatement',
         expression: astNode({
@@ -74,7 +74,7 @@ ValueStatement
           type:     'ValueStatement',
           operator: operator,
           left:     id,
-          right:    operator === ':!' ? null : body
+          right:    operator === '!:' ? null : body
         })
       });
     }

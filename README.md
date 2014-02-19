@@ -21,7 +21,8 @@ which implements the latest [language specification][oli-docs]
 Oli.js provides a general parsing infraestructure to be consumed from other applications
 that uses the Oli syntax for specific purposes, like parsing own DSL
 
-It provides a rich featured [programmatic API](#programmatic-api) and [command-line interface](#command-line-interface)
+It provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
+and [command-line interface](#command-line-interface)
 
 **Note**: oli.js is still an initial alpha implementation! A full compiler re-designing process is pending
 
@@ -33,10 +34,11 @@ It provides a rich featured [programmatic API](#programmatic-api) and [command-l
 - Runs on node.js and the browser
 - High and intermediate level featured API
 - Easily usable from command-line and REPL
-- Heavily tested
-- Good performance (run `grunt bench`)
+- Heavily tested with high coverage
 - No third party dependencies
 - Official language specification implementation
+- Good performance (run `grunt bench`)
+- Good cyclomatic complexity and maintainability (run `grunt plato`)
 
 ## Installation
 
@@ -134,6 +136,7 @@ Options:
   -a, --ast            return the parsed AST serialized as JSON
   -i, --in-line        parse in-line argument as string
   -d, --indent <size>  JSON output indent size. Default to 2
+  -s, --stdin          Read source from stdin
   -r, --repl           use the interactive read-eval-print loop interface
 
 Examples:
@@ -143,6 +146,7 @@ Examples:
   $ oli --ast file.oli
   $ oli --tokens file.oli
   $ oli --in-line "hello: oli!" > result.json
+  $ oli -s < file.oli
 
 ```
 

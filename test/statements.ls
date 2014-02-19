@@ -405,23 +405,23 @@ describe 'Statements', ->
 
     describe 'assignment operators', ->
 
-      describe 'empty (:!)', (_) ->
+      describe 'empty (!:)', (_) ->
 
-        it 'should parse "empty:!" as empty block', ->
-          ast-obj = node ast('empty:!'), 'expression'
-          expect node ast-obj, 'operator' .to.be.equal ':!'
+        it 'should parse "empty!:" as empty block', ->
+          ast-obj = node ast('empty!:'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal '!:'
           expect node ast-obj, 'left.id.name' .to.be.equal 'empty'
           expect node ast-obj, 'right' .to.be.null
 
-        it 'should parse "empty:! \'text\'" as empty block', ->
-          ast-obj = node ast('empty:! "text"'), 'expression'
-          expect node ast-obj, 'operator' .to.be.equal ':!'
+        it 'should parse "empty!: \'text\'" as empty block', ->
+          ast-obj = node ast('empty!: "text"'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal '!:'
           expect node ast-obj, 'left.id.name' .to.be.equal 'empty'
           expect node ast-obj, 'right' .to.be.null
 
-        it 'should parse "empty:! \'text\' end" as empty block', ->
-          ast-obj = node ast('empty:! "text" end'), 'expression'
-          expect node ast-obj, 'operator' .to.be.equal ':!'
+        it 'should parse "empty!: \'text\' end" as empty block', ->
+          ast-obj = node ast('empty!: "text" end'), 'expression'
+          expect node ast-obj, 'operator' .to.be.equal '!:'
           expect node ast-obj, 'left.id.name' .to.be.equal 'empty'
           expect node ast-obj, 'right' .to.be.null
 
