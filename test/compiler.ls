@@ -265,14 +265,14 @@ describe 'Compiler', (_) ->
         &number: 1
         text: *number
         '''
-        expect result.text .to.be.equal '1'
+        expect result.text .to.be.equal 1
 
       it 'should replace a boolean by his reference', ->
         result = parse '''
         &bool: no
         text: *bool
         '''
-        expect result.text .to.be.equal 'false'
+        expect result.text .to.be.false
 
       it 'should replace string by his reference', ->
         result = parse '''
@@ -298,6 +298,22 @@ describe 'Compiler', (_) ->
         full: *name (*type) - *site
         '''
         expect parse(code).full .to.be.equal 'oli (language) - http://oli-lang.org'
+
+    describe 'blocks', (_) ->
+
+      it 'should replace with a list by his reference', ->
+        result = parse '''
+        &list: - 1, 2, 3
+        name: *list
+        '''
+        expect result.name .to.be.deep.equal [ 1, 2, 3 ]
+
+      it 'should replace with a block by his reference', ->
+        result = parse '''
+        &block: name: oli
+        name: *block
+        '''
+        expect result.name .to.be.deep.equal name: 'oli'
 
     describe 'strings', (_) ->
 
