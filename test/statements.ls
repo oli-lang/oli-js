@@ -133,18 +133,32 @@ describe 'Statements', ->
         expect node ast('block: { another: { sub: value } }'), 'expression.right.expression.right.expression.right.value'
           .to.be.equal 'value'
 
-    describe 'identifier attributes only', (_) ->
+    describe 'attributes', (_) ->
 
-      it 'should parse a multi-line attributes identifier', ->
+      it 'should parse a list block with attributes', ->
         ast-obj = ast '''
-          init: yes
-          block (one: yes, another: no)
-          final: yes
+          block (one: yes, another: no):
+            this is a
+            list of
+            strings
+          end
         '''
-        expect node ast-obj, '0.expression.left.id.name' .to.be.equal 'init'
-        expect node ast-obj, '1.expression.attributes.0.left.name' .to.be.equal 'one'
-        expect node ast-obj, '1.expression.attributes.1.left.name' .to.be.equal 'another'
-        expect node ast-obj, '2.expression.left.id.name' .to.be.equal 'final'
+        expect node ast-obj, 'expression.left.attributes.0.left.name' .to.be.equal 'one'
+        expect node ast-obj, 'expression.left.attributes.1.left.name' .to.be.equal 'another'
+        expect node ast-obj, 'expression.right.body.1.value' .to.be.equal 'list of'
+
+      describe 'identifier attributes only', (_) ->
+
+        it 'should parse a multi-line attributes identifier', ->
+          ast-obj = ast '''
+            init: yes
+            block (one: yes, another: no)
+            final: yes
+          '''
+          expect node ast-obj, '0.expression.left.id.name' .to.be.equal 'init'
+          expect node ast-obj, '1.expression.attributes.0.left.name' .to.be.equal 'one'
+          expect node ast-obj, '1.expression.attributes.1.left.name' .to.be.equal 'another'
+          expect node ast-obj, '2.expression.left.id.name' .to.be.equal 'final'
 
     describe 'assignment', ->
 

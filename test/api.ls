@@ -40,7 +40,7 @@ describe 'API', ->
 
     it 'should expose the methods', ->
       expect oli.parse .to.be.a 'function'
-      expect oli.eval .to.be.a 'function'
+      expect oli.transpile .to.be.a 'function'
 
     it 'should have the proper AST object', ->
       expect (ast 'oli rules!').body[0] .to.have.property 'value' .and.be.equal 'oli rules!'
@@ -71,3 +71,7 @@ describe 'API', ->
       expect tokens[1] .to.be.deep.equal { type: 'Identifier', value: 'hello' }
       expect tokens[4] .to.be.deep.equal { type: 'StringLiteral', value: 'oli' }
 
+  describe 'require extension register', (_) ->
+
+    it 'should register the extension', ->
+      expect require("#{__dirname}/fixtures/list.oli") .to.be.deep.equal [ 1, 2, 3 ]

@@ -72,31 +72,46 @@ describe 'Compiler', (_) ->
     it 'should compile an block with reference expression', ->
       expect parse 'hello > world: oli' .to.be.deep.equal hello: world: 'oli'
 
-    it 'should compile an block with attributes', ->
-      expect parse 'hello (attr: yes, another: 12.2): oli' .to.be.deep.equal {
-        hello:
-          $$body: 'oli'
-          $$attributes:
-            attr: yes
-            another: 12.2
-      }
+    describe 'attributes', (_) ->
 
-    it 'should compile an block unassigned attributes', ->
-      expect parse 'hello (attr, another: nil): oli' .to.be.deep.equal {
-        hello:
-          $$body: 'oli'
-          $$attributes:
-            attr: null
-            another: null
-      }
-
-    it 'should compile an block with reference and attributes', ->
-      expect parse 'hello > world (attr: yes): oli' .to.be.deep.equal {
-        hello:
-          world:
+      it 'should compile an block with attributes', ->
+        expect parse 'hello (attr: yes, another: 12.2): oli' .to.be.deep.equal {
+          hello:
             $$body: 'oli'
-            $$attributes: attr: yes
-      }
+            $$attributes:
+              attr: yes
+              another: 12.2
+        }
+
+      it 'should compile an block unassigned attributes', ->
+        expect parse 'hello (attr, another: nil): oli' .to.be.deep.equal {
+          hello:
+            $$body: 'oli'
+            $$attributes:
+              attr: null
+              another: null
+        }
+
+      it 'should compile an block with reference and attributes', ->
+        expect parse 'hello > world (attr: yes): oli' .to.be.deep.equal {
+          hello:
+            world:
+              $$body: 'oli'
+              $$attributes: attr: yes
+        }
+
+      it 'should parse a list block with attributes', ->
+        result = parse '''
+          block (one: yes, another: no):
+            this is a
+            list of
+            strings
+          end
+        '''
+        expect result.block .to.be.deep.equal {
+          $$body: [ 'this is a', 'list of', 'strings' ]
+          $$attributes: one: yes, another: no
+        }
 
     describe 'empty block', (_) ->
 

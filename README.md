@@ -170,7 +170,7 @@ var oli = require('oli')
 try {
   var json = oli.parse('message: - hello, oli!')
 } catch (e) {
-  console.error('Error while parsing:', e.fullMessage)
+  console.error('Error while parsing:', e.message)
   console.error(e.errorLines)
 }
 
@@ -179,7 +179,7 @@ console.log(json)
 ```
 
 #### parse(code, options)
-Alias: `eval`
+Alias: `transpile`
 Return: `mixed`
 
 #### ast(code, options)
@@ -198,6 +198,10 @@ Return: `mixed`
 
 #### compile(ast)
 Alias: `run`
+
+Process the given AST and return the compilation result.
+
+This method will **throw an expection** if a given AST node type is not supported
 
 #### tokens(code, options)
 Alias: `parseTokens`
