@@ -51,7 +51,11 @@ describe 'Memory', ->
         memory.allocate 'this.is.oli', data = this: is: oli: 'language'
         expect memory.fetch 'this.is.oli' .to.be.equal data
 
-      it 'should fetch "oli.language.rules" nested address value', ->
+      it 'should fetch "oli.language" nested address value', ->
+        memory.allocate 'oli', language: yes
+        expect memory.fetch 'oli.language' .to.be.true
+
+      it 'should fetch "oli.language.rules" deep nested address value', ->
         memory.allocate 'oli', language: rules: yes
         expect memory.fetch 'oli.language.rules' .to.be.true
 

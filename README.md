@@ -29,7 +29,7 @@ and [command-line interface](#command-line-interface)
 ## Features
 
 - Powerful parser based on parsing grammar expressions
-- Smart compiler based on type checking and more
+- Smart compiler with good type inference and more
 - Detailed parse and compilation errors
 - Runs on node.js and the browser
 - High and intermediate level featured API
@@ -162,20 +162,33 @@ oli> - oli, rules, yes
 
 ## Programmatic API
 
-### Basic example
+### Examples
 
-```js
+Require the module
+```
 var oli = require('oli')
+```
 
+Parse source
+```js
+var code = 'message: - hello, oli!'
 try {
-  var json = oli.parse('message: - hello, oli!')
+  var result = oli.parse(code)
 } catch (e) {
   console.error('Error while parsing:', e.message)
   console.error(e.errorLines)
 }
+console.log(result) // => { message: [ "hello", "oli!" ] } }
+```
 
-console.log(json)
-// { message: body: [ "hello", "oli!" ] } }
+Binding a context to the compiler
+```
+var code = 'directory: *env.HOME'
+var result = oli.parse(code, {
+  locals: {
+    env: process.env
+  }
+})
 ```
 
 #### parse(code, options)

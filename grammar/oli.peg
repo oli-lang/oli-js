@@ -1,5 +1,7 @@
 {
   var toString = Object.prototype.toString;
+  var indentStack = []
+  var indent = ''
 
   // parsing options
   var includeLOC = options.loc;

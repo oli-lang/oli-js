@@ -372,6 +372,28 @@ describe 'Compiler', (_) ->
         '''
         expect parse(code).full .to.be.equal '/home/oli/http://oli-lang.org'
 
+    describe 'nested references', (_) ->
+
+      it 'should reference a nested value in referenciable block', ->
+        code = '''
+        &block:
+          name: oli
+        end
+        language: *block.name
+        '''
+        expect parse(code).language .to.be.equal 'oli'
+
+      it 'should reference a nested value in referenciable block', ->
+        code = '''
+        &block:
+          data:
+            tags: - minimal, pretty
+          end
+        end
+        language: *block.data.tags
+        '''
+        expect parse(code).language .to.be.deep.equal [ 'minimal', 'pretty' ]
+
     describe 'hidden', (_) ->
 
       it 'should use hidden string references', ->

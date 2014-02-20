@@ -107,17 +107,17 @@ SingleStringCharacters
 
 DoubleStringCharacter
   = !('"' / "\\") char_:SourceCharacter { return char_;     }
-  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / "\\" sequence:EscapeSequence { return sequence;  }
   / LineContinuation
 
 SingleStringCharacter
   = !("'" / "\\") char_:SourceCharacter { return char_;     }
-  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / "\\" sequence:EscapeSequence { return sequence;  }
   / LineContinuation
 
 StringRawCharacter
   = !("\\") char_:SourceCharacter { return char_;     }
-  / "\\" sequence:EscapeSequence                         { return sequence;  }
+  / "\\" sequence:EscapeSequence  { return sequence;  }
   / LineContinuation
 
 LineContinuation
