@@ -77,6 +77,17 @@ describe 'Primitive types', ->
         expect node ast('oli, syntax, is pretty!'), 'value'
           .to.be.equal 'oli, syntax, is pretty!'
 
+    describe 'unicode', (_) ->
+
+      it 'should parse "\u024F\u0250" as unicode characters', ->
+        expect node ast('\\u024F\\u0250'), 'value' .to.be.equal '\u024F\u0250'
+
+      it 'should parse "block: \\u024F\\u0250" as unicode characters', ->
+        expect node ast('block: \\u024F\\u0250'), 'expression.right.value' .to.be.equal '\u024F\u0250'
+
+      it 'should parse "block: "\\u1E25\\u1E27" as quoted string with unicode characters', ->
+        expect node ast('block: "\\u1E25\\u1E27"'), 'expression.right.value' .to.be.equal '\u1E25\u1E27'
+
   describe 'interporaled', (_) ->
 
     it 'should parse "yes, string" as unquoted string', ->
@@ -85,4 +96,3 @@ describe 'Primitive types', ->
 
     it 'should parse "1.1.3, true" as unquoted string', ->
       expect node ast('1.2.1, true'), 'value' .to.be.equal '1.2.1, true'
-

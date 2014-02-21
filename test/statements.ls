@@ -69,7 +69,7 @@ describe 'Statements', ->
         it 'should parse "hello \'oli!" as string with escape character', ->
           expect node ast("string: 'hello \\'oli!'"), 'expression.right.value' .to.be.equal 'hello \'oli!'
 
-        it 'should parse "hello, oli!" as unquoted string', ->
+        it 'should parse "hello, oli!" as quoted string', ->
           expect node ast('string: "hello, oli!"'), 'expression.right.value' .to.be.equal 'hello, oli!'
 
         it 'should parse "in line" as string', ->

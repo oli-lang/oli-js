@@ -9,7 +9,7 @@
 <td><b>Language version</b></td><td>0.1</td>
 </tr>
 <tr>
-<td><b>Stage</b></td><td>alpha</td>
+<td><b>Stage</b></td><td>beta</td>
 </tr>
 </table>
 
@@ -24,16 +24,16 @@ that uses the Oli syntax for specific purposes, like parsing own DSL
 It provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
 and [command-line interface](#command-line-interface)
 
-**Note**: oli.js is still an initial alpha implementation! A full compiler re-designing process is pending
+**Note**: oli.js is still an initial beta implementation! A full compiler re-designing process is pending
 
 ## Features
 
 - Powerful parser based on parsing grammar expressions
-- Smart compiler with good type inference and more
-- Detailed parse and compilation errors
+- Smart compiler with good type inference and checking
+- Detailed parsing errors
 - Runs on node.js and the browser
 - High and intermediate level featured API
-- Easily usable from command-line and REPL
+- Featured command-line interface
 - Heavily tested with high coverage
 - No third party dependencies
 - Official language specification implementation
@@ -71,7 +71,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 - Node.js >= 0.8.0
 - Chrome
 - Firefox
-- Safari 5
+- Safari >= 5
 - Opera >= 11.6
 - IE >= 9
 
@@ -84,7 +84,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] AST
   - [x] Configurable parsing options
   - [x] Errors
-  - [?] Unicode
+  - [x] Unicode characters
   - [_] Indentation based parsing
 - **Compiler**
   - [x] AST walker
