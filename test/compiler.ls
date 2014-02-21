@@ -246,9 +246,29 @@ describe 'Compiler', (_) ->
 
     describe 'raw blocks', (_) ->
 
+      describe 'folded (:-)', (_) ->
+
+        it 'should compile as in-line string', ->
+          code = '''
+            raw:-
+              I'm a
+                raw
+                  string
+            end
+          '''
+          expect parse(code).raw .to.be.equal 'I\'m a raw string'
+
       describe 'unfolded (:=)', (_) ->
 
-      describe 'folded (:-)', (_) ->
+        it 'should compile as in-line string', ->
+          code = '''
+            raw:=
+              I'm a
+                raw
+                  string
+            end
+          '''
+          expect parse(code).raw .to.be.equal 'I\'m a\n    raw\n      string'
 
       describe 'raw (:>)', (_) ->
 
