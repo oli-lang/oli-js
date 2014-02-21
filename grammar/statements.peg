@@ -13,7 +13,6 @@ MainStatement
   / BlockPipeStatement
   / BlockAttributeStatement
   / BlockRawStatement
-  / DentBlockStatement
   / ValueStatement
   / BlockStatement
 
@@ -156,24 +155,6 @@ BlockStatement
         type:    'ExpressionStatement',
         expression: astNode({
           type:     'BlockStatement',
-          operator: operator,
-          left:     id,
-          right:    operator === '!:' ? null : {
-            type: 'BodyStatement',
-            body: body !== null ? body : []
-          }
-        })
-      });
-    }
-
-DentBlockStatement
-  = "@@" _ id:IdentifierExpression __ operator:BlockAsignmentOperator
-    __ INDENT _ body:(PrimitiveTypeStatement / DentBlockStatement) __ (INDENT / DEDENT / EOS)
-    {
-      return astNode({
-        type:    'ExpressionStatement',
-        expression: astNode({
-          type:     'BlockIndentStatement',
           operator: operator,
           left:     id,
           right:    operator === '!:' ? null : {

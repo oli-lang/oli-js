@@ -266,19 +266,6 @@ describe 'Statements', ->
           path = 'expression.right.body.0.expression.right.body.0.expression.right.body.3.elements.4.value'
           expect node code, path .to.be.equal 'pretty'
 
-      xdescribe 'indent', (_) ->
-
-        it 'should parse a nested block by indent', ->
-          ast-obj = ast '''
-          @@ block:
-            hola
-              pepe
-
-          '''
-          inspect ast-obj
-          process.exit!
-          expect node ast-obj, 'expression.right.body.0.value' .to.be.equal 'hola'
-
       describe 'pipe statement', (_) ->
 
         it 'should parse "block: | hello" as pipe statement', ->
