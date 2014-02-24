@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-24 09:20 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 12:16 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -81,105 +81,13 @@
         return result;
       };
     }, {
-      "./errors": 4,
-      "./generator": 5,
-      "./helpers": 6,
-      "./memory": 7,
-      "./transformer": 11
+      "./errors": 2,
+      "./generator": 3,
+      "./helpers": 4,
+      "./memory": 5,
+      "./transformer": 9
     } ],
     2: [ function(require, module, exports) {
-      "use strict";
-      var _ = require("../helpers");
-      var mimeTypes = [ "text/oli", "text/oli-template", "application/oli" ];
-      exports = module.exports = function(oli) {
-        if (window.addEventListener != null) {
-          addEventListener("DOMContentLoaded", runScripts, false);
-        } else if (attachEvent != null) {
-          attachEvent("onload", runScripts);
-        }
-        oli.load = load;
-        function load(url, callback) {
-          var xhr = window.ActiveXObject ? new window.ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-          xhr.open("GET", url, true);
-          if ("overrideMimeType" in xhr) {
-            xhr.overrideMimeType("text/plain");
-          }
-          xhr.onreadystatechange = function() {
-            var ref;
-            if (xhr.readyState !== xhr.DONE) {
-              return;
-            }
-            if ((ref = xhr.status) === 0 || ref === 200) {
-              callback(xhr.responseText);
-            } else {
-              throw new Error("Could not load " + url);
-            }
-          };
-          xhr.send(null);
-        }
-        function runScripts() {
-          var sources, index = 0;
-          var scripts = document.getElementsByTagName("script");
-          sources = getSources(scripts);
-          execute();
-          function getSources(scripts) {
-            var sources = [];
-            _.forEach(scripts, function(script) {
-              if (mimeTypes.indexOf(script.type) !== -1) {
-                sources.push(script);
-              }
-            });
-            return sources;
-          }
-          function execute(src) {
-            var script = sources[index];
-            if (!script) {
-              return;
-            }
-            if (!src && script.src) {
-              load(script.src, execute);
-            } else {
-              addScript(script, src, index);
-              index += 1;
-              execute();
-            }
-          }
-        }
-        function addScript(script, src, index) {
-          oli.scripts = oli.scripts || [];
-          src = script.innerHTML || src;
-          var source = {
-            id: script.src || index,
-            filename: getFilename(script.src),
-            source: src
-          };
-          if (!script.hasAttribute("data-ignore")) {
-            source.result = oli.parse(src);
-          }
-          oli.scripts.push(source);
-          function getFilename(src) {
-            if (src) {
-              src = src.split("/").slice(-1)[0].match(/\w+\.?\w+/g)[0];
-            }
-            return src;
-          }
-        }
-      };
-    }, {
-      "../helpers": 6
-    } ],
-    3: [ function(require, module, exports) {
-      "use strict";
-      var fs = require("fs");
-      exports = module.exports = function oliRequireHandler(oli) {
-        require.extensions[".oli"] = function(module, filename) {
-          exports = module.exports = oli.parse(fs.readFileSync(filename, "utf8"));
-        };
-      };
-    }, {
-      fs: 12
-    } ],
-    4: [ function(require, module, exports) {
       "use strict";
       var isBrowser = require("./helpers").isBrowser;
       exports = module.exports = {
@@ -187,7 +95,7 @@
         SyntaxError: SyntaxError,
         CompileError: CompileError,
         ReferenceError: ReferenceError,
-        addErrorLines: addErrorLines
+        handler: handler
       };
       function TypeError(message) {
         this.name = "TypeError";
@@ -212,12 +120,12 @@
         this.column = column;
       }
       CompileError.prototype = SyntaxError.prototype = ReferenceError.prototype = ReferenceError.prototype = Error.prototype;
-      function addErrorLines(error, src) {
+      function handler(error, src) {
         if (error.line != null) {
           error.errorLines = getErrorLines(src, error);
         }
         if (error.name === "SintaxError") {
-          error.fullMessage = SintaxErrorMessage(error);
+          error.fullMessage = sintaxErrorMessage(error);
         } else {
           error.fullMessage = error.name + ": " + error.message;
         }
@@ -258,7 +166,7 @@
         }
         return spaces;
       }
-      function SintaxErrorMessage(error) {
+      function sintaxErrorMessage(error) {
         return "Syntax error on line " + error.line + ", column " + error.column + ": " + error.message;
       }
       function length(n) {
@@ -274,9 +182,9 @@
         return isBrowser ? "<b>" + str + "</b>" : "[1m" + str + "[22m";
       }
     }, {
-      "./helpers": 6
+      "./helpers": 4
     } ],
-    5: [ function(require, module, exports) {
+    3: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
       var e = require("./errors");
@@ -623,11 +531,11 @@
         }
       }
     }, {
-      "./errors": 4,
-      "./helpers": 6,
-      "./tokens": 10
+      "./errors": 2,
+      "./helpers": 4,
+      "./tokens": 8
     } ],
-    6: [ function(require, module, exports) {
+    4: [ function(require, module, exports) {
       "use strict";
       var toString = Object.prototype.toString;
       var hasOwn = Object.prototype.hasOwnProperty;
@@ -893,7 +801,7 @@
         return toString.call(obj);
       }
     }, {} ],
-    7: [ function(require, module, exports) {
+    5: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
       exports = module.exports = Memory;
@@ -972,9 +880,9 @@
         return _.has(obj, "$$body") || _.has(obj, "$$name");
       }
     }, {
-      "./helpers": 6
+      "./helpers": 4
     } ],
-    8: [ function(require, module, exports) {
+    6: [ function(require, module, exports) {
       var Buffer = require("__browserify_Buffer");
       "use strict";
       var _ = require("./helpers");
@@ -986,6 +894,7 @@
       oli.version = "0.1.0-rc.1";
       oli.parser = parser;
       oli.Compiler = Compiler;
+      require("./engine/" + (_.isBrowser ? "browser" : "node"))(oli);
       function parse(code, options) {
         var ast = oli.ast(code, options);
         if (!ast) {
@@ -1043,7 +952,9 @@
       function tokens(code, options) {
         var tokens = [];
         var loc = options ? options.loc : false;
-        _.walk(oli.ast(code, options), function(node) {
+        _.walk(oli.ast(code, options), getToken);
+        return tokens;
+        function getToken(node) {
           var value;
           if (_.isString(node.value)) {
             value = addToken(loc, node);
@@ -1055,15 +966,9 @@
           if (value) {
             tokens.push(value);
           }
-        });
-        return tokens;
+        }
       }
       oli.tokens = oli.parseTokens = tokens;
-      if (_.isBrowser) {
-        require("./engine/browser")(oli);
-      } else {
-        require("./engine/node")(oli);
-      }
       function addToken(loc, node, type) {
         var token = {
           type: node.type,
@@ -1075,18 +980,16 @@
         return token;
       }
       function rethrow(error, code) {
-        throw errors.addErrorLines(error, code);
+        throw errors.handler(error, code);
       }
     }, {
       "./compiler": 1,
-      "./engine/browser": 2,
-      "./engine/node": 3,
-      "./errors": 4,
-      "./helpers": 6,
-      "./parser": 9,
-      __browserify_Buffer: 13
+      "./errors": 2,
+      "./helpers": 4,
+      "./parser": 7,
+      __browserify_Buffer: 10
     } ],
-    9: [ function(require, module, exports) {
+    7: [ function(require, module, exports) {
       module.exports = function() {
         function peg$subclass(child, parent) {
           function ctor() {
@@ -6284,139 +6187,6 @@
             }
             return s0;
           }
-          function peg$parseDentBlockElementBackup() {
-            var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
-            s0 = peg$currPos;
-            s1 = peg$parseINDENT();
-            if (s1 !== peg$FAILED) {
-              s2 = peg$parseDentBlockStatement();
-              if (s2 === peg$FAILED) {
-                s2 = peg$parsePrimitiveTypeStatement();
-              }
-              if (s2 !== peg$FAILED) {
-                s3 = peg$parse_();
-                if (s3 !== peg$FAILED) {
-                  s4 = peg$parseLineTerminatorSequence();
-                  if (s4 === peg$FAILED) {
-                    s4 = peg$c2;
-                  }
-                  if (s4 !== peg$FAILED) {
-                    s5 = [];
-                    s6 = peg$currPos;
-                    s7 = peg$parseSAMEDENT();
-                    if (s7 !== peg$FAILED) {
-                      s8 = peg$parseDentBlockStatement();
-                      if (s8 === peg$FAILED) {
-                        s8 = peg$currPos;
-                        s9 = peg$parsePrimitiveTypeStatement();
-                        if (s9 !== peg$FAILED) {
-                          s10 = peg$parse_();
-                          if (s10 !== peg$FAILED) {
-                            s11 = peg$parseLineTerminatorSequence();
-                            if (s11 !== peg$FAILED) {
-                              peg$reportedPos = s8;
-                              s9 = peg$c158(s9);
-                              s8 = s9;
-                            } else {
-                              peg$currPos = s8;
-                              s8 = peg$c0;
-                            }
-                          } else {
-                            peg$currPos = s8;
-                            s8 = peg$c0;
-                          }
-                        } else {
-                          peg$currPos = s8;
-                          s8 = peg$c0;
-                        }
-                      }
-                      if (s8 !== peg$FAILED) {
-                        peg$reportedPos = s6;
-                        s7 = peg$c159(s8);
-                        s6 = s7;
-                      } else {
-                        peg$currPos = s6;
-                        s6 = peg$c0;
-                      }
-                    } else {
-                      peg$currPos = s6;
-                      s6 = peg$c0;
-                    }
-                    while (s6 !== peg$FAILED) {
-                      s5.push(s6);
-                      s6 = peg$currPos;
-                      s7 = peg$parseSAMEDENT();
-                      if (s7 !== peg$FAILED) {
-                        s8 = peg$parseDentBlockStatement();
-                        if (s8 === peg$FAILED) {
-                          s8 = peg$currPos;
-                          s9 = peg$parsePrimitiveTypeStatement();
-                          if (s9 !== peg$FAILED) {
-                            s10 = peg$parse_();
-                            if (s10 !== peg$FAILED) {
-                              s11 = peg$parseLineTerminatorSequence();
-                              if (s11 !== peg$FAILED) {
-                                peg$reportedPos = s8;
-                                s9 = peg$c158(s9);
-                                s8 = s9;
-                              } else {
-                                peg$currPos = s8;
-                                s8 = peg$c0;
-                              }
-                            } else {
-                              peg$currPos = s8;
-                              s8 = peg$c0;
-                            }
-                          } else {
-                            peg$currPos = s8;
-                            s8 = peg$c0;
-                          }
-                        }
-                        if (s8 !== peg$FAILED) {
-                          peg$reportedPos = s6;
-                          s7 = peg$c159(s8);
-                          s6 = s7;
-                        } else {
-                          peg$currPos = s6;
-                          s6 = peg$c0;
-                        }
-                      } else {
-                        peg$currPos = s6;
-                        s6 = peg$c0;
-                      }
-                    }
-                    if (s5 !== peg$FAILED) {
-                      s6 = peg$parseDEDENT();
-                      if (s6 !== peg$FAILED) {
-                        peg$reportedPos = s0;
-                        s1 = peg$c160(s2, s5);
-                        s0 = s1;
-                      } else {
-                        peg$currPos = s0;
-                        s0 = peg$c0;
-                      }
-                    } else {
-                      peg$currPos = s0;
-                      s0 = peg$c0;
-                    }
-                  } else {
-                    peg$currPos = s0;
-                    s0 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$c0;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-            return s0;
-          }
           function peg$parseDentBlockElement() {
             var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
             s0 = peg$currPos;
@@ -7483,7 +7253,7 @@
         };
       }();
     }, {} ],
-    10: [ function(require, module, exports) {
+    8: [ function(require, module, exports) {
       exports = module.exports = {
         ASSIGN: ":",
         EQUAL: "=",
@@ -7502,7 +7272,7 @@
         MERGE: ">>>"
       };
     }, {} ],
-    11: [ function(require, module, exports) {
+    9: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
       var tokens = require("./tokens");
@@ -7757,12 +7527,11 @@
         }
       }
     }, {
-      "./errors": 4,
-      "./helpers": 6,
-      "./tokens": 10
+      "./errors": 2,
+      "./helpers": 4,
+      "./tokens": 8
     } ],
-    12: [ function(require, module, exports) {}, {} ],
-    13: [ function(require, module, exports) {
+    10: [ function(require, module, exports) {
       require = function e(t, n, r) {
         function s(o, u) {
           if (!n[o]) {
@@ -8792,5 +8561,5 @@
       }, {}, []);
       module.exports = require("native-buffer-browserify").Buffer;
     }, {} ]
-  }, {}, [ 8 ])(8);
+  }, {}, [ 6 ])(6);
 });

@@ -75,7 +75,7 @@ SingleLineComment
     })
   }
 
-/* Experimental dent-based parsing, to do! */
+/* Experimental indent-based parsing */
 
 LINE
   = SAMEDENT LINE:(!EOS c:SourceElements { return c; })+ EOS?
@@ -99,4 +99,3 @@ INDENT
 
 DEDENT
   = { indent = indentStack.pop(); }
-

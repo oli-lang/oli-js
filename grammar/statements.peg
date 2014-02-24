@@ -166,12 +166,6 @@ BlockStatement
       });
     }
 
-DentBlockElementBackup
-  = INDENT tail:(DentBlockStatement / PrimitiveTypeStatement) _ EOL?
-  head:(SAMEDENT head:(DentBlockStatement / p:PrimitiveTypeStatement _ EOL { return p; }) { return head; })* DEDENT {
-    return [ tail ].concat(head)
-  }
-
 DentBlockElement
   = INDENT tail:(DentBlockStatement / PrimitiveTypeStatement) _ EOL?
   head:(SAMEDENT head:(MainStatement / ValueStatement / p:PrimitiveTypeStatement _ EOL { return p; }) { return head; })* DEDENT {

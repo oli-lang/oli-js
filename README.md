@@ -1,6 +1,6 @@
 # oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
 
-> Oli minimal language parser and compiler for node and the browser
+> Oli language parser and compiler for node and the browser
 
 > **SPOILER! WORK IN PROGRESS**
 
@@ -85,14 +85,14 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] Configurable parsing options
   - [x] Errors
   - [x] Unicode characters
-  - [_] Indentation based parsing
+  - [*] Indentation based parsing
 - **Compiler**
   - [x] AST walker
   - [x] Memory register
   - [x] Intermediate code transpiler
   - [x] Code generator
-  - [*] Interpreter
   - [*] Errors
+  - [_] Interpreter
   - [_] Optimiser
   - [_] Event-driven
 - **Interfaces**
