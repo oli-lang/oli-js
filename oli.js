@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 12:16 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 12:19 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -81,13 +81,105 @@
         return result;
       };
     }, {
-      "./errors": 2,
-      "./generator": 3,
-      "./helpers": 4,
-      "./memory": 5,
-      "./transformer": 9
+      "./errors": 4,
+      "./generator": 5,
+      "./helpers": 6,
+      "./memory": 7,
+      "./transformer": 11
     } ],
     2: [ function(require, module, exports) {
+      "use strict";
+      var _ = require("../helpers");
+      var mimeTypes = [ "text/oli", "text/oli-template", "application/oli" ];
+      exports = module.exports = function(oli) {
+        if (window.addEventListener != null) {
+          addEventListener("DOMContentLoaded", runScripts, false);
+        } else if (attachEvent != null) {
+          attachEvent("onload", runScripts);
+        }
+        oli.load = load;
+        function load(url, callback) {
+          var xhr = window.ActiveXObject ? new window.ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+          xhr.open("GET", url, true);
+          if ("overrideMimeType" in xhr) {
+            xhr.overrideMimeType("text/plain");
+          }
+          xhr.onreadystatechange = function() {
+            var ref;
+            if (xhr.readyState !== xhr.DONE) {
+              return;
+            }
+            if ((ref = xhr.status) === 0 || ref === 200) {
+              callback(xhr.responseText);
+            } else {
+              throw new Error("Could not load " + url);
+            }
+          };
+          xhr.send(null);
+        }
+        function runScripts() {
+          var sources, index = 0;
+          var scripts = document.getElementsByTagName("script");
+          sources = getSources(scripts);
+          execute();
+          function getSources(scripts) {
+            var sources = [];
+            _.forEach(scripts, function(script) {
+              if (mimeTypes.indexOf(script.type) !== -1) {
+                sources.push(script);
+              }
+            });
+            return sources;
+          }
+          function execute(src) {
+            var script = sources[index];
+            if (!script) {
+              return;
+            }
+            if (!src && script.src) {
+              load(script.src, execute);
+            } else {
+              addScript(script, src, index);
+              index += 1;
+              execute();
+            }
+          }
+        }
+        function addScript(script, src, index) {
+          oli.scripts = oli.scripts || [];
+          src = script.innerHTML || src;
+          var source = {
+            id: script.src || index,
+            filename: getFilename(script.src),
+            source: src
+          };
+          if (!script.hasAttribute("data-ignore")) {
+            source.result = oli.parse(src);
+          }
+          oli.scripts.push(source);
+          function getFilename(src) {
+            if (src) {
+              src = src.split("/").slice(-1)[0].match(/\w+\.?\w+/g)[0];
+            }
+            return src;
+          }
+        }
+      };
+    }, {
+      "../helpers": 6
+    } ],
+    3: [ function(require, module, exports) {
+      "use strict";
+      var fs = require("fs");
+      exports = module.exports = function oliRequireHandler(oli) {
+        require.extensions[".oli"] = function(module, filename) {
+          exports = module.exports = oli.parse(fs.readFileSync(filename, "utf8"));
+        };
+      };
+    }, {
+      fs: 12
+    } ],
+    4: [ function(require, module, exports) {
       "use strict";
       var isBrowser = require("./helpers").isBrowser;
       exports = module.exports = {
@@ -182,9 +274,9 @@
         return isBrowser ? "<b>" + str + "</b>" : "[1m" + str + "[22m";
       }
     }, {
-      "./helpers": 4
+      "./helpers": 6
     } ],
-    3: [ function(require, module, exports) {
+    5: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
       var e = require("./errors");
@@ -531,11 +623,11 @@
         }
       }
     }, {
-      "./errors": 2,
-      "./helpers": 4,
-      "./tokens": 8
+      "./errors": 4,
+      "./helpers": 6,
+      "./tokens": 10
     } ],
-    4: [ function(require, module, exports) {
+    6: [ function(require, module, exports) {
       "use strict";
       var toString = Object.prototype.toString;
       var hasOwn = Object.prototype.hasOwnProperty;
@@ -801,7 +893,7 @@
         return toString.call(obj);
       }
     }, {} ],
-    5: [ function(require, module, exports) {
+    7: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
       exports = module.exports = Memory;
@@ -880,9 +972,9 @@
         return _.has(obj, "$$body") || _.has(obj, "$$name");
       }
     }, {
-      "./helpers": 4
+      "./helpers": 6
     } ],
-    6: [ function(require, module, exports) {
+    8: [ function(require, module, exports) {
       var Buffer = require("__browserify_Buffer");
       "use strict";
       var _ = require("./helpers");
@@ -894,7 +986,6 @@
       oli.version = "0.1.0-rc.1";
       oli.parser = parser;
       oli.Compiler = Compiler;
-      require("./engine/" + (_.isBrowser ? "browser" : "node"))(oli);
       function parse(code, options) {
         var ast = oli.ast(code, options);
         if (!ast) {
@@ -969,6 +1060,11 @@
         }
       }
       oli.tokens = oli.parseTokens = tokens;
+      if (_.isBrowser) {
+        require("./engine/browser")(oli);
+      } else {
+        require("./engine/node")(oli);
+      }
       function addToken(loc, node, type) {
         var token = {
           type: node.type,
@@ -984,12 +1080,14 @@
       }
     }, {
       "./compiler": 1,
-      "./errors": 2,
-      "./helpers": 4,
-      "./parser": 7,
-      __browserify_Buffer: 10
+      "./engine/browser": 2,
+      "./engine/node": 3,
+      "./errors": 4,
+      "./helpers": 6,
+      "./parser": 9,
+      __browserify_Buffer: 13
     } ],
-    7: [ function(require, module, exports) {
+    9: [ function(require, module, exports) {
       module.exports = function() {
         function peg$subclass(child, parent) {
           function ctor() {
@@ -7253,7 +7351,7 @@
         };
       }();
     }, {} ],
-    8: [ function(require, module, exports) {
+    10: [ function(require, module, exports) {
       exports = module.exports = {
         ASSIGN: ":",
         EQUAL: "=",
@@ -7272,7 +7370,7 @@
         MERGE: ">>>"
       };
     }, {} ],
-    9: [ function(require, module, exports) {
+    11: [ function(require, module, exports) {
       "use strict";
       var _ = require("./helpers");
       var tokens = require("./tokens");
@@ -7527,11 +7625,12 @@
         }
       }
     }, {
-      "./errors": 2,
-      "./helpers": 4,
-      "./tokens": 8
+      "./errors": 4,
+      "./helpers": 6,
+      "./tokens": 10
     } ],
-    10: [ function(require, module, exports) {
+    12: [ function(require, module, exports) {}, {} ],
+    13: [ function(require, module, exports) {
       require = function e(t, n, r) {
         function s(o, u) {
           if (!n[o]) {
@@ -8561,5 +8660,5 @@
       }, {}, []);
       module.exports = require("native-buffer-browserify").Buffer;
     }, {} ]
-  }, {}, [ 6 ])(6);
+  }, {}, [ 8 ])(8);
 });
