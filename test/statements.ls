@@ -535,7 +535,8 @@ describe 'Statements', ->
           expect node ast-obj, 'right.raw' .to.be.true
           expect node ast-obj, 'right.body.value' .to.be.equal 'hello: world\n  using: end'
 
-      describe 'indent blocks', (_) ->
+      # experimental support, pending more tests
+      describe 'indentation', (_) ->
 
         ast-obj = ast '''
           block:
@@ -565,7 +566,6 @@ describe 'Statements', ->
             this is a string
           '''
 
-        # pending more test
         it 'should have the hello block', ->
           expect node ast-obj, '0.expression.right.body.0.expression.left.id.name' .to.be.equal 'hello'
 

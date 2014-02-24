@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-23 02:14 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-24 09:20 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -6557,7 +6557,7 @@
             return s0;
           }
           function peg$parseDentBlockStatement() {
-            var s0, s1, s2, s3, s4, s5, s6, s7;
+            var s0, s1, s2, s3, s4, s5, s6;
             s0 = peg$currPos;
             s1 = peg$parseIdentifierExpression();
             if (s1 !== peg$FAILED) {
@@ -6569,16 +6569,7 @@
                   if (s4 !== peg$FAILED) {
                     s5 = peg$parseLineTerminatorSequence();
                     if (s5 !== peg$FAILED) {
-                      s6 = [];
-                      s7 = peg$parseDentBlockElement();
-                      if (s7 !== peg$FAILED) {
-                        while (s7 !== peg$FAILED) {
-                          s6.push(s7);
-                          s7 = peg$parseDentBlockElement();
-                        }
-                      } else {
-                        s6 = peg$c0;
-                      }
+                      s6 = peg$parseDentBlockElement();
                       if (s6 !== peg$FAILED) {
                         peg$reportedPos = s0;
                         s1 = peg$c157(s1, s3, s6);
