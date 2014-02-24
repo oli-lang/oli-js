@@ -535,3 +535,41 @@ describe 'Statements', ->
           expect node ast-obj, 'right.raw' .to.be.true
           expect node ast-obj, 'right.body.value' .to.be.equal 'hello: world\n  using: end'
 
+      describe 'indent blocks', (_) ->
+
+        ast-obj = ast '''
+          block:
+            hello:
+              yes
+              key: value
+              this is oli
+              nested:
+                sample string!
+                block 3:
+                  yes
+                  - no, 1, 2, 3
+              raw:>
+                if (foo) {
+                  bar()
+                }
+              end
+              text:-
+                hello oli
+                  this is a sample
+                text multi-line string
+              another string # comment
+            inner block:
+              hi
+              how are you?
+          final block:
+            this is a string
+          '''
+
+        # pending more test
+        it 'should have the hello block', ->
+          expect node ast-obj, '0.expression.right.body.0.expression.left.id.name' .to.be.equal 'hello'
+
+        it 'hello block should have the proper values', ->
+          expect node ast-obj, '0.expression.right.body.0.expression.right.body.0.value' .to.be.true
+          expect node ast-obj, '0.expression.right.body.0.expression.right.body.1.expression.right.value' .to.be.equal 'value'
+          expect node ast-obj, '0.expression.right.body.0.expression.right.body.2.value' .to.be.equal 'this is oli'

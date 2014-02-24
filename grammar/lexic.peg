@@ -28,6 +28,9 @@ LineTerminatorSequence "end of line"
 EOF
   = !.
 
+EOL
+  = LineTerminatorSequence
+
 EOS
   = _ LineTerminatorSequence
   / _ EOF

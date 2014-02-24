@@ -15,6 +15,7 @@ MainStatement
   / BlockRawStatement
   / ValueStatement
   / BlockStatement
+  / DentBlockStatement
 
 ListElementStatement
   = MainStatement
@@ -150,6 +151,36 @@ BlockRawStatement
 BlockStatement
   = id:IdentifierExpression __ operator:BlockAsignmentOperator
     __ body:BlockElementStatement __ EndToken
+    {
+      return astNode({
+        type:    'ExpressionStatement',
+        expression: astNode({
+          type:     'BlockStatement',
+          operator: operator,
+          left:     id,
+          right:    operator === '!:' ? null : {
+            type: 'BodyStatement',
+            body: body !== null ? body : []
+          }
+        })
+      });
+    }
+
+DentBlockElementBackup
+  = INDENT tail:(DentBlockStatement / PrimitiveTypeStatement) _ EOL?
+  head:(SAMEDENT head:(DentBlockStatement / p:PrimitiveTypeStatement _ EOL { return p; }) { return head; })* DEDENT {
+    return [ tail ].concat(head)
+  }
+
+DentBlockElement
+  = INDENT tail:(DentBlockStatement / PrimitiveTypeStatement) _ EOL?
+  head:(SAMEDENT head:(MainStatement / ValueStatement / p:PrimitiveTypeStatement _ EOL { return p; }) { return head; })* DEDENT {
+    return [ tail ].concat(head)
+  }
+
+DentBlockStatement
+  = id:IdentifierExpression __ operator:BlockAsignmentOperator
+    _ EOL body:DentBlockElement
     {
       return astNode({
         type:    'ExpressionStatement',
