@@ -232,6 +232,23 @@ oli.load('path/to/file.oli', function (text) {
 })
 ```
 
+#### oli.Compiler(ast, options)
+The compiler perform a side-by-side code transformation and generation given an AST tree.
+It creates a new memory context and uses the tranformer and generator
+in order to proceed with the compilation
+
+Once you create an instance of the object, you need to call
+the `compile()` method in order to perform the compilation
+
+#### oli.Compiler.transformer(obj, memoryContext)
+This method performs an AST traversal walk transforming each node
+and returning an intermediate-level simplified object tree
+
+#### oli.Compiler.generator(obj, memoryContext)
+
+#### oli.Compiler.nodes
+An object with the AST node type transformer functions
+
 ### Options
 
 #### meta
@@ -239,7 +256,8 @@ Type: `boolean`
 Default: `false`
 
 Return an intermediate level object with metadata properties.
-This is useful when you need to process an intermediate object that includes tokens, operators, expressions and more, instead of process a cutted resultant object
+This is useful when you need to process an intermediate object that includes
+tokens, operators, expressions and more, instead of process a cutted resultant object
 
 #### loc
 Type: `boolean`

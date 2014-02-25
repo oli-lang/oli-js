@@ -128,11 +128,6 @@ describe 'Statements', ->
         expect node ast('block: { another: value }'), 'expression.right.expression.right.value'
           .to.be.equal 'value'
 
-      # pending support
-      xit 'should parse a braces nested block property', ->
-        expect node ast('block: { another: { sub: value } }'), 'expression.right.expression.right.expression.right.value'
-          .to.be.equal 'value'
-
     describe 'attributes', (_) ->
 
       it 'should parse a list block with attributes', ->
