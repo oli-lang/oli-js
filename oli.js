@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 11:41 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 12:32 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -288,23 +288,6 @@
       var uniqueReferencePattern = /^[\$]{3}([^\${3}]*)[\$]{3}$/g;
       var EOL = /\n|\r|\r\n/;
       exports = module.exports = generator;
-      function Generator(data, memory) {
-        this.result = this.data = data;
-        this.memory = memory;
-      }
-      Generator.prototype.generate = function() {
-        this.references();
-        if (_.isMutable(this.result)) {
-          this.result = normalize(generate(this.result));
-        }
-        return this.result;
-      };
-      Generator.prototype.references = function() {
-        this.result = mapReferences(blockReferences(this.result), processStringReferences);
-      };
-      function blockReferences(result) {
-        return findBlockReferences(result, processBlockExpression);
-      }
       function generator(obj, memory) {
         return normalize(generate(mapReferences(processBlockExpression(obj))));
         function processBlockExpression(obj) {
@@ -347,26 +330,20 @@
           return node;
         }
         function generate(obj) {
-          var buf;
           switch (_.isType(obj)) {
            case "array":
-            buf = processArray(obj);
+            obj = processArray(obj);
             break;
 
            case "object":
-            buf = {};
             if (hasMetaData(obj)) {
-              _.extendKeep(buf, processBlock(obj));
+              obj = processBlock(obj);
             } else {
-              buf = generatePlainBlock(obj);
+              obj = generatePlainBlock(obj);
             }
             break;
-
-           default:
-            buf = obj;
-            break;
           }
-          return buf;
+          return obj;
         }
         function generatePlainBlock(obj) {
           var k, child;
@@ -394,7 +371,7 @@
           }
           return store;
         }
-        function blockExpression(expr, block) {
+        function blockReference(expr, block) {
           var alias;
           if (!_.isArray(expr)) {
             expr = [ expr ];
@@ -408,89 +385,75 @@
           });
           return alias;
         }
-        function processBlock(obj) {
-          var attrStore;
-          var result = {};
+        function blockResult(result, name) {
+          return function(key, value, alias) {
+            var ref = result[name];
+            if (key === "body") {
+              if (alias) {
+                result[name][alias] = value;
+              } else {
+                result[name] = value;
+              }
+            } else {
+              if (alias) {
+                if (!_.isObject(result[name][alias])) {
+                  result[name][alias] = {};
+                }
+                ref = result[name][alias];
+              }
+              ref[key] = value;
+            }
+          };
+        }
+        function blockKeys(body, keys) {
+          keys.forEach(function(k) {
+            var buf = [];
+            if (_.isArray(body[k])) {
+              body[k].forEach(function(node) {
+                buf.push(node.$$body);
+              });
+              body[k] = buf;
+            }
+          });
+        }
+        function blockBody(obj) {
           var body = obj.$$body;
-          var expr = obj.$$expression;
-          var attrs = obj.$$attributes;
-          var name = obj.$$name;
           var keys = obj.$$duplicateKeys;
-          var alias = null;
-          var cur = result[name] = {};
-          if (expr) {
-            alias = blockExpression(expr);
-          }
-          if (attrs) {
-            attrs = blockAttributes(attrs);
-          }
           if (_.isObject(body)) {
             if (hasMetaData(body)) {
               body = processBlock(body);
             } else {
               if (keys) {
-                keys.forEach(function(k) {
-                  var tmp = [];
-                  if (_.isArray(body[k])) {
-                    body[k].forEach(function(node) {
-                      tmp.push(node.$$body);
-                    });
-                    body[k] = tmp;
-                  }
-                });
+                blockKeys(body, keys);
               }
               body = generate(body);
             }
-            if (alias) {
-              if (attrs) {
-                result[name][alias]["$$attributes"] = attrs;
-                result[name][alias]["$$body"] = body;
-              } else {
-                result[name][alias] = body;
-              }
-            } else {
-              if (attrs) {
-                result[name]["$$attributes"] = attrs;
-                result[name]["$$body"] = body;
-              } else {
-                result[name] = body;
-              }
-            }
           } else if (_.isArray(body)) {
-            if (alias) {
-              result[name][alias] = processArray(body);
-              if (attrs) {
-                var tmp = {};
-                tmp["$$body"] = result[name][alias];
-                tmp["$$attributes"] = attrs;
-                result[name][alias] = tmp;
-              }
-            } else {
-              result[name] = processArray(body);
-              if (attrs) {
-                var tmp = {};
-                tmp["$$body"] = result[name];
-                tmp["$$attributes"] = attrs;
-                result[name] = tmp;
-              }
-            }
+            body = processArray(body);
+          } else if (_.isString(body)) {
+            body = processString(body, obj.$$operator);
+          }
+          return body;
+        }
+        function processBlock(obj) {
+          var result = {};
+          var body = obj.$$body;
+          var expr = obj.$$expression;
+          var attrs = obj.$$attributes;
+          var name = obj.$$name;
+          var alias = null;
+          var setResult = blockResult(result, name);
+          result[name] = {};
+          body = blockBody(obj);
+          if (expr) {
+            alias = blockReference(expr);
+          }
+          if (attrs) {
+            attrs = blockAttributes(attrs);
+            setResult("$$attributes", attrs, alias);
+            setResult("$$body", body, alias);
           } else {
-            if (_.isString(body)) {
-              body = processString(body, obj.$$operator);
-            }
-            if (alias) {
-              if (attrs) {
-                result[name][alias]["$$body"] = body;
-                result[name][alias]["$$attributes"] = attrs;
-              } else {
-                result[name][alias] = body;
-              }
-            } else if (attrs) {
-              result[name]["$$attributes"] = attrs;
-              result[name]["$$body"] = body;
-            } else {
-              result[name] = body;
-            }
+            setResult("body", body, alias);
           }
           return result;
         }
