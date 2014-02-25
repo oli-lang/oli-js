@@ -696,7 +696,6 @@ describe 'Compiler', (_) ->
       ]
 
     it 'should have the text nested block', ->
-      inspect parse(code)
       expect parse(code)[1].text .to.be.equal 'hello oli this is a sample multi-line string'
 
     it 'should have a nested string', ->

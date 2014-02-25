@@ -82,6 +82,14 @@ module.exports = (grunt) ->
       oli:
         files:
           'oli.js': ['oli.js']
+      min:
+        options:
+          beautify: no
+          mangle: yes
+          compress: yes
+          report: 'min'
+        files:
+          'oli.min.js': ['oli.js']
 
      jsdoc:
         dist:

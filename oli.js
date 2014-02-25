@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 08:23 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 11:41 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -248,7 +248,7 @@
         var lineNumber = current + 1;
         line = src[current];
         if (e.line === lineNumber) {
-          line = red(lineNumber + lineIndent(lineNumber, end) + "| ") + line.substr(0, e.column - 1) + red(line.charAt(e.column - 1)) + line.substr(e.column);
+          line = red(lineNumber + lineIndent(lineNumber, end) + "| ") + line.substr(0, e.column - 1) + bold(red(line.charAt(e.column - 1))) + line.substr(e.column);
         } else {
           line = green(lineNumber + lineIndent(lineNumber, end) + "| ") + line;
         }
@@ -295,7 +295,7 @@
       Generator.prototype.generate = function() {
         this.references();
         if (_.isMutable(this.result)) {
-          this.result = bodyNormalize(transformer(this.result));
+          this.result = normalize(generate(this.result));
         }
         return this.result;
       };
@@ -306,104 +306,107 @@
         return findBlockReferences(result, processBlockExpression);
       }
       function generator(obj, memory) {
-        var result;
-        result = mapReferences(findBlockReferences(obj, processBlockExpression), processStringReferences);
-        if (_.isMutable(result)) {
-          result = bodyNormalize(transformer(result));
-        }
-        return result;
-        function bodyNormalize(obj) {
-          var tmp;
-          if (!_.canIterate(obj) || _.isObject(obj)) {
-            return obj;
-          }
-          if (_.isArray(obj)) {
-            if (hasOnlyBlocks(obj)) {
-              tmp = {};
-              obj.forEach(function(node) {
-                _.extendKeep(tmp, node);
+        return normalize(generate(mapReferences(processBlockExpression(obj))));
+        function processBlockExpression(obj) {
+          return findBlockReferences(obj, function(node) {
+            var expr = node.$$expression;
+            if (_.isObject(expr)) {
+              extendBlock(node, expr);
+            } else if (_.isArray(expr)) {
+              expr.forEach(function(ex) {
+                extendBlock(node, ex);
               });
-              obj = tmp;
-            } else if (obj.length === 1) {
-              if (_.isArray(obj[0])) {
-                obj = obj[0];
-              }
-            }
-          }
-          return obj;
-        }
-        function hasOnlyBlocks(arr) {
-          var has = true;
-          for (var i = 0, l = arr.length; i < l; i += 1) {
-            if (!has) break;
-            if (!_.isObject(arr[i])) {
-              has = false;
-            }
-          }
-          return has;
-        }
-        function hasMetaData(obj) {
-          return _.has(obj, "$$body") || _.has(obj, "$$name");
-        }
-        function processBlockExpression(node) {
-          var expr = node.$$expression;
-          if (_.isObject(expr)) {
-            extendBlock(node, expr);
-          } else if (_.isArray(expr)) {
-            expr.forEach(function(ex) {
-              extendBlock(node, ex);
-            });
-          }
-          return node;
-          function extendBlock(node, expr) {
-            var ref;
-            if (expr.type === "extend" || expr.type === "merge") {
-              ref = fetchFromMemory(expr.value);
-              if (!_.isMutable(ref)) {
-                throw new e.TypeError('Cannot extend "' + node.$$name + '" block because "' + expr.value + '" reference is not a block');
-              }
-              if (!_.isMutable(node.$$body)) {
-                throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": both must be blocks');
-              }
-              if (_.isType(node.$$body) !== _.isType(ref)) {
-                throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": blocks types are mismatched');
-              }
-              switch (expr.type) {
-               case "extend":
-                node.$$body = _.extend(_.clone(ref), node.$$body);
-                break;
-
-               case "merge":
-                node.$$body = _.merge(_.clone(ref), node.$$body);
-                break;
-              }
             }
             return node;
-          }
+          });
         }
-        function transformer(obj) {
-          var buf;
-          if (!_.isMutable(obj)) {
-            return obj;
+        function extendBlock(node, expr) {
+          var ref;
+          if (expr.type === "extend" || expr.type === "merge") {
+            ref = fetchFromMemory(expr.value);
+            if (!_.isMutable(ref)) {
+              throw new e.TypeError('Cannot extend "' + node.$$name + '" block because "' + expr.value + '" reference is not a block');
+            }
+            if (!_.isMutable(node.$$body)) {
+              throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": both must be blocks');
+            }
+            if (_.isType(node.$$body) !== _.isType(ref)) {
+              throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": blocks types are mismatched');
+            }
+            ref = _.clone(ref);
+            switch (expr.type) {
+             case "extend":
+              node.$$body = _.extend(ref, node.$$body);
+              break;
+
+             case "merge":
+              node.$$body = _.merge(ref, node.$$body);
+              break;
+            }
           }
-          if (_.isArray(obj)) {
+          return node;
+        }
+        function generate(obj) {
+          var buf;
+          switch (_.isType(obj)) {
+           case "array":
             buf = processArray(obj);
-          } else if (_.isObject(obj)) {
+            break;
+
+           case "object":
             buf = {};
             if (hasMetaData(obj)) {
               _.extendKeep(buf, processBlock(obj));
             } else {
-              _.keys(obj).forEach(function(k) {
-                var tmp, child = transformer(obj[k]);
-                if (_.isObject(child)) {
-                  _.extendKeep(buf, child);
-                } else {
-                  buf[k] = child;
-                }
-              });
+              buf = generatePlainBlock(obj);
+            }
+            break;
+
+           default:
+            buf = obj;
+            break;
+          }
+          return buf;
+        }
+        function generatePlainBlock(obj) {
+          var k, child;
+          var buf = {};
+          for (k in obj) {
+            if (_.has(obj, k)) {
+              child = generate(obj[k]);
+              if (_.isObject(child)) {
+                _.extendKeep(buf, child);
+              } else {
+                buf[k] = child;
+              }
             }
           }
           return buf;
+        }
+        function blockAttributes(attrs) {
+          var store = {};
+          if (_.isArray(attrs) && attrs) {
+            attrs.forEach(function(attr) {
+              if (attr.name) {
+                store[attr.name] = attr.value;
+              }
+            });
+          }
+          return store;
+        }
+        function blockExpression(expr, block) {
+          var alias;
+          if (!_.isArray(expr)) {
+            expr = [ expr ];
+          }
+          expr.forEach(function(expr) {
+            if (expr.type === "reference") {
+              if (expr.visible) {
+                alias = expr.value;
+              }
+            }
+          });
+          return alias;
         }
         function processBlock(obj) {
           var attrStore;
@@ -416,33 +419,10 @@
           var alias = null;
           var cur = result[name] = {};
           if (expr) {
-            if (_.isArray(expr)) {
-              expr.forEach(function(expr) {
-                if (expr.type === "reference") {
-                  if (expr.visible) {
-                    alias = expr.value;
-                    cur = cur[expr.value] = {};
-                  }
-                }
-              });
-            } else {
-              if (expr.type === "reference") {
-                if (expr.visible) {
-                  alias = expr.value;
-                  cur = cur[expr.value] = {};
-                }
-              }
-            }
+            alias = blockExpression(expr);
           }
           if (attrs) {
-            if (_.isArray(attrs)) {
-              attrStore = {};
-              attrs.forEach(function(attr) {
-                if (attr.name) {
-                  attrStore[attr.name] = attr.value;
-                }
-              });
-            }
+            attrs = blockAttributes(attrs);
           }
           if (_.isObject(body)) {
             if (hasMetaData(body)) {
@@ -459,18 +439,18 @@
                   }
                 });
               }
-              body = transformer(body);
+              body = generate(body);
             }
             if (alias) {
-              if (attrStore) {
-                result[name][alias]["$$attributes"] = attrStore;
+              if (attrs) {
+                result[name][alias]["$$attributes"] = attrs;
                 result[name][alias]["$$body"] = body;
               } else {
                 result[name][alias] = body;
               }
             } else {
-              if (attrStore) {
-                result[name]["$$attributes"] = attrStore;
+              if (attrs) {
+                result[name]["$$attributes"] = attrs;
                 result[name]["$$body"] = body;
               } else {
                 result[name] = body;
@@ -479,34 +459,34 @@
           } else if (_.isArray(body)) {
             if (alias) {
               result[name][alias] = processArray(body);
-              if (attrStore) {
+              if (attrs) {
                 var tmp = {};
                 tmp["$$body"] = result[name][alias];
-                tmp["$$attributes"] = attrStore;
+                tmp["$$attributes"] = attrs;
                 result[name][alias] = tmp;
               }
             } else {
               result[name] = processArray(body);
-              if (attrStore) {
+              if (attrs) {
                 var tmp = {};
                 tmp["$$body"] = result[name];
-                tmp["$$attributes"] = attrStore;
+                tmp["$$attributes"] = attrs;
                 result[name] = tmp;
               }
             }
           } else {
             if (_.isString(body)) {
-              body = processBodyString(body, obj.$$operator);
+              body = processString(body, obj.$$operator);
             }
             if (alias) {
-              if (attrStore) {
+              if (attrs) {
                 result[name][alias]["$$body"] = body;
-                result[name][alias]["$$attributes"] = attrStore;
+                result[name][alias]["$$attributes"] = attrs;
               } else {
                 result[name][alias] = body;
               }
-            } else if (attrStore) {
-              result[name]["$$attributes"] = attrStore;
+            } else if (attrs) {
+              result[name]["$$attributes"] = attrs;
               result[name]["$$body"] = body;
             } else {
               result[name] = body;
@@ -514,7 +494,7 @@
           }
           return result;
         }
-        function processBodyString(str, operator) {
+        function processString(str, operator) {
           switch (operator) {
            case tokens.ASSIGN_UNFOLD:
             str = str.replace(/^\s+|\s+$/g, "");
@@ -531,7 +511,7 @@
           return str;
         }
         function processArray(arr) {
-          var buf = arr.map(transformer);
+          var buf = arr.map(generate);
           if (buf.length === 1) {
             if (_.isArray(buf[0]) && buf[0].length === 1) {
               buf = buf[0];
@@ -541,9 +521,9 @@
         }
         function findBlockReferences(obj, cb) {
           if (_.canIterate(obj)) {
-            walker(obj);
+            walk(obj);
           }
-          function walker(obj, parent) {
+          function walk(obj, parent) {
             var i, l, key, node;
             var isArr = _.isArray(obj);
             var keys = _.keys(obj);
@@ -564,16 +544,16 @@
                   }
                 }
               }
-              walker(node, parent);
+              walk(node, parent);
             }
           }
           return obj;
         }
-        function mapReferences(obj, cb) {
+        function mapReferences(obj) {
           if (_.canIterate(obj)) {
-            walker(obj);
+            walk(obj, processStringReferences);
           }
-          function walker(obj) {
+          function walk(obj, cb) {
             var i, l, key, node;
             var isArr = _.isArray(obj);
             var keys = _.keys(obj);
@@ -588,7 +568,7 @@
                   obj[key] = cb(node);
                 }
               } else if (_.canIterate(node)) {
-                walker(node);
+                walk(node, processStringReferences);
               }
             }
           }
@@ -610,9 +590,9 @@
             }
           }
           return str;
-          function hasOnlyReference(str) {
-            return uniqueReferencePattern.test(str);
-          }
+        }
+        function hasOnlyReference(str) {
+          return uniqueReferencePattern.test(str);
         }
         function fetchFromMemory(ref) {
           var data = memory.fetch(ref);
@@ -624,20 +604,52 @@
           }
           return data;
         }
-        function processStringInterpolated(str) {
-          return str.replace(replacePattern, function(m, ref) {
-            return fetchFromMemory(ref);
-          });
+      }
+      function normalize(obj) {
+        var tmp, k;
+        if (_.isArray(obj)) {
+          if (hasOnlyBlocks(obj)) {
+            tmp = {};
+            for (k in obj) {
+              if (_.has(obj, k)) {
+                _.extendKeep(tmp, obj[k]);
+              }
+            }
+            obj = tmp;
+          } else if (obj.length === 1) {
+            if (_.isArray(obj[0])) {
+              obj = obj[0];
+            }
+          }
         }
-        function removeDollars(str) {
-          return str.replace(/^\${3}/g, "").replace(/\${3}$/g, "");
+        return obj;
+      }
+      function hasOnlyBlocks(arr) {
+        var has = true;
+        for (var i = 0, l = arr.length; i < l; i += 1) {
+          if (!has) break;
+          if (!_.isObject(arr[i])) {
+            has = false;
+          }
         }
-        function isReferenceBlock(expr, key) {
-          return _.isObject(expr) && expr.type === "reference" && expr.value !== key && expr.visible;
-        }
-        function isNestedRef(ref) {
-          return ref.indexOf(".") !== -1;
-        }
+        return has;
+      }
+      function hasMetaData(obj) {
+        return _.has(obj, "$$body") || _.has(obj, "$$name");
+      }
+      function processStringInterpolated(str) {
+        return str.replace(replacePattern, function(m, ref) {
+          return fetchFromMemory(ref);
+        });
+      }
+      function removeDollars(str) {
+        return str.replace(/^\${3}/g, "").replace(/\${3}$/g, "");
+      }
+      function isReferenceBlock(expr, key) {
+        return _.isObject(expr) && expr.type === "reference" && expr.value !== key && expr.visible;
+      }
+      function isNestedRef(ref) {
+        return ref.indexOf(".") !== -1;
       }
     }, {
       "./errors": 4,
