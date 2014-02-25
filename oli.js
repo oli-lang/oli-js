@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 12:32 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 12:38 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -289,8 +289,8 @@
       var EOL = /\n|\r|\r\n/;
       exports = module.exports = generator;
       function generator(obj, memory) {
-        return normalize(generate(mapReferences(processBlockExpression(obj))));
-        function processBlockExpression(obj) {
+        return normalize(generate(processReferences(processBlockExpressions(obj))));
+        function processBlockExpressions(obj) {
           return findBlockReferences(obj, function(node) {
             var expr = node.$$expression;
             if (_.isObject(expr)) {
@@ -437,14 +437,13 @@
         }
         function processBlock(obj) {
           var result = {};
-          var body = obj.$$body;
           var expr = obj.$$expression;
           var attrs = obj.$$attributes;
           var name = obj.$$name;
           var alias = null;
           var setResult = blockResult(result, name);
+          var body = blockBody(obj);
           result[name] = {};
-          body = blockBody(obj);
           if (expr) {
             alias = blockReference(expr);
           }
@@ -512,50 +511,50 @@
           }
           return obj;
         }
-        function mapReferences(obj) {
-          if (_.canIterate(obj)) {
-            walk(obj, processStringReferences);
-          }
-          function walk(obj, cb) {
-            var i, l, key, node;
-            var isArr = _.isArray(obj);
-            var keys = _.keys(obj);
-            if (!keys.length) return;
-            for (i = 0, l = keys.length; i < l; i += 1) {
-              key = keys[i];
-              node = obj[key];
-              if (typeof node === "string") {
-                if (isArr) {
-                  obj[i] = cb(node);
-                } else {
-                  obj[key] = cb(node);
+        function processReferences(obj) {
+          return mapReferences(obj);
+          function mapReferences(obj) {
+            if (_.canIterate(obj)) {
+              walk(obj, processStringReferences);
+            }
+            function walk(obj, cb) {
+              var i, l, key, node;
+              var isArr = _.isArray(obj);
+              var keys = _.keys(obj);
+              if (!keys.length) return;
+              for (i = 0, l = keys.length; i < l; i += 1) {
+                key = keys[i];
+                node = obj[key];
+                if (typeof node === "string") {
+                  if (isArr) {
+                    obj[i] = cb(node);
+                  } else {
+                    obj[key] = cb(node);
+                  }
+                } else if (_.canIterate(node)) {
+                  walk(node, processStringReferences);
                 }
-              } else if (_.canIterate(node)) {
-                walk(node, processStringReferences);
               }
             }
+            return obj;
           }
-          return obj;
-        }
-        function processStringReferences(str) {
-          if (hasOnlyReference(str)) {
-            str = fetchFromMemory(removeDollars(str));
-          } else {
-            var match = str.match(replacePattern);
-            if (match) {
-              _.forEach(match, function(ref) {
-                var data = fetchFromMemory(removeDollars(ref));
-                if (_.isMutable(data)) {
-                  throw new e.TypeError("Interpolated strings references cannot point to blocks: " + removeDollars(ref));
-                }
-                str = str.replace(ref, String(data));
-              });
+          function processStringReferences(str) {
+            if (hasOnlyReference(str)) {
+              str = fetchFromMemory(removeDollars(str));
+            } else {
+              var match = str.match(replacePattern);
+              if (match) {
+                _.forEach(match, function(ref) {
+                  var data = fetchFromMemory(removeDollars(ref));
+                  if (_.isMutable(data)) {
+                    throw new e.TypeError("Interpolated strings references cannot point to blocks: " + removeDollars(ref));
+                  }
+                  str = str.replace(ref, String(data));
+                });
+              }
             }
+            return str;
           }
-          return str;
-        }
-        function hasOnlyReference(str) {
-          return uniqueReferencePattern.test(str);
         }
         function fetchFromMemory(ref) {
           var data = memory.fetch(ref);
@@ -596,6 +595,9 @@
           }
         }
         return has;
+      }
+      function hasOnlyReference(str) {
+        return uniqueReferencePattern.test(str);
       }
       function hasMetaData(obj) {
         return _.has(obj, "$$body") || _.has(obj, "$$name");
