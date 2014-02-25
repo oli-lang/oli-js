@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 08:00 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 08:23 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -288,6 +288,23 @@
       var uniqueReferencePattern = /^[\$]{3}([^\${3}]*)[\$]{3}$/g;
       var EOL = /\n|\r|\r\n/;
       exports = module.exports = generator;
+      function Generator(data, memory) {
+        this.result = this.data = data;
+        this.memory = memory;
+      }
+      Generator.prototype.generate = function() {
+        this.references();
+        if (_.isMutable(this.result)) {
+          this.result = bodyNormalize(transformer(this.result));
+        }
+        return this.result;
+      };
+      Generator.prototype.references = function() {
+        this.result = mapReferences(blockReferences(this.result), processStringReferences);
+      };
+      function blockReferences(result) {
+        return findBlockReferences(result, processBlockExpression);
+      }
       function generator(obj, memory) {
         var result;
         result = mapReferences(findBlockReferences(obj, processBlockExpression), processStringReferences);
