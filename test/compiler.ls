@@ -670,6 +670,41 @@ describe 'Compiler', (_) ->
           '''
           expect (-> parse code) .to.throw /mismatched/
 
+  describe 'indent', (_) ->
+
+    code = '''
+      block:
+        hello:
+          yes
+          key: value
+          this is oli
+        text:-
+          hello oli
+            this is a sample
+          multi-line string
+        end
+        another string # comment
+      final block:
+        this is a string
+    '''
+
+    it 'should have the hello nested block', ->
+      expect parse(code)[0].block.hello .to.be.deep.equal [
+        true
+        { key: 'value' }
+        'this is oli'
+      ]
+
+    it 'should have the text nested block', ->
+      inspect parse(code)
+      expect parse(code)[1].text .to.be.equal 'hello oli this is a sample multi-line string'
+
+    it 'should have a nested string', ->
+      expect parse(code)[2] .to.be.equal 'another string'
+
+    it 'should have a final block', ->
+      expect parse(code)[3]['final block'] .to.be.deep.equal [ 'this is a string' ]
+
   describe 'options', (_) ->
 
     describe 'meta', (_) ->
@@ -708,4 +743,24 @@ describe 'Compiler', (_) ->
                     '$$name': 'using'
                     '$$operator': ':'
                     '$$body': 'oli'
+          }
+
+    describe 'loc', (_) ->
+
+      it 'should parse and return an intermediate compilation result with lines of code data', ->
+        code = '''
+        oli:
+          hello
+        end
+        '''
+        expect parse code, loc: yes .to.be.deep.equal {
+          oli:
+            '$$name': 'oli'
+            '$$operator': ':'
+            '$$body': [ 'hello' ]
+            '$$loc':
+              'line': 1
+              'column': 1
+              'start': 0
+              'end': 16
           }

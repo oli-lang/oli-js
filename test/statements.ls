@@ -530,7 +530,7 @@ describe 'Statements', ->
           expect node ast-obj, 'right.raw' .to.be.true
           expect node ast-obj, 'right.body.value' .to.be.equal 'hello: world\n  using: end'
 
-      # experimental support, pending more tests
+      # experimental support, work in progress
       describe 'indentation', (_) ->
 
         ast-obj = ast '''
@@ -552,7 +552,7 @@ describe 'Statements', ->
               text:-
                 hello oli
                   this is a sample
-                text multi-line string
+                multi-line string
               another string # comment
             inner block:
               hi
