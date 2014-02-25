@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 12:19 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-25 09:35 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -39,6 +39,7 @@
       var CompilerError = require("./errors").CompilerError;
       exports = module.exports = Compiler;
       function Compiler(ast, options) {
+        this.result = null;
         this.ast = ast;
         this.memory = new Memory();
         this.config(options);
@@ -48,6 +49,7 @@
       Compiler.generator = generator;
       Compiler.prototype.options = {
         meta: false,
+        loc: false,
         locals: null,
         data: null
       };
@@ -66,6 +68,17 @@
         }
         return this;
       };
+      Compiler.prototype.clean = function(result) {
+        if (!this.options.loc) {
+          _.walk(result, function(node) {
+            if (_.isObject(node) && node.$$loc) {
+              node.$$loc = undefined;
+            }
+          });
+          result = _.clean(result);
+        }
+        return result;
+      };
       Compiler.prototype.compile = function() {
         var result = transformer(this.ast, this.memory);
         if (result.length === 1) {
@@ -78,6 +91,7 @@
             result = generator(result, this.memory);
           }
         }
+        this.result = result;
         return result;
       };
     }, {
@@ -283,7 +297,7 @@
       var tokens = require("./tokens");
       var replacePattern = /[\$]{3}([^\${3}]*)[\$]{3}/g;
       var uniqueReferencePattern = /^[\$]{3}([^\${3}]*)[\$]{3}$/g;
-      var EOL = /\n|\r\n/;
+      var EOL = /\n|\r|\r\n/;
       exports = module.exports = generator;
       function generator(obj, memory) {
         var result;
@@ -916,7 +930,7 @@
         return this.fetch(address) !== undefined;
       };
       Memory.prototype.free = function(address) {
-        if (this.pool.hasOwnProperty(address) && this.pool[address] !== undefined) {
+        if (_.has(this.pool, address) && this.pool[address] !== undefined) {
           this.pool[address] = undefined;
         }
         return this;
@@ -7376,10 +7390,10 @@
       var tokens = require("./tokens");
       var CompileError = require("./errors").CompileError;
       exports = module.exports = transformer;
+      transformer.tokens = tokens;
       function transformer(ast, memory) {
         return _.mapEach(ast.body, astTraverse(memory));
       }
-      transformer.tokens = tokens;
       function astTraverse(memory) {
         return function traverse(node) {
           var result, type;

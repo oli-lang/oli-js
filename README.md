@@ -18,13 +18,13 @@
 Multi-purpose high level [Oli language][1] parser and compiler for node.js and the browser,
 which implements the latest [language specification][oli-docs]
 
-Oli.js provides a general parsing infraestructure to be consumed from other applications
+Oli.js provides a general parsing infraestructure to be integrated and consumed from other applications
 that uses the Oli syntax for specific purposes, like parsing own DSL
 
-It provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
-and [command-line interface](#command-line-interface)
+Aditionally it provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
+and a rich [command-line interface](#command-line-interface)
 
-**Note**: oli.js is still an initial beta implementation! A full compiler re-designing process is pending
+**Note**: it's still an beta implementation! A full compiler re-designing process is pending
 
 ## Features
 
@@ -75,8 +75,6 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 - Opera >= 11.6
 - IE >= 9
 
-**Note**: pending tests in embebed JavaScript engines
-
 ## Milestones
 
 - **Parser**
@@ -102,9 +100,9 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 - **Serializer**
   - [_] JSON to Oli
   - [_] Concret Sintax Tree to Oli
-- **Environments**
+- **Engines**
   - [x] Node.js
-  - [x] Browser
+  - [x] Browsers
   - [?] Rhino
 
 #### Upcoming features
@@ -240,11 +238,13 @@ in order to proceed with the compilation
 Once you create an instance of the object, you need to call
 the `compile()` method in order to perform the compilation
 
-#### oli.Compiler.transformer(obj, memoryContext)
+#### oli.Compiler.transformer(ast, memoryContext)
 This method performs an AST traversal walk transforming each node
 and returning an intermediate-level simplified object tree
 
 #### oli.Compiler.generator(obj, memoryContext)
+Takes the intermediate object from the trasnformation process and performs the final code generator.
+It takes the responsabilities of the interpreter, data mutation and final transformation
 
 #### oli.Compiler.nodes
 An object with the AST node type transformer functions
