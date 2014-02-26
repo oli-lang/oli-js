@@ -334,6 +334,28 @@ describe 'Compiler', (_) ->
         '''
         expect parse(code).full .to.be.equal 'oli (language) - http://oli-lang.org'
 
+    describe 'multiple references', (_) ->
+
+      it 'should apply properly multiple references', ->
+        code = '''
+        &type: language
+        &name: oli *type
+        &category: markup
+        full: "*name (*category)"
+        '''
+        expect parse(code).full .to.be.equal 'oli language (markup)'
+
+      it 'should apply properly multiple nested references', ->
+        code = '''
+        &info:
+          &name: oli *info.type
+          type: language
+        end
+        &category: markup
+        full: "*name (*category)"
+        '''
+        expect parse(code).full .to.be.equal 'oli language (markup)'
+
     describe 'blocks', (_) ->
 
       it 'should replace with a list by his reference', ->
