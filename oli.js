@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 11:02 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 11:24 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -977,7 +977,6 @@
       var parser = require("./parser").parse;
       var Compiler = require("./compiler");
       var errors = require("./errors");
-      var empty = null;
       var oli = exports = module.exports = {};
       oli.version = "0.1.0-rc.1";
       oli.parser = parser;
@@ -985,10 +984,10 @@
       function parse(code, options) {
         var ast = oli.ast(code, options);
         if (!ast) {
-          return empty;
+          return null;
         }
         if (!ast.body.length) {
-          return empty;
+          return null;
         }
         options = _.extend({
           locals: null
@@ -1014,7 +1013,7 @@
       function ast(code, options) {
         var ast;
         if (!_.isString(code)) {
-          throw new errors.TypeError("First argument must be an string or buffer");
+          throw new errors.TypeError("First argument must be an string");
         }
         options = _.extend({
           loc: false,
@@ -1585,7 +1584,7 @@
                     type: "StringLiteral",
                     value: body,
                     raw: body,
-                    template: false
+                    template: true
                   }) : null
                 }
               })

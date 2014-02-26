@@ -2,8 +2,6 @@
 
 > Oli language parser and compiler for node and the browser
 
-> **SPOILER! WORK IN PROGRESS**
-
 <table>
 <tr>
 <td><b>Language version</b></td><td>0.1</td>
@@ -24,7 +22,7 @@ that uses the Oli syntax for specific purposes, like parsing own DSL
 Aditionally it provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
 and a rich [command-line interface](#command-line-interface)
 
-**Note**: it's still an beta implementation! A full compiler re-design process is pending
+**Note**: it's still a beta implementation! A full compiler re-design process is pending
 
 ## Features
 
@@ -329,6 +327,11 @@ grunt bench
 Coding zen mode
 ```
 $ grunt dev [--force]
+```
+
+Cyclomatic complexibility report
+```
+$ grunt plato
 ```
 
 ## License
