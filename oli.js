@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 10:54 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 11:02 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -305,7 +305,7 @@
         function generate(obj) {
           switch (_.isType(obj)) {
            case "array":
-            obj = processArray(obj);
+            obj = generateList(obj);
             break;
 
            case "object":
@@ -392,7 +392,8 @@
         function blockBody(obj) {
           var body = obj.$$body;
           var keys = obj.$$duplicateKeys;
-          if (_.isObject(body)) {
+          switch (_.isType(body)) {
+           case "object":
             if (hasMetaData(body)) {
               body = generateBlock(body);
             } else {
@@ -401,10 +402,15 @@
               }
               body = generate(body);
             }
-          } else if (_.isArray(body)) {
-            body = processArray(body);
-          } else if (_.isString(body)) {
-            body = processString(body, obj.$$operator);
+            break;
+
+           case "array":
+            body = generateList(body);
+            break;
+
+           case "string":
+            body = generateString(body, obj.$$operator);
+            break;
           }
           return body;
         }
@@ -429,7 +435,7 @@
           }
           return result;
         }
-        function processString(str, operator) {
+        function generateString(str, operator) {
           switch (operator) {
            case tokens.ASSIGN_UNFOLD:
             str = str.replace(/^\s+|\s+$/g, "");
@@ -438,14 +444,10 @@
            case tokens.ASSIGN_FOLD:
             str = str.replace(EOL, "").replace(/\s+/g, " ");
             break;
-
-           default:
-            str = str;
-            break;
           }
           return str;
         }
-        function processArray(arr) {
+        function generateList(arr) {
           var buf = arr.map(generate);
           if (buf.length === 1) {
             if (_.isArray(buf[0]) && buf[0].length === 1) {
