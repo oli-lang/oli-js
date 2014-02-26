@@ -196,7 +196,6 @@ Return: `object`
 
 This is the most low-level API method.
 It returns an object that represent the parsed abstract-syntax tree
-This method will **throw an expection** cannot parser or
 
 > **Note**: AST node types or tree data structures can change between minor versions, as the parser is still beta.
 > Please be aware with that in order to prevent possible inconsistencies if your implementation is coupled to the parsed AST
