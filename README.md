@@ -164,7 +164,7 @@ Require the module
 var oli = require('oli')
 ```
 
-Parse source
+Simple code parsing
 ```js
 var code = 'message: - hello, oli!'
 try {
@@ -196,6 +196,7 @@ Return: `object`
 
 This is the most low-level API method.
 It returns an object that represent the parsed abstract-syntax tree
+This method will **throw an expection** cannot parser or
 
 > **Note**: AST node types or tree data structures can change between minor versions, as the parser is still beta.
 > Please be aware with that in order to prevent possible inconsistencies if your implementation is coupled to the parsed AST
@@ -204,17 +205,20 @@ It returns an object that represent the parsed abstract-syntax tree
 Alias: `meta`
 Return: `mixed`
 
+Parse a given code and return an intermediate resultant object tree structure which includes
+meta data such as block operators, block expressions, references and attributes prefixed with `$$`
+
 #### compile(ast)
 Alias: `run`
+Return: `mixed`
 
 Process the given AST and return the compilation result.
 
-This method will **throw an expection** if a given AST node type is not supported
-
 #### tokens(code, options)
 Alias: `parseTokens`
+Return: `array`
 
-Returns a one-level collection of the existent tokens
+Returns a one-level objects collection with the existent tokens in the given code
 
 #### load(path, callback)
 Context: `browser`
