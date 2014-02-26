@@ -79,7 +79,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] AST
   - [x] Configurable parsing options
   - [x] Errors
-  - [x] Unicode characters
+  - [x] Unicode expressions
   - [*] Indentation based parsing
 - **Compiler**
   - [x] AST walker
