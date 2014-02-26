@@ -24,7 +24,7 @@ that uses the Oli syntax for specific purposes, like parsing own DSL
 Aditionally it provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
 and a rich [command-line interface](#command-line-interface)
 
-**Note**: it's still an beta implementation! A full compiler re-designing process is pending
+**Note**: it's still an beta implementation! A full compiler re-design process is pending
 
 ## Features
 
@@ -244,7 +244,7 @@ and returning an intermediate-level simplified object tree
 
 #### oli.Compiler.generator(obj, memoryContext)
 Takes the intermediate object from the trasnformation process and performs the final code generator.
-It takes the responsabilities of the interpreter, data mutation and final transformation
+It takes the responsabilities of the interpreter, data mutation and final code generation
 
 #### oli.Compiler.nodes
 An object with the AST node type transformer functions
