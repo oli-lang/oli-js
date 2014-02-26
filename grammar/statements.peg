@@ -119,12 +119,11 @@ BlockAttributeStatement
   }
 
 BlockRawStatement
-  = id:IdentifierExpression __ operator:BlockAsignmentRawOperators
-    __ body:(
-        body:(!EndToken c:StringRawCharacter { return c; })* __ EndToken { return body }
-      / body:(!EOS c:StringRawCharacter { return c; })* _ EOS { return body }
-    )
-    {
+  = id:IdentifierExpression __ operator:BlockAsignmentRawOperators __
+  body:(
+      body:(!EndToken c:StringRawCharacter { return c; })* __ EndToken { return body }
+    / body:(!EOS c:StringRawCharacter { return c; })* _ EOS { return body }
+  ) {
       if (body) {
         body = body.join('').trim()
       }
@@ -141,7 +140,7 @@ BlockRawStatement
               type:  'StringLiteral',
               value: body,
               raw:   body,
-              template: false
+              template: true
             }) : null
           }
         })
