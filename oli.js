@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 12:38 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 10:54 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -238,9 +238,8 @@
         do {
           current += 1;
         } while (current < 0);
-        while (current < end) {
+        while (current++ < end) {
           buf.push(renderLine(line, src, current, end, e));
-          current += 1;
         }
         return buf;
       }
@@ -284,50 +283,24 @@
       var _ = require("./helpers");
       var e = require("./errors");
       var tokens = require("./tokens");
-      var replacePattern = /[\$]{3}([^\${3}]*)[\$]{3}/g;
-      var uniqueReferencePattern = /^[\$]{3}([^\${3}]*)[\$]{3}$/g;
-      var EOL = /\n|\r|\r\n/;
+      var replacePattern = /[\@]{3}([^\@{3}]*)[\@]{3}/g;
+      var uniqueReferencePattern = /^[\@]{3}([^\@{3}]*)[\@]{3}$/;
+      var EOL = /\n|\r|\r\n/g;
       exports = module.exports = generator;
       function generator(obj, memory) {
-        return normalize(generate(processReferences(processBlockExpressions(obj))));
-        function processBlockExpressions(obj) {
-          return findBlockReferences(obj, function(node) {
-            var expr = node.$$expression;
-            if (_.isObject(expr)) {
-              extendBlock(node, expr);
-            } else if (_.isArray(expr)) {
-              expr.forEach(function(ex) {
-                extendBlock(node, ex);
-              });
-            }
-            return node;
-          });
+        return normalize(generate(transformReferences(obj)));
+        function transformReferences(obj) {
+          return processReferences(processBlockReferences(obj));
         }
-        function extendBlock(node, expr) {
-          var ref;
-          if (expr.type === "extend" || expr.type === "merge") {
-            ref = fetchFromMemory(expr.value);
-            if (!_.isMutable(ref)) {
-              throw new e.TypeError('Cannot extend "' + node.$$name + '" block because "' + expr.value + '" reference is not a block');
-            }
-            if (!_.isMutable(node.$$body)) {
-              throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": both must be blocks');
-            }
-            if (_.isType(node.$$body) !== _.isType(ref)) {
-              throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": blocks types are mismatched');
-            }
-            ref = _.clone(ref);
-            switch (expr.type) {
-             case "extend":
-              node.$$body = _.extend(ref, node.$$body);
-              break;
-
-             case "merge":
-              node.$$body = _.merge(ref, node.$$body);
-              break;
-            }
+        function fetchFromMemory(ref) {
+          var data = memory.fetch(ref);
+          if (data === undefined) {
+            throw new e.ReferenceError(ref);
           }
-          return node;
+          if (isNestedRef(ref) && hasMetaData(data)) {
+            data = data.$$body;
+          }
+          return data;
         }
         function generate(obj) {
           switch (_.isType(obj)) {
@@ -337,7 +310,7 @@
 
            case "object":
             if (hasMetaData(obj)) {
-              obj = processBlock(obj);
+              obj = generateBlock(obj);
             } else {
               obj = generatePlainBlock(obj);
             }
@@ -371,7 +344,7 @@
           }
           return store;
         }
-        function blockReference(expr, block) {
+        function blockReference(expr) {
           var alias;
           if (!_.isArray(expr)) {
             expr = [ expr ];
@@ -421,7 +394,7 @@
           var keys = obj.$$duplicateKeys;
           if (_.isObject(body)) {
             if (hasMetaData(body)) {
-              body = processBlock(body);
+              body = generateBlock(body);
             } else {
               if (keys) {
                 blockKeys(body, keys);
@@ -435,7 +408,7 @@
           }
           return body;
         }
-        function processBlock(obj) {
+        function generateBlock(obj) {
           var result = {};
           var expr = obj.$$expression;
           var attrs = obj.$$attributes;
@@ -463,7 +436,7 @@
             break;
 
            case tokens.ASSIGN_FOLD:
-            str = str.replace(/\n|\r\n/g, "").replace(/\s+/g, " ");
+            str = str.replace(EOL, "").replace(/\s+/g, " ");
             break;
 
            default:
@@ -480,6 +453,97 @@
             }
           }
           return buf;
+        }
+        function processReferences(obj) {
+          return mapReferences(obj);
+          function mapReferences(obj) {
+            if (_.canIterate(obj)) {
+              walk(obj, replaceReferences);
+            }
+            function walk(obj, cb) {
+              var i, l, key, node;
+              var isArr = _.isArray(obj);
+              var keys = _.keys(obj);
+              if (!keys.length) return;
+              for (i = 0, l = keys.length; i < l; i += 1) {
+                key = keys[i];
+                node = obj[key];
+                if (typeof node === "string") {
+                  if (isArr) {
+                    obj[i] = cb(node);
+                  } else {
+                    obj[key] = cb(node);
+                  }
+                } else if (_.canIterate(node)) {
+                  walk(node, replaceReferences);
+                }
+              }
+            }
+            return obj;
+          }
+        }
+        function replaceReferences(str) {
+          var matches;
+          while (matches = matchReferences(str)) {
+            str = replaceReferences(str, matches);
+          }
+          return str;
+          function matchReferences(str) {
+            if (_.isString(str)) {
+              return str.match(replacePattern);
+            }
+          }
+          function replaceReferences(str, matches) {
+            matches.forEach(function(ref) {
+              var name = removeDollars(ref);
+              var data = fetchFromMemory(name);
+              if (isUniqueReference(str)) {
+                str = data;
+              } else {
+                if (_.isMutable(data)) {
+                  throw new e.TypeError("Interpolated strings references cannot point to blocks: " + name);
+                }
+                str = str.replace(ref, data);
+              }
+            });
+            return str;
+          }
+        }
+        function processBlockReferences(obj) {
+          return findBlockReferences(obj, function(node) {
+            var expr = node.$$expression;
+            if (_.isObject(expr)) {
+              mutateBlock(node, expr);
+            } else if (_.isArray(expr)) {
+              expr.forEach(function(ex) {
+                mutateBlock(node, ex);
+              });
+            }
+            return node;
+          });
+        }
+        function mutateBlock(node, expr) {
+          var ref;
+          var type = expr.type;
+          if (type === "extend" || type === "merge") {
+            ref = fetchFromMemory(expr.value);
+            if (!_.isMutable(ref)) {
+              throw new e.TypeError('Cannot extend "' + node.$$name + '" block because "' + expr.value + '" reference is not a block');
+            }
+            if (!_.isMutable(node.$$body)) {
+              throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": both must be blocks');
+            }
+            if (_.isType(node.$$body) !== _.isType(ref)) {
+              throw new e.TypeError('Cannot extend "' + node.$$name + '" block with "' + expr.value + '": blocks types are mismatched');
+            }
+            ref = _.clone(ref);
+            if (type === "extend") {
+              node.$$body = _.extend(ref, node.$$body);
+            } else if (type === "merge") {
+              node.$$body = _.merge(ref, node.$$body);
+            }
+          }
+          return node;
         }
         function findBlockReferences(obj, cb) {
           if (_.canIterate(obj)) {
@@ -511,61 +575,6 @@
           }
           return obj;
         }
-        function processReferences(obj) {
-          return mapReferences(obj);
-          function mapReferences(obj) {
-            if (_.canIterate(obj)) {
-              walk(obj, processStringReferences);
-            }
-            function walk(obj, cb) {
-              var i, l, key, node;
-              var isArr = _.isArray(obj);
-              var keys = _.keys(obj);
-              if (!keys.length) return;
-              for (i = 0, l = keys.length; i < l; i += 1) {
-                key = keys[i];
-                node = obj[key];
-                if (typeof node === "string") {
-                  if (isArr) {
-                    obj[i] = cb(node);
-                  } else {
-                    obj[key] = cb(node);
-                  }
-                } else if (_.canIterate(node)) {
-                  walk(node, processStringReferences);
-                }
-              }
-            }
-            return obj;
-          }
-          function processStringReferences(str) {
-            if (hasOnlyReference(str)) {
-              str = fetchFromMemory(removeDollars(str));
-            } else {
-              var match = str.match(replacePattern);
-              if (match) {
-                _.forEach(match, function(ref) {
-                  var data = fetchFromMemory(removeDollars(ref));
-                  if (_.isMutable(data)) {
-                    throw new e.TypeError("Interpolated strings references cannot point to blocks: " + removeDollars(ref));
-                  }
-                  str = str.replace(ref, String(data));
-                });
-              }
-            }
-            return str;
-          }
-        }
-        function fetchFromMemory(ref) {
-          var data = memory.fetch(ref);
-          if (data === undefined) {
-            throw new e.ReferenceError(ref);
-          }
-          if (isNestedRef(ref) && hasMetaData(data)) {
-            data = data.$$body;
-          }
-          return data;
-        }
       }
       function normalize(obj) {
         var tmp, k;
@@ -596,22 +605,14 @@
         }
         return has;
       }
-      function hasOnlyReference(str) {
+      function isUniqueReference(str) {
         return uniqueReferencePattern.test(str);
       }
       function hasMetaData(obj) {
         return _.has(obj, "$$body") || _.has(obj, "$$name");
       }
-      function processStringInterpolated(str) {
-        return str.replace(replacePattern, function(m, ref) {
-          return fetchFromMemory(ref);
-        });
-      }
       function removeDollars(str) {
-        return str.replace(/^\${3}/g, "").replace(/\${3}$/g, "");
-      }
-      function isReferenceBlock(expr, key) {
-        return _.isObject(expr) && expr.type === "reference" && expr.value !== key && expr.visible;
+        return str.replace(/^\@{3}/g, "").replace(/\@{3}$/g, "");
       }
       function isNestedRef(ref) {
         return ref.indexOf(".") !== -1;
@@ -974,7 +975,7 @@
       var parser = require("./parser").parse;
       var Compiler = require("./compiler");
       var errors = require("./errors");
-      var empty = "";
+      var empty = null;
       var oli = exports = module.exports = {};
       oli.version = "0.1.0-rc.1";
       oli.parser = parser;
@@ -7587,7 +7588,7 @@
         return value;
       }
       function referenceStringTemplate(str) {
-        return "$$$" + str + "$$$";
+        return "@@@" + str + "@@@";
       }
       function createNode(astNode, obj) {
         if (astNode.loc) {
