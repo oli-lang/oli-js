@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">67.96</p>
+      <p class="stat">68.45</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">125</p>
+      <p class="stat">119</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">35.70</p>
+      <p class="stat">32.81</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">0.87</p>
+      <p class="stat">0.84</p>
     </div>
   </div>
 </div>
@@ -95,20 +95,18 @@
 var _ = require(&#039;./helpers&#039;)
 var parser = require(&#039;./parser&#039;).parse
 var Compiler = require(&#039;./compiler&#039;)
-var Memory = require(&#039;./memory&#039;)
-var addErrorLines = require(&#039;./errors&#039;).addErrorLines
+var errors = require(&#039;./errors&#039;)
 
-var empty = &#039;&#039;
+var empty = null
 var oli = exports = module.exports = {}
 
 //
-// Expose the public API
+// Build the API
 //
 
 oli.version = &#039;0.1.0-rc.1&#039;
 oli.parser = parser
 oli.Compiler = Compiler
-oli.Memory = Memory
 
 function parse(code, options) {
   var ast = oli.ast(code, options)
@@ -125,7 +123,7 @@ function parse(code, options) {
   return oli.compile(ast, options, code)
 }
 
-oli.parse = oli.eval = parse
+oli.parse = oli.transpile = parse
 
 function compile(ast, options, code) {
   try {
@@ -148,12 +146,7 @@ function ast(code, options) {
   var ast
 
   if (!_.isString(code)) {
-    if (_.isBrowser) {
-      return null
-    }
-    if (code instanceof Buffer) {
-      code = code.toString()
-    }
+    throw new errors.TypeError(&#039;First argument must be an string or buffer&#039;)
   }
 
   options = _.extend({ loc: false, comments: false, meta: false }, options)
@@ -173,7 +166,11 @@ function tokens(code, options) {
   var tokens = []
   var loc = options ? options.loc : false
 
-  _.walk(oli.ast(code, options), function (node) {
+  _.walk(oli.ast(code, options), getToken)
+
+  return tokens
+
+  function getToken(node) {
     var value
     if (_.isString(node.value)) {
       value = addToken(loc, node)
@@ -185,19 +182,16 @@ function tokens(code, options) {
     if (value) {
       tokens.push(value)
     }
-  })
-
-  return tokens
+  }
 }
 
 oli.tokens = oli.parseTokens = tokens
 
-//
-// Support for browser environments
-//
-
+// Load the engine-specific environment features
 if (_.isBrowser) {
-  require(&#039;./browser&#039;)(oli)
+  require(&#039;./engine/browser&#039;)(oli)
+} else {
+  require(&#039;./engine/node&#039;)(oli)
 }
 
 //
@@ -213,7 +207,7 @@ function addToken(loc, node, type) {
 }
 
 function rethrow(error, code) {
-  throw addErrorLines(error, code)
+  throw errors.handler(error, code)
 }</textarea>
   </div>
 </div>

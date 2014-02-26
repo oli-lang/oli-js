@@ -38,7 +38,6 @@ and a rich [command-line interface](#command-line-interface)
 - No third party dependencies
 - Official language specification implementation
 - Good performance (run `grunt bench`)
-- Good cyclomatic complexity and maintainability (run `grunt plato`)
 
 ## Installation
 

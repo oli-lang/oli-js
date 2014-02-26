@@ -37,7 +37,7 @@
 
 <div class="jumbotron">
   <div class="container">
-    <h1>compiler.js</h1>
+    <h1>tokens.js</h1>
   </div>
 </div>
 
@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">70.21</p>
+      <p class="stat">61.05</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">62</p>
+      <p class="stat">17</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">19.20</p>
+      <p class="stat">2.06</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">0.44</p>
+      <p class="stat">0.09</p>
     </div>
   </div>
 </div>
@@ -90,67 +90,22 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
-
-var Memory = require(&#039;./memory&#039;)
-var transformer = require(&#039;./transformer&#039;)
-var generator = require(&#039;./generator&#039;)
-var _ = require(&#039;./helpers&#039;)
-var CompilerError = require(&#039;./errors&#039;).CompilerError
-
-exports = module.exports = Compiler
-
-function Compiler(ast, options) {
-  this.result = null
-  this.ast = ast
-  this.memory = new Memory()
-  this.config(options)
-}
-
-Compiler.nodes = transformer.nodes
-Compiler.transformer = transformer
-Compiler.generator = generator
-
-Compiler.prototype.options = {
-  meta: false,
-  loc: false,
-  locals: null,
-  data: null
-}
-
-Compiler.prototype.config = function (options) {
-  if (_.isObject(options)) {
-    this.options = _.extend(this.options, options)
-    if (options.locals) {
-      this.push(options.locals)
-    }
-  }
-  return this
-}
-
-Compiler.prototype.push = function (context) {
-  if (_.isObject(context)) {
-    this.memory.push(context)
-  }
-  return this
-}
-
-Compiler.prototype.compile = function () {
-  var result = transformer(this.ast, this.memory)
-
-  if (result.length === 1) {
-    result = result[0]
-  }
-  if (this.options.meta) {
-    result = _.clean(result)
-  } else {
-    if (_.isMutable(result)) {
-      result = generator(result, this.memory)
-    }
-  }
-  this.result = result
-
-  return result
+    <textarea id="file-source" class="col-md-12">exports = module.exports = {
+  ASSIGN:         &#039;:&#039;,
+  EQUAL:          &#039;=&#039;,
+  ASSIGN_RAW:     &#039;:&gt;&#039;,
+  ASSIGN_NOT:     &#039;!:&#039;,
+  ASSIGN_UNFOLD:  &#039;:=&#039;,
+  ASSIGN_FOLD:    &#039;:-&#039;,
+  PIPE:           &#039;|&#039;,
+  DASH:           &#039;-&#039;,
+  DOUBLEDASH:     &#039;--&#039;,
+  RELATIONAL:     &#039;&gt;&#039;,
+  RELATIONAL_NOT: &#039;!&gt;&#039;,
+  AMPERSAND:      &#039;&amp;&#039;,
+  AMPERSAND_NOT:  &#039;!&amp;&#039;,
+  EXTEND:         &#039;&gt;&gt;&#039;,
+  MERGE:          &#039;&gt;&gt;&gt;&#039;
 }</textarea>
   </div>
 </div>

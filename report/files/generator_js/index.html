@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">63.12</p>
+      <p class="stat">66.83</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">381</p>
+      <p class="stat">415</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">77.14</p>
+      <p class="stat">73.35</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">3.06</p>
+      <p class="stat">3.13</p>
     </div>
   </div>
 </div>
@@ -92,289 +92,342 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
 
-var _ = require(&#039;./helpers&#039;)
-var e = require(&#039;./errors&#039;)
-
 /**
- * Code generator
- * Pending major refactor
+ * Hey! this is still a rudimentary implementation
+ * until the initial language specification will be closed
+ * It will be fully redesigned as a part of the compiler in a near future version
  */
 
-var replacePattern = /[\$]{3}([^\${3}]*)[\$]{3}/g
+var _ = require(&#039;./helpers&#039;)
+var e = require(&#039;./errors&#039;)
+var tokens = require(&#039;./tokens&#039;)
+
+var replacePattern = /[\@]{3}([^\@{3}]*)[\@]{3}/g
+var uniqueReferencePattern = /^[\@]{3}([^\@{3}]*)[\@]{3}$/
+var EOL = /\n|\r|\r\n/g
 
 exports = module.exports = generator
 
 function generator(obj, memory) {
-  var result
 
-  if (!_.canIterate(obj)) {
-    return obj
-  }
-
-  result = mapReferences(
-    findBlockReferences(obj, processBlockExpression),
-    processStringReferences
+  return normalize(
+    generate(
+      transformReferences(obj)
+    )
   )
 
-  if (_.isMutable(result)) {
-    result = bodyNormalize(transformer(result))
+  function transformReferences(obj) {
+    return processReferences(
+      processBlockReferences(obj)
+    )
   }
 
-  return result
-
-  function bodyNormalize(obj) {
-    var tmp
-
-    if (!_.canIterate(obj) || _.isObject(obj)) {
-      return obj
+  function fetchFromMemory(ref) {
+    var data = memory.fetch(ref)
+    if (data === undefined) {
+      throw new e.ReferenceError(ref)
     }
+    if (isNestedRef(ref) &amp;&amp; hasMetaData(data)) {
+      data = data.$$body
+    }
+    return data
+  }
 
-    if (_.isArray(obj)) {
-      if (hasOnlyBlocks(obj)) {
-        tmp = {}
-        obj.forEach(function (node) {
-          _.extendKeep(tmp, node)
-        })
-        obj = tmp
-      } else if (obj.length === 1) {
-        if (_.isArray(obj[0])) {
-          obj = obj[0]
+  //
+  // Code generators
+  //
+
+  function generate(obj) {
+    switch (_.isType(obj)) {
+      case &#039;array&#039;:
+        obj = generateList(obj)
+        break
+      case &#039;object&#039;:
+        if (hasMetaData(obj)) {
+          obj = generateBlock(obj)
+        } else {
+          obj = generatePlainBlock(obj)
         }
-      }
+        break
     }
-
     return obj
   }
 
-  function hasOnlyBlocks(arr) {
-    var has = true
-    var i = 0, l = arr.length
-    for (; i &lt; l; i += 1) {
-      if (!has) break;
-      if (!_.isObject(arr[i])) {
-        has = false
-      }
-    }
-    return has
-  }
-
-  function hasMetaData(obj) {
-    return _.has(obj, &#039;$$body&#039;) || _.has(obj, &#039;$$name&#039;)
-  }
-
-  function processBlockExpression(node) {
-    var expr = node.$$expression
-    if (_.isObject(expr)) {
-      extendBlock(node, expr)
-    } else if (_.isArray(expr)) {
-      expr.forEach(function (ex) {
-        extendBlock(node, ex)
-      })
-    }
-
-    return node
-
-    function extendBlock(node, expr) {
-      var ref
-
-      if (expr.type === &#039;extend&#039; || expr.type === &#039;merge&#039;) {
-        ref = fetchFromMemory(expr.value)
-
-        if (!_.isMutable(ref)) {
-          throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block because &quot;&#039; + expr.value + &#039;&quot; reference is not a block&#039;)
-        }
-        if (!_.isMutable(node.$$body)) {
-          throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block with &quot;&#039; + expr.value + &#039;&quot;: both must be blocks&#039;)
-        }
-        if (_.isType(node.$$body) !== _.isType(ref)) {
-          throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block with &quot;&#039; + expr.value + &#039;&quot;: blocks types are mismatched&#039;)
-        }
-
-        switch (expr.type) {
-          case &#039;extend&#039;:
-            node.$$body = _.extend(_.clone(ref), node.$$body)
-            break
-          case &#039;merge&#039;:
-            node.$$body = _.merge(_.clone(ref), node.$$body)
-            break
+  function generatePlainBlock(obj) {
+    var k, child
+    var buf = {}
+    for (k in obj) {
+      if (_.has(obj, k)) {
+        child = generate(obj[k])
+        if (_.isObject(child)) {
+          _.extendKeep(buf, child)
+        } else {
+          buf[k] = child
         }
       }
-
-      return node
     }
-  }
-
-  function transformer(obj) {
-    var buf
-
-    if (!_.isMutable(obj)) {
-      return obj
-    }
-
-    if (_.isArray(obj)) {
-      buf = processArray(obj)
-    } else if (_.isObject(obj)) {
-      buf = {}
-      if (hasMetaData(obj)) {
-        _.extendKeep(buf, processBlock(obj))
-      } else {
-        _.keys(obj).forEach(function (k) {
-          var tmp, child = transformer(obj[k])
-          if (_.isObject(child)) {
-            _.extendKeep(buf, child)
-          } else {
-            buf[k] = child
-          }
-        })
-      }
-    }
-
     return buf
   }
 
-  function processBlock(obj) {
-    var attrStore
-    var result = {}
+  function blockAttributes(attrs) {
+    var store = {}
+    if (_.isArray(attrs) &amp;&amp; attrs) {
+      attrs.forEach(function (attr) {
+        if (attr.name) {
+          store[attr.name] = attr.value
+        }
+      })
+    }
+    return store
+  }
+
+  function blockReference(expr) {
+    var alias
+    if (!_.isArray(expr)) {
+      expr = [ expr ]
+    }
+    expr.forEach(function (expr) {
+      if (expr.type === &#039;reference&#039;) {
+        if (expr.visible) {
+          alias = expr.value
+        }
+      }
+    })
+    return alias
+  }
+
+  function blockResult(result, name) {
+    return function (key, value, alias) {
+      var ref = result[name]
+      if (key === &#039;body&#039;) {
+        if (alias) {
+          result[name][alias] = value
+        } else {
+          result[name] = value
+        }
+      } else {
+        if (alias) {
+          if (!_.isObject(result[name][alias])) {
+            result[name][alias] = {}
+          }
+          ref = result[name][alias]
+        }
+        ref[key] = value
+      }
+    }
+  }
+
+  function blockKeys(body, keys) {
+    keys.forEach(function (k) {
+      var buf = []
+      if (_.isArray(body[k])) {
+        body[k].forEach(function (node) {
+          buf.push(node.$$body)
+        })
+        body[k] = buf
+      }
+    })
+  }
+
+  function blockBody(obj) {
     var body = obj.$$body
+    var keys = obj.$$duplicateKeys
+
+    switch (_.isType(body)) {
+      case &#039;object&#039;:
+        if (hasMetaData(body)) {
+          body = generateBlock(body)
+        } else {
+          if (keys) {
+            blockKeys(body, keys)
+          }
+          body = generate(body)
+        }
+        break
+      case &#039;array&#039;:
+        body = generateList(body)
+        break
+      case &#039;string&#039;:
+        body = generateString(body, obj.$$operator)
+        break
+    }
+
+    return body
+  }
+
+  function generateBlock(obj) {
+    var result = {}
     var expr = obj.$$expression
     var attrs = obj.$$attributes
     var name = obj.$$name
-    var keys = obj.$$duplicateKeys
     var alias = null
-    var cur = result[name] = {}
+    var setResult = blockResult(result, name)
 
-    // pending refactor!
+    var body = blockBody(obj)
+    result[name] = {}
+
     if (expr) {
-      if (_.isArray(expr)) {
-        expr.forEach(function (expr) {
-          if (expr.type === &#039;reference&#039;) {
-            if (expr.visible) {
-              alias = expr.value
-              cur = cur[expr.value] = {}
-            }
-          }
-        })
-      } else {
-        if (expr.type === &#039;reference&#039;) {
-          if (expr.visible) {
-            alias = expr.value
-            cur = cur[expr.value] = {}
-          }
-        }
-      }
+      alias = blockReference(expr)
     }
-
     if (attrs) {
-      if (_.isArray(attrs)) {
-        attrStore = {}
-        attrs.forEach(function (attr) {
-          if (attr.name) {
-            attrStore[attr.name] = attr.value
-          }
-        })
-      }
-    }
-
-    if (_.isObject(body)) {
-      if (hasMetaData(body)) {
-        body = processBlock(body)
-      } else {
-        if (keys) {
-          keys.forEach(function (k) {
-            var tmp = []
-            if (_.isArray(body[k])) {
-              body[k].forEach(function (node) {
-                tmp.push(node.$$body)
-              })
-              body[k] = tmp
-            }
-          })
-        }
-        body = transformer(body)
-      }
-      if (alias) {
-        if (attrStore) {
-          result[name][alias][&#039;$$attributes&#039;] = attrStore
-          result[name][alias][&#039;$$body&#039;] = body
-        } else {
-          result[name][alias] = body
-        }
-      } else {
-        if (attrStore) {
-          result[name][&#039;$$attributes&#039;] = attrStore
-          result[name][&#039;$$body&#039;] = body
-        } else {
-          result[name] = body
-        }
-      }
-    } else if (_.isArray(body)) {
-      if (alias) {
-        result[name][alias] = processArray(body)
-      } else {
-        result[name] = processArray(body)
-      }
+      attrs = blockAttributes(attrs)
+      setResult(&#039;$$attributes&#039;, attrs, alias)
+      setResult(&#039;$$body&#039;, body, alias)
     } else {
-      if (_.isString(body)) {
-        body = processBodyString(body, obj.$$operator)
-      }
-      if (alias) {
-        if (attrStore) {
-          result[name][alias][&#039;$$body&#039;] = body
-          result[name][alias][&#039;$$attributes&#039;] = attrStore
-        } else {
-          result[name][alias] = body
-        }
-      } else if (attrStore) {
-        result[name][&#039;$$attributes&#039;] = attrStore
-        result[name][&#039;$$body&#039;] = body
-      } else {
-        result[name] = body
-      }
+      setResult(&#039;body&#039;, body, alias)
     }
 
     return result
   }
 
-  function processBodyString(str, operator) {
+  function generateString(str, operator) {
     switch (operator) {
-      case &#039;:-&#039;:
-        str = str.split(/\n|\r\n/).join(&#039; &#039;)
+      case tokens.ASSIGN_UNFOLD:
+        str = str.replace(/^\s+|\s+$/g, &#039;&#039;)
         break
-      case &#039;:=&#039;:
-        str = str.split(/\n|\r\n/).join(&#039; &#039;)
-        break
-      default:
-        str = str
+      case tokens.ASSIGN_FOLD:
+        str = str.replace(EOL, &#039;&#039;).replace(/\s+/g, &#039; &#039;)
         break
     }
     return str
   }
 
-  function processArray(arr) {
-    var buf = arr.map(transformer)
-
+  function generateList(arr) {
+    var buf = arr.map(generate)
     if (buf.length === 1) {
       if (_.isArray(buf[0]) &amp;&amp; buf[0].length === 1) {
         buf = buf[0]
       }
     }
-
     return buf
+  }
+
+  //
+  // References
+  //
+
+  function processReferences(obj) {
+    return mapReferences(obj)
+
+    function mapReferences(obj) {
+      if (_.canIterate(obj)) {
+        walk(obj, replaceReferences)
+      }
+
+      function walk(obj, cb) { // not chuck norris
+        var i, l, key, node
+        var isArr = _.isArray(obj)
+        var keys = _.keys(obj)
+
+        if (!keys.length) return;
+        for (i = 0, l = keys.length; i &lt; l; i += 1) {
+          key = keys[i]
+          node = obj[key]
+          if (typeof node === &#039;string&#039;) {
+            if (isArr) {
+              obj[i] = cb(node)
+            } else {
+              obj[key] = cb(node)
+            }
+          } else if (_.canIterate(node)) {
+            walk(node, replaceReferences)
+          }
+        }
+      }
+
+      return obj
+    }
+  }
+
+  function replaceReferences(str) {
+    var matches
+    while (matches = matchReferences(str)) {
+      str = replaceReferences(str, matches)
+    }
+
+    return str
+
+    function matchReferences(str) {
+      if (_.isString(str)) {
+        return str.match(replacePattern)
+      }
+    }
+
+    function replaceReferences(str, matches) {
+      matches.forEach(function (ref) {
+        var name = removeDollars(ref)
+        var data = fetchFromMemory(name)
+        if (isUniqueReference(str)) {
+          str = data
+        } else {
+          if (_.isMutable(data)) {
+            throw new e.TypeError(&#039;Interpolated strings references cannot point to blocks: &#039; + name)
+          }
+          str = str.replace(ref, data)
+        }
+      })
+      return str
+    }
+  }
+
+  //
+  // Blocks
+  //
+
+  function processBlockReferences(obj) {
+    return findBlockReferences(obj, function (node) {
+      var expr = node.$$expression
+      if (_.isObject(expr)) {
+        mutateBlock(node, expr)
+      } else if (_.isArray(expr)) {
+        expr.forEach(function (ex) {
+          mutateBlock(node, ex)
+        })
+      }
+      return node
+    })
+  }
+
+  function mutateBlock(node, expr) {
+    var ref
+    var type = expr.type
+
+    if (type === &#039;extend&#039; || type === &#039;merge&#039;) {
+      ref = fetchFromMemory(expr.value)
+
+      if (!_.isMutable(ref)) {
+        throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block because &quot;&#039; + expr.value + &#039;&quot; reference is not a block&#039;)
+      }
+      if (!_.isMutable(node.$$body)) {
+        throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block with &quot;&#039; + expr.value + &#039;&quot;: both must be blocks&#039;)
+      }
+      if (_.isType(node.$$body) !== _.isType(ref)) {
+        throw new e.TypeError(&#039;Cannot extend &quot;&#039; + node.$$name + &#039;&quot; block with &quot;&#039; + expr.value + &#039;&quot;: blocks types are mismatched&#039;)
+      }
+
+      ref = _.clone(ref)
+      if (type === &#039;extend&#039;){
+        node.$$body = _.extend(ref, node.$$body)
+      } else if (type === &#039;merge&#039;) {
+        node.$$body = _.merge(ref, node.$$body)
+      }
+    }
+
+    return node
   }
 
   function findBlockReferences(obj, cb) {
     if (_.canIterate(obj)) {
-      walker(obj)
+      walk(obj)
     }
 
-    function walker(obj, parent) {
+    function walk(obj, parent) {
       var i, l, key, node
       var isArr = _.isArray(obj)
       var keys = _.keys(obj)
       parent = parent || obj
 
       if (!keys.length) return;
-
       for (i = 0, l = keys.length; i &lt; l; i += 1) {
         key = keys[i]
         node = obj[key]
@@ -382,7 +435,6 @@ function generator(obj, memory) {
         if (!_.canIterate(node)) {
           continue
         }
-
         if (_.isObject(node)) {
           if (hasMetaData(node)) {
             if (isArr) {
@@ -392,84 +444,66 @@ function generator(obj, memory) {
             }
           }
         }
-
-        walker(node, parent)
+        walk(node, parent)
       }
     }
 
     return obj
   }
 
-  function mapReferences(obj, cb) {
-    if (_.canIterate(obj)) {
-      walker(obj)
-    }
+}
 
-    function walker(obj) { // not chuck norris
-      var i, l, key, node
-      var isArr = _.isArray(obj)
-      var keys = _.keys(obj)
+//
+// Helpers
+//
 
-      if (!keys.length) return;
-
-      for (i = 0, l = keys.length; i &lt; l; i += 1) {
-        key = keys[i]
-        node = obj[key]
-        if (typeof node === &#039;string&#039;) {
-          if (isArr) {
-            obj[i] = cb(node)
-          } else {
-            obj[key] = cb(node)
-          }
-        } else if (_.canIterate(node)) {
-          walker(node)
+function normalize(obj) {
+  var tmp, k
+  if (_.isArray(obj)) {
+    if (hasOnlyBlocks(obj)) {
+      tmp = {}
+      for (k in obj) {
+        if (_.has(obj, k)) {
+          _.extendKeep(tmp, obj[k])
         }
       }
+      obj = tmp
+    } else if (obj.length === 1) {
+      if (_.isArray(obj[0])) {
+        obj = obj[0]
+      }
     }
-
-    return obj
   }
+  return obj
+}
 
-  function processStringReferences(str) {
-    var match = str.match(replacePattern)
-
-    if (match) {
-      _.forEach(match, function (ref) {
-        var data = fetchFromMemory(removeDollars(ref))
-
-        if (_.isMutable(data)) {
-          throw new e.TypeError(&#039;Interpolated strings references cannot point to blocks: &#039; + removeDollars(ref))
-        }
-
-        str = str.replace(ref, String(data))
-      })
+function hasOnlyBlocks(arr) {
+  var has = true
+  for (var i = 0, l = arr.length; i &lt; l; i += 1) {
+    if (!has) break;
+    if (!_.isObject(arr[i])) {
+      has = false
     }
-
-    return str
   }
+  return has
+}
 
-  function fetchFromMemory(ref) {
-    var data = memory.fetch(ref)
-    if (data === undefined) {
-      throw new e.ReferenceError(ref)
-    }
-    return data
-  }
+function isUniqueReference(str) {
+  return uniqueReferencePattern.test(str)
+}
 
-  function processStringInterpolated(str) {
-    return str.replace(replacePattern, function (m, ref) {
-      return fetchFromMemory(ref)
-    })
-  }
+function hasMetaData(obj) {
+  return _.has(obj, &#039;$$body&#039;) || _.has(obj, &#039;$$name&#039;)
+}
 
-  function removeDollars(str) {
-    return str.replace(/^\${3}/g, &#039;&#039;).replace(/\${3}$/g, &#039;&#039;)
-  }
+function removeDollars(str) {
+  return str
+    .replace(/^\@{3}/g, &#039;&#039;)
+    .replace(/\@{3}$/g, &#039;&#039;)
+}
 
-  function isReferenceBlock(expr, key) {
-    return _.isObject(expr) &amp;&amp; expr.type === &#039;reference&#039; &amp;&amp; expr.value !== key &amp;&amp; expr.visible
-  }
-
+function isNestedRef(ref) {
+  return ref.indexOf(&#039;.&#039;) !== -1
 }</textarea>
   </div>
 </div>

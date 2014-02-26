@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">72.68</p>
+      <p class="stat">72.87</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">121</p>
+      <p class="stat">118</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,7 +63,7 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">37.55</p>
+      <p class="stat">39.10</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
@@ -99,7 +99,7 @@ exports = module.exports = {
   SyntaxError: SyntaxError,
   CompileError: CompileError,
   ReferenceError: ReferenceError,
-  addErrorLines: addErrorLines
+  handler: handler
 }
 
 function TypeError(message) {
@@ -133,17 +133,15 @@ SyntaxError.prototype =
 ReferenceError.prototype =
 ReferenceError.prototype = Error.prototype
 
-function addErrorLines(error, src) {
+function handler(error, src) {
   if (error.line != null) {
     error.errorLines = getErrorLines(src, error)
   }
-
   if (error.name === &#039;SintaxError&#039;) {
-    error.fullMessage = SintaxErrorMessage(error)
+    error.fullMessage = sintaxErrorMessage(error)
   } else {
     error.fullMessage = error.name + &#039;: &#039; + error.message
   }
-
   return error
 }
 
@@ -162,9 +160,8 @@ function getErrorLines(src, e) {
   do { end -= 1 } while (end &gt; src.length)
   do { current += 1 } while (current &lt; 0)
 
-  while (current &lt; end) {
+  while (current++ &lt; end) {
     buf.push(renderLine(line, src, current, end, e))
-    current += 1
   }
 
   return buf
@@ -174,14 +171,14 @@ function renderLine(line, src, current, end, e) {
   var lineNumber = current + 1
   line = src[current]
   if (e.line === lineNumber) {
-    line = red((lineNumber) + lineSpace(lineNumber, end) + &#039;| &#039;) + line.substr(0, e.column - 1) + red(line.charAt(e.column - 1)) + line.substr(e.column)
+    line = red((lineNumber) + lineIndent(lineNumber, end) + &#039;| &#039;) + line.substr(0, e.column - 1) + bold(red(line.charAt(e.column - 1))) + line.substr(e.column)
   } else {
-    line = green((lineNumber) + lineSpace(lineNumber, end) + &#039;| &#039;) + line
+    line = green((lineNumber) + lineIndent(lineNumber, end) + &#039;| &#039;) + line
   }
   return line
 }
 
-function lineSpace(line, end) {
+function lineIndent(line, end) {
   var spaces = &#039;&#039;
   if (length(line) &lt; length(end)) {
     spaces += isBrowser ? &#039;&amp;nbsp;&amp;nbsp;&#039; : &#039; &#039;
@@ -189,7 +186,7 @@ function lineSpace(line, end) {
   return spaces
 }
 
-function SintaxErrorMessage(error) {
+function sintaxErrorMessage(error) {
   return &#039;Syntax error on line &#039; + error.line + &#039;, column &#039; + error.column + &#039;: &#039; + error.message
 }
 

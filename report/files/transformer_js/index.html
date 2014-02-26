@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">72.62</p>
+      <p class="stat">70.84</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">56</p>
+      <p class="stat">310</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">11.75</p>
+      <p class="stat">49.17</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">0.35</p>
+      <p class="stat">2.32</p>
     </div>
   </div>
 </div>
@@ -93,57 +93,311 @@
     <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
 
 var _ = require(&#039;./helpers&#039;)
-var nodes = require(&#039;./nodes&#039;)
+var tokens = require(&#039;./tokens&#039;)
 var CompileError = require(&#039;./errors&#039;).CompileError
 
 /**
- * AST transformer to intermediate high-level syntax tree structure
+ * AST traversal walk
  */
 
 exports = module.exports = transformer
 
-var types = transformer.types = {
-  StringLiteral: &#039;StringLiteral&#039;,
-  IntegerLiteral: &#039;Literal&#039;,
-  DecimalLiteral: &#039;Literal&#039;,
-  HexadecimalLiteral: &#039;Literal&#039;,
-  BooleanLiteral: &#039;Literal&#039;,
-  NilLiteral: &#039;Literal&#039;,
-  ExpressionStatement: &#039;ExpressionStatement&#039;,
-  ListExpression: &#039;ListExpression&#039;,
-  TopListExpression: &#039;TopListExpression&#039;,
-  BodyStatement: &#039;BodyStatement&#039;,
-  BlockStatement: &#039;BlockStatement&#039;,
-  ValueStatement: &#039;BlockStatement&#039;,
-  PipeStatement: &#039;PipeStatement&#039;,
-  Identifier: &#039;Identifier&#039;,
-  IdentifierExpression: &#039;IdentifierExpression&#039;,
-  ReferenceExpression: &#039;ReferenceExpression&#039;,
-  AttributeExpression: &#039;AttributeExpression&#039;,
-  BinaryExpression: &#039;BinaryExpression&#039;,
-  UnaryExpression: &#039;UnaryExpression&#039;
-}
-
-transformer.nodes = nodes
+transformer.tokens = tokens
 
 function transformer(ast, memory) {
-  var traverse = astTraverse(memory)
-  return _.mapEach(ast.body, traverse)
+  return _.mapEach(ast.body, astTraverse(memory))
 }
 
 function astTraverse(memory) {
   return function traverse(node) {
     var result, type
-    if (!_.isObject(node)) return;
-
-    type = node.type
-    if (_.has(types, type)) {
-      result = nodes[types[type]](node, traverse, memory)
-    } else {
-      throw new CompileError(&#039;AST node type &quot;&#039; + type + &#039;&quot; is not supported&#039;)
+    if (_.isObject(node)) {
+      type = node.type
+      if (_.has(nodes, type)) {
+        result = nodes[type](node, traverse, memory)
+      } else {
+        throw new CompileError(&#039;AST node type &quot;&#039; + type + &#039;&quot; is not supported&#039;)
+      }
     }
-
     return result
+  }
+}
+
+/**
+ * AST nodes transformer
+ */
+
+var nodes = transformer.nodes = {
+  StringLiteral: StringLiteral,
+  IntegerLiteral: Literal,
+  DecimalLiteral: Literal,
+  HexadecimalLiteral: Literal,
+  BooleanLiteral: Literal,
+  NilLiteral: Literal,
+  ExpressionStatement: ExpressionStatement,
+  ListExpression: ListExpression,
+  TopListExpression: TopListExpression,
+  BodyStatement: BodyStatement,
+  BlockStatement: BlockStatement,
+  ValueStatement: BlockStatement,
+  PipeStatement: PipeStatement,
+  Identifier: Identifier,
+  IdentifierExpression: IdentifierExpression,
+  ReferenceExpression: ReferenceExpression,
+  AttributeExpression: AttributeExpression,
+  BinaryExpression: BinaryExpression,
+  UnaryExpression: UnaryExpression
+}
+
+function Literal(node) {
+  return node.value
+}
+
+function StringLiteral(node, traverse) {
+  var value = node.value
+  if (node.template) {
+    value = stringReferenceReplace(value)
+  }
+  return value
+}
+
+function ListExpression(node, traverse) {
+  return _.mapEach(node.elements, function (element) {
+    return traverse(element, node)
+  })
+}
+
+function TopListExpression(node, traverse) {
+  return [
+    _.mapEach(node.elements, function (element) {
+      return traverse(element, node)
+    })
+  ]
+}
+
+function ExpressionStatement(node, traverse) {
+  return traverse(node.expression)
+}
+
+function BodyStatement(node, traverse) {
+  if (_.isObject(node.body)) {
+    return traverse(node.body)
+  } else {
+    return _.mapEach(node.body, function (element) {
+      return traverse(element, node)
+    })
+  }
+}
+
+function BlockStatement(node, traverse, memory) {
+  var duplicateKeys
+  var value = {}
+  var left = traverse(node.left)
+  var body = traverse(node.right)
+
+  if (node.operator === tokens.ASSIGN_NOT) {
+    value[left.name] = null
+    return value
+  }
+
+  if (_.isArray(body) &amp;&amp; isBlockOperator(node)) {
+    body = processBlockBody(body)
+  }
+
+  if (node.operator === tokens.EQUAL) {
+    memory.allocate(left.name, body)
+    return
+  }
+
+  value[left.name] = createNode(node, {
+    $$name: left.name,
+    $$operator: node.operator,
+    $$duplicateKeys: duplicateKeys,
+    $$attributes: left.attributes,
+    $$expression: left.expression,
+    $$body: body
+  })
+
+  if (left.expression) {
+    if (_.isArray(left.expression)) {
+      _.forEach(left.expression, function (node) {
+        if (node.type === &#039;reference&#039;) {
+          memory.allocate(node.value, body)
+        }
+      })
+    } else if (left.expression.type === &#039;reference&#039;) {
+      memory.allocate(left.expression.value, body)
+    }
+  }
+
+  return value
+
+  function isBlockOperator(node) {
+    return node.operator === tokens.ASSIGN || node.operator === tokens.EQUAL
+  }
+
+  function processChildNode(buf, child) {
+    for (var key in child) {
+      if (_.has(child, key)) {
+        if (_.has(buf, key)) {
+          buf[key] = [ buf[key] ]
+          buf[key].push(child[key])
+          if (!duplicateKeys) {
+            duplicateKeys = []
+          }
+          duplicateKeys.push(key)
+        } else {
+          buf[key] = child[key]
+        }
+      }
+    }
+  }
+
+  function processBlockBody(body) {
+    var child
+    var buf = {}
+    var hasPrimitives = false
+    for (var key in body) {
+      if (_.has(body, key)) {
+        child = body[key]
+        if (!_.isObject(child)) {
+          hasPrimitives = true
+          break
+        }
+        processChildNode(buf, child)
+      }
+    }
+    return hasPrimitives ? body : buf
+  }
+}
+
+function PipeStatement(node, traverse) {
+  return traverse(node.body)
+}
+
+function IdentifierExpression(node, traverse) {
+  var attrsStore, value
+  var attrs = node.attributes
+  var name = traverse(node.id)
+  var expr = node.expression
+
+  if (_.isArray(expr)) {
+    expr = _.mapEach(expr, function (expr) {
+      return traverse(expr)
+    })
+  } else {
+    expr = traverse(expr)
+  }
+
+  if (attrs) {
+    attrsStore = _.mapEach(attrs, function (attribute) {
+      return traverse(attribute)
+    })
+  }
+
+  if (!expr &amp;&amp; name.type === &#039;reference&#039;) {
+    expr = name
+    name = name.value
+  }
+
+  value = createNode(node, {
+    name: name,
+    attributes: attrsStore,
+    expression: expr
+  })
+
+  return value
+}
+
+function Identifier(node, traverse) {
+  return node.name
+}
+
+function ReferenceExpression(node, traverse) {
+  return referenceStringTemplate(node.name)
+}
+
+function AttributeExpression(node, traverse) {
+  var value
+  var identifier = traverse(node.left)
+  var assignment = traverse(node.right)
+
+  if (assignment === undefined) {
+    assignment = null
+  }
+
+  value = {
+    name: identifier,
+    value: assignment
+  }
+
+  return value
+}
+
+function BinaryExpression(node, traverse) {
+  var left = traverse(node.left)
+  var right = traverse(node.right)
+  return [ left, right ]
+}
+
+function UnaryExpression(node, traverse) {
+  var value = createNode(node, {
+    value: traverse(node.argument, node)
+  })
+
+  switch (node.operator) {
+    case tokens.RELATIONAL:
+      value.type = &#039;reference&#039;
+      value.visible = true
+      break
+    case tokens.AMPERSAND:
+    case tokens.AMPERSAND_NOT:
+    case tokens.RELATIONAL_NOT:
+      value.type = &#039;reference&#039;
+      value.visible = false
+      break
+    case tokens.EXTEND:
+      value.type = &#039;extend&#039;
+      break
+    case tokens.MERGE:
+      value.type = &#039;merge&#039;
+      break
+  }
+
+  return value
+}
+
+//
+// Helpers
+//
+
+function referenceStringTemplate(str) {
+  return &#039;@@@&#039; + str + &#039;@@@&#039;
+}
+
+function createNode(astNode, obj) {
+  if (astNode.loc) {
+    obj.$$loc = astNode.loc
+  }
+  return obj
+}
+
+var alphanumeric = &#039;a-zA-Z0-9&#039;
+var symbols = &#039;\\-\\_\\^\\º\\ç\\.\\$\\@\\€\\?\\%\\+\\;&#039;
+var rawExpression = new RegExp(&#039;\\*([&#039;+ alphanumeric + symbols +&#039;]+)&#039;, &#039;gi&#039;)
+var bracesExpression = new RegExp(&#039;\\*[\{]([&#039;+ alphanumeric + symbols +&#039;]+)[\}]&#039;, &#039;gi&#039;)
+var quotesExpression = new RegExp(&#039;\\*[\&#039;|\&quot;|\\\&#039;|\\\&quot;]([&#039;+ alphanumeric + symbols +&#039;]+)[\&#039;|\&quot;|\\\&#039;|\\\&quot;]&#039;, &#039;gi&#039;)
+
+function stringReferenceReplace(value) {
+  [ rawExpression, bracesExpression, quotesExpression ]
+    .forEach(replace)
+
+  return value
+
+  function replace(pattern) {
+    value = value.replace(pattern, function (m, match) {
+      return referenceStringTemplate(match)
+    })
   }
 }</textarea>
   </div>
