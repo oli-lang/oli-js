@@ -22,7 +22,7 @@ that uses the Oli syntax for specific purposes, like parsing own DSL
 Aditionally it provides a rich featured high and intermediate level [programmatic API](#programmatic-api)
 and a rich [command-line interface](#command-line-interface)
 
-**Note**: it's still a beta implementation! A full compiler re-design process is pending
+**Note**: it's still a beta implementation! A full compiler re-designing process is pending
 
 ## Features
 
