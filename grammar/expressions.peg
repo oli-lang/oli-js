@@ -7,7 +7,6 @@ __
 PrimitiveTerminatorSequence
  = &("," / "]" / ")" / "}" / EOS)
 
-// to do: separate rule in especific expressions contexts
 PrimitiveValueExpression
   = exp:BooleanLiteral _ PrimitiveTerminatorSequence { return exp; }
   / exp:NilLiteral _ PrimitiveTerminatorSequence { return exp; }
