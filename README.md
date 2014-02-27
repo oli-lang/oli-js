@@ -96,7 +96,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
   - [x] REPL
 - **Serializer**
   - [_] JSON to Oli
-  - [_] Concret Sintax Tree to Oli
+  - [_] Concret Syntax Tree to Oli
 - **Engines**
   - [x] Node.js
   - [x] Browsers
@@ -275,7 +275,7 @@ oli.js provides detailed errors. Usually it will be throwed as exception
 
 #### Types
 
-- SintaxError
+- SyntaxError
 - CompileError
 - TypeError
 - ReferenceError
