@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-27 09:31 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-27 08:21 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -497,7 +497,7 @@
           }
           function replaceReferences(str, matches) {
             matches.forEach(function(ref) {
-              var name = removeDollars(ref);
+              var name = removeReferencesChars(ref);
               var data = fetchFromMemory(name);
               if (isUniqueReference(str)) {
                 str = data;
@@ -613,7 +613,7 @@
       function hasMetaData(obj) {
         return _.has(obj, "$$body") || _.has(obj, "$$name");
       }
-      function removeDollars(str) {
+      function removeReferencesChars(str) {
         return str.replace(/^\@{3}/g, "").replace(/\@{3}$/g, "");
       }
       function isNestedRef(ref) {
@@ -1584,7 +1584,8 @@
                     type: "StringLiteral",
                     value: body,
                     raw: body,
-                    template: true
+                    template: true,
+                    startColumn: column()
                   }) : null
                 }
               })
@@ -7446,6 +7447,11 @@
         if (_.isArray(body) && isBlockOperator(node)) {
           body = processBlockBody(body);
         }
+        if (node.operator === tokens.ASSIGN_RAW || node.operator === tokens.ASSIGN_UNFOLD) {
+          if (_.isString(body) && _.isObject(node.right.body)) {
+            body = trimLeadingIndent(body, node.right.body.startColumn);
+          }
+        }
         if (node.operator === tokens.EQUAL) {
           memory.allocate(left.name, body);
           return;
@@ -7609,6 +7615,42 @@
           value = value.replace(pattern, function(m, match) {
             return referenceStringTemplate(match);
           });
+        }
+      }
+      var EOL = /\n|\r|\r\n/g;
+      function trimLeadingIndent(str, column) {
+        if (!column) return str;
+        column *= column === 1 ? 4 : 2;
+        var buf = [];
+        var leadingSpaces = new RegExp("^" + Array(column).join("\\s"));
+        var leadingTabs = new RegExp("^" + Array(column).join("\\t"));
+        str.split(EOL).forEach(function(line, i) {
+          line = line.replace(leadingSpaces, "").replace(leadingTabs, "");
+          if (i > 0 && !isOddIndentLevel(line)) {
+            line = getIndentChar(line) + line;
+          }
+          console.log("--", line);
+          line = trimRight(line);
+          console.log("--", line);
+          buf.push(line);
+        });
+        return buf.join("\n");
+      }
+      function trimRight(str) {
+        return str.replace(/(\s+|\t+)$/, "");
+      }
+      function isOddIndentLevel(line) {
+        var indent = line.match(/^[(\s+|\t+)]/);
+        if (indent) {
+          return indent.length % 2 === 0;
+        }
+        return false;
+      }
+      function getIndentChar(line) {
+        if (/^\t/.test(line)) {
+          return "	";
+        } else {
+          return " ";
         }
       }
     }, {
