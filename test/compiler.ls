@@ -263,12 +263,13 @@ describe 'Compiler', (_) ->
         it 'should compile as in-line string', ->
           code = '''
             raw:=
-              I'm a
-                raw
-                  string
+              I'm
+                a
+                  raw
+                    string
             end
           '''
-          expect parse(code).raw .to.be.equal 'I\'m a\n    raw\n      string'
+          expect parse(code).raw .to.be.equal 'I\'m\n  a\n    raw\n      string'
 
       describe 'raw (:>)', (_) ->
 
@@ -277,12 +278,16 @@ describe 'Compiler', (_) ->
 
         it 'should compile multi-line as raw string', ->
           code = '''
-            raw:>
-              I'm a
-              raw string
+            block:
+              raw:>
+                I'm
+                  a
+                    raw
+                      string
+              end
             end
           '''
-          expect parse(code).raw .to.be.equal 'I\'m a\n  raw string'
+          expect parse(code).block.raw .to.be.equal 'I\'m\n  a\n    raw\n      string'
 
   describe 'references', ->
 

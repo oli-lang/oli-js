@@ -140,7 +140,8 @@ BlockRawStatement
               type:  'StringLiteral',
               value: body,
               raw:   body,
-              template: true
+              template: true,
+              startColumn: column()
             }) : null
           }
         })

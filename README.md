@@ -177,7 +177,7 @@ console.log(result) // => { message: [ "hello", "oli!" ] } }
 ```
 
 Binding a context to the compiler
-```
+```js
 var code = 'directory: *env.HOME'
 var result = oli.parse(code, {
   locals: {
