@@ -25,6 +25,8 @@
     "toml",
     "cson",
     "dsl",
+    "olijs",
+    "oml",
     "minimal",
     "markup"
   ],
@@ -38,6 +40,7 @@
     "test",
     "report",
     "docs",
+    "benchmarks",
     "grammar",
     "Gruntfile.*",
     ".editorconfig",

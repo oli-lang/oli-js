@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-26 11:52 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-27 09:31 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -1046,22 +1046,22 @@
             tokens.push(value);
           }
         }
+        function addToken(loc, node, type) {
+          var token = {
+            type: node.type,
+            value: node[type || "value"]
+          };
+          if (loc === true) {
+            token.loc = _.clone(node.loc);
+          }
+          return token;
+        }
       }
       oli.tokens = oli.parseTokens = tokens;
       if (_.isBrowser) {
         require("./engine/browser")(oli);
       } else {
         require("./engine/node")(oli);
-      }
-      function addToken(loc, node, type) {
-        var token = {
-          type: node.type,
-          value: node[type || "value"]
-        };
-        if (loc === true) {
-          token.loc = _.clone(node.loc);
-        }
-        return token;
       }
       function rethrow(error, code) {
         throw errors.handler(error, code);
