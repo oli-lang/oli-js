@@ -139,6 +139,7 @@ module.exports = (grunt) ->
   ]
 
   grunt.registerTask 'browser', [
+    'test'
     'browserify'
     'uglify'
   ]
