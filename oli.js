@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-27 08:22 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-27 08:42 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -628,7 +628,7 @@
       "use strict";
       var toString = Object.prototype.toString;
       var hasOwn = Object.prototype.hasOwnProperty;
-      var isConsole = console && console.log;
+      var hasConsole = console && console.log;
       var isBrowser = typeof window !== "undefined";
       var _ = exports = module.exports = {};
       _.isBrowser = isBrowser;
@@ -855,7 +855,7 @@
         return obj;
       };
       _.log = function() {
-        if (isConsole) {
+        if (hasConsole) {
           console.log.apply(console, arguments);
         }
       };
