@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-if (process.argv.length <= 2) {
+if (process.argv.length < 3) {
   require('../lib/repl').init()
 } else {
   require('../lib/cli').parse(process.argv)

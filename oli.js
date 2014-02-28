@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-28 07:59 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-28 08:24 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -456,32 +456,29 @@
           return buf;
         }
         function processReferences(obj) {
-          return mapReferences(obj);
-          function mapReferences(obj) {
-            if (_.canIterate(obj)) {
-              walk(obj, replaceReferences);
-            }
-            function walk(obj, cb) {
-              var i, l, key, node;
-              var isArr = _.isArray(obj);
-              var keys = _.keys(obj);
-              if (!keys.length) return;
-              for (i = 0, l = keys.length; i < l; i += 1) {
-                key = keys[i];
-                node = obj[key];
-                if (typeof node === "string") {
-                  if (isArr) {
-                    obj[i] = cb(node);
-                  } else {
-                    obj[key] = cb(node);
-                  }
-                } else if (_.canIterate(node)) {
-                  walk(node, replaceReferences);
+          if (_.canIterate(obj)) {
+            walk(obj, replaceReferences);
+          }
+          function walk(obj, cb) {
+            var i, l, key, node;
+            var isArr = _.isArray(obj);
+            var keys = _.keys(obj);
+            if (!keys.length) return;
+            for (i = 0, l = keys.length; i < l; i += 1) {
+              key = keys[i];
+              node = obj[key];
+              if (typeof node === "string") {
+                if (isArr) {
+                  obj[i] = cb(node);
+                } else {
+                  obj[key] = cb(node);
                 }
+              } else if (_.canIterate(node)) {
+                walk(node, replaceReferences);
               }
             }
-            return obj;
           }
+          return obj;
         }
         function replaceReferences(str) {
           var matches;
