@@ -14,7 +14,6 @@ Keyword
       StartToken
     / EndToken
     / NilToken
-    / RelationalNotOperator
   )
   !IdentifierPart
 
@@ -65,9 +64,6 @@ DuobleDashOperator
 
 RelationalOperator
   = ">"
-
-RelationalNotOperator
-  = "!>"
 
 ReferenceOperator
   = "*"

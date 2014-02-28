@@ -278,15 +278,13 @@ describe 'Expressions', ->
         expect node ast('hello > "oli rules": "hola"'), 'expression.left.expression.argument.value'
           .to.be.equal 'oli rules'
 
-      describe 'negation', (_) ->
+      it 'should parse "oli.rules" as reference identifier', ->
+        expect node ast('hello > oli.rules: "hola"'), 'expression.left.expression.argument.name'
+          .to.be.equal 'oli.rules'
 
-        it 'should parse "hello" as reference identifier', ->
-          expect node ast('hello !> oli rules: "hola"'), 'expression.left.id.name'
-            .to.be.equal 'hello'
-
-        it 'should parse "\'oli rules\'" as reference identifier', ->
-          expect node ast('hello !> "oli rules": "hola"'), 'expression.left.expression.argument.value'
-            .to.be.equal 'oli rules'
+      it 'should parse "oli-rules" as reference identifier', ->
+        expect node ast('hello > oli-rules: "hola"'), 'expression.left.expression.argument.name'
+          .to.be.equal 'oli-rules'
 
     describe 'reference alias with ampersand', (_) ->
 

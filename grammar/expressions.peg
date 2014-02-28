@@ -17,7 +17,6 @@ PrimitiveValueExpression
 
 LiteralReservedTokens
   = ":"
-  / RelationalNotOperator
   / LineTerminator
   / CommentToken
   / EndToken
@@ -148,7 +147,6 @@ IdentifierUnaryExpression
   = operator:(
         MergeOperator
       / ExtendOperator
-      / RelationalNotOperator
       / RelationalOperator
       / AnchorRelationalOperator
       / AnchorOperator
@@ -170,7 +168,7 @@ IdentifierReferenceExpression
   }
 
 IdentifierArrowReferenceExpression
-  = operator:(AnchorRelationalOperator / RelationalNotOperator / RelationalOperator) _ argument:IdentifierLiteralExpression {
+  = operator:(AnchorRelationalOperator / RelationalOperator) _ argument:IdentifierLiteralExpression {
     return astNode({
       type:     'UnaryExpression',
       operator: operator,
