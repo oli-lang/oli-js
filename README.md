@@ -111,8 +111,7 @@ A summary about most important features that will be implemented
 - Interpolated code expressions ([oli/#3](https://github.com/oli-lang/oli/issues/3))
 - Generic helper functions (random, string format, date format...)
 - Helpers functions extension via API
-- Interpolated code with control flow structures
-- Block scope variables ([oli/#18](https://github.com/oli-lang/oli/issues/18))
+- Block scope references ([oli/#18](https://github.com/oli-lang/oli/issues/18))
 - Indentation-based parsing ([oli/#5](https://github.com/oli-lang/oli/issues/5))
 - Date as first-class primitive type ([oli/#2](https://github.com/oli-lang/oli/issues/2))
 
