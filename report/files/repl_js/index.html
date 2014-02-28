@@ -98,11 +98,11 @@ var echo = require(&#039;./helpers&#039;).log
 var oli = require(&#039;./oli&#039;)
 
 exports.init = function () {
-  oliBanner()
+  showBanner()
   initReadline()
 }
 
-function oliBanner() {
+function showBanner() {
   echo([
     &#039;        _   _    &#039;,
     &#039;       | | (_)   &#039;,

@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">66.83</p>
+      <p class="stat">66.59</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">415</p>
+      <p class="stat">411</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">73.35</p>
+      <p class="stat">73.90</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">3.13</p>
+      <p class="stat">3.10</p>
     </div>
   </div>
 </div>
@@ -94,8 +94,8 @@
 
 /**
  * Hey! this is still a rudimentary implementation
- * until the initial language specification will be closed
- * It will be fully redesigned as a part of the compiler in a near future version
+ * until the language specification is closed
+ * It will be fully redesigned as a part of the compiler in a inminent future version
  */
 
 var _ = require(&#039;./helpers&#039;)
@@ -104,7 +104,6 @@ var tokens = require(&#039;./tokens&#039;)
 
 var replacePattern = /[\@]{3}([^\@{3}]*)[\@]{3}/g
 var uniqueReferencePattern = /^[\@]{3}([^\@{3}]*)[\@]{3}$/
-var EOL = /\n|\r|\r\n/g
 
 exports = module.exports = generator
 
@@ -187,7 +186,7 @@ function generator(obj, memory) {
       expr = [ expr ]
     }
     expr.forEach(function (expr) {
-      if (expr.type === &#039;reference&#039;) {
+      if (expr.type === &#039;alias&#039;) {
         if (expr.visible) {
           alias = expr.value
         }
@@ -257,10 +256,10 @@ function generator(obj, memory) {
 
   function generateBlock(obj) {
     var result = {}
+    var alias = null
     var expr = obj.$$expression
     var attrs = obj.$$attributes
     var name = obj.$$name
-    var alias = null
     var setResult = blockResult(result, name)
 
     var body = blockBody(obj)
@@ -269,6 +268,7 @@ function generator(obj, memory) {
     if (expr) {
       alias = blockReference(expr)
     }
+
     if (attrs) {
       attrs = blockAttributes(attrs)
       setResult(&#039;$$attributes&#039;, attrs, alias)
@@ -286,7 +286,7 @@ function generator(obj, memory) {
         str = str.replace(/^\s+|\s+$/g, &#039;&#039;)
         break
       case tokens.ASSIGN_FOLD:
-        str = str.replace(EOL, &#039;&#039;).replace(/\s+/g, &#039; &#039;)
+        str = str.replace(_.EOL, &#039;&#039;).replace(/\s+/g, &#039; &#039;)
         break
     }
     return str
@@ -307,36 +307,32 @@ function generator(obj, memory) {
   //
 
   function processReferences(obj) {
-    return mapReferences(obj)
+    if (_.canIterate(obj)) {
+      walk(obj, replaceReferences)
+    }
 
-    function mapReferences(obj) {
-      if (_.canIterate(obj)) {
-        walk(obj, replaceReferences)
-      }
+    function walk(obj, cb) {
+      var i, l, key, node
+      var isArr = _.isArray(obj)
+      var keys = _.keys(obj)
 
-      function walk(obj, cb) { // not chuck norris
-        var i, l, key, node
-        var isArr = _.isArray(obj)
-        var keys = _.keys(obj)
-
-        if (!keys.length) return;
-        for (i = 0, l = keys.length; i &lt; l; i += 1) {
-          key = keys[i]
-          node = obj[key]
-          if (typeof node === &#039;string&#039;) {
-            if (isArr) {
-              obj[i] = cb(node)
-            } else {
-              obj[key] = cb(node)
-            }
-          } else if (_.canIterate(node)) {
-            walk(node, replaceReferences)
+      if (!keys.length) return;
+      for (i = 0, l = keys.length; i &lt; l; i += 1) {
+        key = keys[i]
+        node = obj[key]
+        if (typeof node === &#039;string&#039;) {
+          if (isArr) {
+            obj[i] = cb(node)
+          } else {
+            obj[key] = cb(node)
           }
+        } else if (_.canIterate(node)) {
+          walk(node, replaceReferences)
         }
       }
-
-      return obj
     }
+
+    return obj
   }
 
   function replaceReferences(str) {
@@ -355,7 +351,7 @@ function generator(obj, memory) {
 
     function replaceReferences(str, matches) {
       matches.forEach(function (ref) {
-        var name = removeDollars(ref)
+        var name = removeReferencesChars(ref)
         var data = fetchFromMemory(name)
         if (isUniqueReference(str)) {
           str = data
@@ -496,7 +492,7 @@ function hasMetaData(obj) {
   return _.has(obj, &#039;$$body&#039;) || _.has(obj, &#039;$$name&#039;)
 }
 
-function removeDollars(str) {
+function removeReferencesChars(str) {
   return str
     .replace(/^\@{3}/g, &#039;&#039;)
     .replace(/\@{3}$/g, &#039;&#039;)
