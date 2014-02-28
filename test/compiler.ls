@@ -333,11 +333,27 @@ describe 'Compiler', (_) ->
       it 'should reference properly using different operators', ->
         code = '''
         &name: oli
-        !&type: language
-        web > site: 'http://oli-lang.org'
+        type = language
+        web & site: 'http://oli-lang.org'
         full: *name (*type) - *site
         '''
         expect parse(code).full .to.be.equal 'oli (language) - http://oli-lang.org'
+
+    describe 'ampersand alias', (_) ->
+
+      it 'should points to a string reference', ->
+        result = parse '''
+        say & text: hello
+        hello: *text
+        '''
+        expect result.hello .to.be.equal 'hello'
+
+      it 'should points to a string reference', ->
+        result = parse '''
+        say > salutation & text: hello
+        hello: *text
+        '''
+        expect result.hello .to.be.equal 'hello'
 
     describe 'multiple references', (_) ->
 

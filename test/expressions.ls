@@ -303,15 +303,45 @@ describe 'Expressions', ->
         expect node ast('&"hello oli": "hola"'), 'expression.left.id.argument.value'
           .to.be.equal 'hello oli'
 
-      describe 'negation', (_) ->
+      it 'should parse "&hello.oli" as reference identifier', ->
+        expect node ast('&hello.oli: "hola"'), 'expression.left.id.argument.name'
+          .to.be.equal 'hello.oli'
 
-        it 'should parse "!&hello oli" as reference identifier', ->
-          expect node ast('!&hello oli: "hola"'), 'expression.left.id.argument.name'
-            .to.be.equal 'hello oli'
+      it 'should parse "&hello-oli" as reference identifier', ->
+        expect node ast('&hello-oli: "hola"'), 'expression.left.id.argument.name'
+          .to.be.equal 'hello-oli'
 
-        it 'should parse "!&\'hello oli\'" as reference identifier', ->
-          expect node ast('!&"hello oli": "hola"'), 'expression.left.id.argument.value'
-            .to.be.equal 'hello oli'
+      it 'should parse "&hello_oli" as reference identifier', ->
+        expect node ast('&hello_oli: "hola"'), 'expression.left.id.argument.name'
+          .to.be.equal 'hello_oli'
+
+    describe 'reference ampersand expression', (_) ->
+
+      it 'should parse "oli & rules" as reference identifier', ->
+        ast-obj = node ast('oli & rules: "hola"'), 'expression.left'
+        expect node ast-obj, 'id.name' .to.be.equal 'oli'
+        expect node ast-obj, 'expression.argument.name' .to.be.equal 'rules'
+        expect node ast-obj, 'expression.operator' .to.be.equal '&'
+
+      it 'should parse "oli & \'rules\'" as reference identifier', ->
+        ast-obj = node ast('oli & "rules": "hola"'), 'expression.left'
+        expect node ast-obj, 'id.name' .to.be.equal 'oli'
+        expect node ast-obj, 'expression.argument.value' .to.be.equal 'rules'
+        expect node ast-obj, 'expression.operator' .to.be.equal '&'
+
+    describe 'reference alias ampersand expression', (_) ->
+
+      it 'should parse "oli &> rules" as reference identifier', ->
+        ast-obj = node ast('oli &> rules: "hola"'), 'expression.left'
+        expect node ast-obj, 'id.name' .to.be.equal 'oli'
+        expect node ast-obj, 'expression.argument.name' .to.be.equal 'rules'
+        expect node ast-obj, 'expression.operator' .to.be.equal '&>'
+
+      it 'should parse "oli & \'rules\'" as reference identifier', ->
+        ast-obj = node ast('oli &> "rules": "hola"'), 'expression.left'
+        expect node ast-obj, 'id.name' .to.be.equal 'oli'
+        expect node ast-obj, 'expression.argument.value' .to.be.equal 'rules'
+        expect node ast-obj, 'expression.operator' .to.be.equal '&>'
 
     describe 'clone', (_) ->
 
@@ -363,7 +393,7 @@ describe 'Expressions', ->
           expect node ast-obj, 'expression.left.expression.0.argument.name' .to.be.equal 'language'
           expect node ast-obj, 'expression.left.expression.1.argument.name' .to.be.equal 'markup'
 
-    describe 'reference + operation', (_) ->
+    describe 'alias + operation', (_) ->
 
       it 'should parse "oli" as identifier', ->
         expect node ast('oli >> rules > say: "hola"'), 'expression.left.id.name'
@@ -387,6 +417,26 @@ describe 'Expressions', ->
         ast-obj = node ast('oli >>> rules > say: "hola"'), 'expression.left.expression.left'
         expect node ast-obj, 'argument.name' .to.be.equal 'rules'
         expect node ast-obj, 'operator' .to.be.equal '>>>'
+
+    describe 'alias + reference', (_) ->
+
+      it 'should parse "oli" as identifier', ->
+        ast-obj = node ast('oli > rules & say: "hola"'), 'expression.left'
+        expect node ast-obj, 'id.name' .to.be.equal 'oli'
+        expect node ast-obj, 'expression.0.operator' .to.be.equal '>'
+        expect node ast-obj, 'expression.0.argument.name' .to.be.equal 'rules'
+        expect node ast-obj, 'expression.1.operator' .to.be.equal '&'
+        expect node ast-obj, 'expression.1.argument.name' .to.be.equal 'say'
+
+    describe 'operation + reference', (_) ->
+
+      it 'should parse "oli" as identifier', ->
+        ast-obj = node ast('oli >> rules & say: "hola"'), 'expression.left'
+        expect node ast-obj, 'id.name' .to.be.equal 'oli'
+        expect node ast-obj, 'expression.left.operator' .to.be.equal '>>'
+        expect node ast-obj, 'expression.left.argument.name' .to.be.equal 'rules'
+        expect node ast-obj, 'expression.right.operator' .to.be.equal '&'
+        expect node ast-obj, 'expression.right.argument.name' .to.be.equal 'say'
 
   describe 'attributes declaration', (_) ->
 

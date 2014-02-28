@@ -163,7 +163,7 @@ Require the module
 var oli = require('oli')
 ```
 
-Simple code parsing
+Simple parsing
 ```js
 var code = 'message: - hello, oli!'
 try {
@@ -175,7 +175,7 @@ try {
 console.log(result) // => { message: [ "hello", "oli!" ] } }
 ```
 
-Binding a context to the compiler
+Binding a custom context to the compiler
 ```js
 var code = 'directory: *env.HOME'
 var result = oli.parse(code, {

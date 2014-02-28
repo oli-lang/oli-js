@@ -136,7 +136,7 @@ IdentifierOperationExpression
 
 IdentifierBinaryExpression
   = left:IdentifierCloneExpression
-    __ right:IdentifierArrowReferenceExpression {
+    __ right:(IdentifierAmpersandReferenceExpression / IdentifierArrowReferenceExpression) {
     return {
       type:  'BinaryExpression',
       left:  left,
@@ -150,6 +150,8 @@ IdentifierUnaryExpression
       / ExtendOperator
       / RelationalNotOperator
       / RelationalOperator
+      / AnchorRelationalOperator
+      / AnchorOperator
     ) __ argument:IdentifierLiteralExpression {
     return astNode({
       type:     'UnaryExpression',
@@ -159,7 +161,7 @@ IdentifierUnaryExpression
   }
 
 IdentifierReferenceExpression
-  = operator:(AnchorNotOperator / AnchorOperator) __ argument:IdentifierLiteralExpression {
+  = operator:AnchorOperator _ argument:IdentifierLiteralExpression {
     return astNode({
       type:     'UnaryExpression',
       operator: operator,
@@ -168,7 +170,16 @@ IdentifierReferenceExpression
   }
 
 IdentifierArrowReferenceExpression
-  = operator:(RelationalNotOperator / RelationalOperator)__ argument:IdentifierLiteralExpression {
+  = operator:(AnchorRelationalOperator / RelationalNotOperator / RelationalOperator) _ argument:IdentifierLiteralExpression {
+    return astNode({
+      type:     'UnaryExpression',
+      operator: operator,
+      argument: argument
+    })
+  }
+
+IdentifierAmpersandReferenceExpression
+  = operator:AnchorOperator _ argument:IdentifierLiteralExpression {
     return astNode({
       type:     'UnaryExpression',
       operator: operator,
@@ -177,7 +188,7 @@ IdentifierArrowReferenceExpression
   }
 
 IdentifierCloneExpression
-  = operator:(MergeOperator / ExtendOperator) __ argument:IdentifierLiteralExpression {
+  = operator:(MergeOperator / ExtendOperator) _ argument:IdentifierLiteralExpression {
     return astNode({
       type:     'UnaryExpression',
       operator: operator,
@@ -186,7 +197,7 @@ IdentifierCloneExpression
   }
 
 AttributeExpression
-  = id:IdentifierNameExpression __ value:(StartToken __ value:(PrimitiveValueExpression / IdentifierLiteralExpression) {
+  = id:IdentifierNameExpression _ value:(StartToken __ value:(PrimitiveValueExpression / IdentifierLiteralExpression) {
       return value;
     })? {
     var node = astNode({
@@ -224,8 +235,8 @@ IdentifierAttributesExpression
 
 IdentifierExpression
   = !"-" _ id:IdentifierNameExpression
-  __ expr:IdentifierOperationExpression?
-  __ attrs:IdentifierAttributesExpression? {
+  _ expr:IdentifierOperationExpression?
+  _ attrs:IdentifierAttributesExpression? {
     return astNode({
       type:       'IdentifierExpression',
       id:         id,
@@ -236,7 +247,7 @@ IdentifierExpression
 
 IdenfitierAttributeExpression
   = !"-" _ id:IdentifierNameExpression
-  __ attrs:IdentifierAttributesExpression {
+  _ attrs:IdentifierAttributesExpression {
     return astNode({
       type:       'IdentifierExpression',
       id:         id,
