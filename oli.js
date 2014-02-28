@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-27 11:11 */
+/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-28 07:59 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -285,7 +285,6 @@
       var tokens = require("./tokens");
       var replacePattern = /[\@]{3}([^\@{3}]*)[\@]{3}/g;
       var uniqueReferencePattern = /^[\@]{3}([^\@{3}]*)[\@]{3}$/;
-      var EOL = /\n|\r|\r\n/g;
       exports = module.exports = generator;
       function generator(obj, memory) {
         return normalize(generate(transformReferences(obj)));
@@ -350,7 +349,7 @@
             expr = [ expr ];
           }
           expr.forEach(function(expr) {
-            if (expr.type === "reference") {
+            if (expr.type === "alias") {
               if (expr.visible) {
                 alias = expr.value;
               }
@@ -416,10 +415,10 @@
         }
         function generateBlock(obj) {
           var result = {};
+          var alias = null;
           var expr = obj.$$expression;
           var attrs = obj.$$attributes;
           var name = obj.$$name;
-          var alias = null;
           var setResult = blockResult(result, name);
           var body = blockBody(obj);
           result[name] = {};
@@ -442,7 +441,7 @@
             break;
 
            case tokens.ASSIGN_FOLD:
-            str = str.replace(EOL, "").replace(/\s+/g, " ");
+            str = str.replace(_.EOL, "").replace(/\s+/g, " ");
             break;
           }
           return str;
@@ -631,6 +630,7 @@
       var hasConsole = console && console.log;
       var isBrowser = typeof window !== "undefined";
       var _ = exports = module.exports = {};
+      _.EOL = /\n|\r|\r\n/g;
       _.isBrowser = isBrowser;
       _.isBoolean = function(obj) {
         return typeof obj === "boolean";
@@ -1670,18 +1670,18 @@
             type: "literal",
             value: ">",
             description: '">"'
-          }, peg$c191 = "!>", peg$c192 = {
-            type: "literal",
-            value: "!>",
-            description: '"!>"'
-          }, peg$c193 = "*", peg$c194 = {
+          }, peg$c191 = "*", peg$c192 = {
             type: "literal",
             value: "*",
             description: '"*"'
-          }, peg$c195 = "&", peg$c196 = {
+          }, peg$c193 = "&", peg$c194 = {
             type: "literal",
             value: "&",
             description: '"&"'
+          }, peg$c195 = "&>", peg$c196 = {
+            type: "literal",
+            value: "&>",
+            description: '"&>"'
           }, peg$c197 = "!", peg$c198 = {
             type: "literal",
             value: "!",
@@ -3044,52 +3044,49 @@
               }
             }
             if (s0 === peg$FAILED) {
-              s0 = peg$parseRelationalNotOperator();
+              s0 = peg$parseLineTerminator();
               if (s0 === peg$FAILED) {
-                s0 = peg$parseLineTerminator();
+                s0 = peg$parseCommentToken();
                 if (s0 === peg$FAILED) {
-                  s0 = peg$parseCommentToken();
+                  s0 = peg$parseEndToken();
                   if (s0 === peg$FAILED) {
-                    s0 = peg$parseEndToken();
+                    if (input.charCodeAt(peg$currPos) === 91) {
+                      s0 = peg$c55;
+                      peg$currPos++;
+                    } else {
+                      s0 = peg$FAILED;
+                      if (peg$silentFails === 0) {
+                        peg$fail(peg$c56);
+                      }
+                    }
                     if (s0 === peg$FAILED) {
-                      if (input.charCodeAt(peg$currPos) === 91) {
-                        s0 = peg$c55;
+                      if (input.charCodeAt(peg$currPos) === 93) {
+                        s0 = peg$c29;
                         peg$currPos++;
                       } else {
                         s0 = peg$FAILED;
                         if (peg$silentFails === 0) {
-                          peg$fail(peg$c56);
+                          peg$fail(peg$c30);
                         }
                       }
                       if (s0 === peg$FAILED) {
-                        if (input.charCodeAt(peg$currPos) === 93) {
-                          s0 = peg$c29;
+                        if (input.charCodeAt(peg$currPos) === 125) {
+                          s0 = peg$c50;
                           peg$currPos++;
                         } else {
                           s0 = peg$FAILED;
                           if (peg$silentFails === 0) {
-                            peg$fail(peg$c30);
+                            peg$fail(peg$c51);
                           }
                         }
                         if (s0 === peg$FAILED) {
-                          if (input.charCodeAt(peg$currPos) === 125) {
-                            s0 = peg$c50;
+                          if (input.charCodeAt(peg$currPos) === 123) {
+                            s0 = peg$c57;
                             peg$currPos++;
                           } else {
                             s0 = peg$FAILED;
                             if (peg$silentFails === 0) {
-                              peg$fail(peg$c51);
-                            }
-                          }
-                          if (s0 === peg$FAILED) {
-                            if (input.charCodeAt(peg$currPos) === 123) {
-                              s0 = peg$c57;
-                              peg$currPos++;
-                            } else {
-                              s0 = peg$FAILED;
-                              if (peg$silentFails === 0) {
-                                peg$fail(peg$c58);
-                              }
+                              peg$fail(peg$c58);
                             }
                           }
                         }
@@ -3762,7 +3759,10 @@
             if (s1 !== peg$FAILED) {
               s2 = peg$parse__();
               if (s2 !== peg$FAILED) {
-                s3 = peg$parseIdentifierArrowReferenceExpression();
+                s3 = peg$parseIdentifierAmpersandReferenceExpression();
+                if (s3 === peg$FAILED) {
+                  s3 = peg$parseIdentifierArrowReferenceExpression();
+                }
                 if (s3 !== peg$FAILED) {
                   peg$reportedPos = s0;
                   s1 = peg$c90(s1, s3);
@@ -3788,9 +3788,12 @@
             if (s1 === peg$FAILED) {
               s1 = peg$parseExtendOperator();
               if (s1 === peg$FAILED) {
-                s1 = peg$parseRelationalNotOperator();
+                s1 = peg$parseRelationalOperator();
                 if (s1 === peg$FAILED) {
-                  s1 = peg$parseRelationalOperator();
+                  s1 = peg$parseAnchorRelationalOperator();
+                  if (s1 === peg$FAILED) {
+                    s1 = peg$parseAnchorOperator();
+                  }
                 }
               }
             }
@@ -3819,12 +3822,9 @@
           function peg$parseIdentifierReferenceExpression() {
             var s0, s1, s2, s3;
             s0 = peg$currPos;
-            s1 = peg$parseAnchorNotOperator();
-            if (s1 === peg$FAILED) {
-              s1 = peg$parseAnchorOperator();
-            }
+            s1 = peg$parseAnchorOperator();
             if (s1 !== peg$FAILED) {
-              s2 = peg$parse__();
+              s2 = peg$parse_();
               if (s2 !== peg$FAILED) {
                 s3 = peg$parseIdentifierLiteralExpression();
                 if (s3 !== peg$FAILED) {
@@ -3848,12 +3848,38 @@
           function peg$parseIdentifierArrowReferenceExpression() {
             var s0, s1, s2, s3;
             s0 = peg$currPos;
-            s1 = peg$parseRelationalNotOperator();
+            s1 = peg$parseAnchorRelationalOperator();
             if (s1 === peg$FAILED) {
               s1 = peg$parseRelationalOperator();
             }
             if (s1 !== peg$FAILED) {
-              s2 = peg$parse__();
+              s2 = peg$parse_();
+              if (s2 !== peg$FAILED) {
+                s3 = peg$parseIdentifierLiteralExpression();
+                if (s3 !== peg$FAILED) {
+                  peg$reportedPos = s0;
+                  s1 = peg$c91(s1, s3);
+                  s0 = s1;
+                } else {
+                  peg$currPos = s0;
+                  s0 = peg$c0;
+                }
+              } else {
+                peg$currPos = s0;
+                s0 = peg$c0;
+              }
+            } else {
+              peg$currPos = s0;
+              s0 = peg$c0;
+            }
+            return s0;
+          }
+          function peg$parseIdentifierAmpersandReferenceExpression() {
+            var s0, s1, s2, s3;
+            s0 = peg$currPos;
+            s1 = peg$parseAnchorOperator();
+            if (s1 !== peg$FAILED) {
+              s2 = peg$parse_();
               if (s2 !== peg$FAILED) {
                 s3 = peg$parseIdentifierLiteralExpression();
                 if (s3 !== peg$FAILED) {
@@ -3882,7 +3908,7 @@
               s1 = peg$parseExtendOperator();
             }
             if (s1 !== peg$FAILED) {
-              s2 = peg$parse__();
+              s2 = peg$parse_();
               if (s2 !== peg$FAILED) {
                 s3 = peg$parseIdentifierLiteralExpression();
                 if (s3 !== peg$FAILED) {
@@ -3908,7 +3934,7 @@
             s0 = peg$currPos;
             s1 = peg$parseIdentifierNameExpression();
             if (s1 !== peg$FAILED) {
-              s2 = peg$parse__();
+              s2 = peg$parse_();
               if (s2 !== peg$FAILED) {
                 s3 = peg$currPos;
                 s4 = peg$parseStartToken();
@@ -4132,14 +4158,14 @@
               if (s2 !== peg$FAILED) {
                 s3 = peg$parseIdentifierNameExpression();
                 if (s3 !== peg$FAILED) {
-                  s4 = peg$parse__();
+                  s4 = peg$parse_();
                   if (s4 !== peg$FAILED) {
                     s5 = peg$parseIdentifierOperationExpression();
                     if (s5 === peg$FAILED) {
                       s5 = peg$c2;
                     }
                     if (s5 !== peg$FAILED) {
-                      s6 = peg$parse__();
+                      s6 = peg$parse_();
                       if (s6 !== peg$FAILED) {
                         s7 = peg$parseIdentifierAttributesExpression();
                         if (s7 === peg$FAILED) {
@@ -4205,7 +4231,7 @@
               if (s2 !== peg$FAILED) {
                 s3 = peg$parseIdentifierNameExpression();
                 if (s3 !== peg$FAILED) {
-                  s4 = peg$parse__();
+                  s4 = peg$parse_();
                   if (s4 !== peg$FAILED) {
                     s5 = peg$parseIdentifierAttributesExpression();
                     if (s5 !== peg$FAILED) {
@@ -6742,9 +6768,6 @@
               s1 = peg$parseEndToken();
               if (s1 === peg$FAILED) {
                 s1 = peg$parseNilToken();
-                if (s1 === peg$FAILED) {
-                  s1 = peg$parseRelationalNotOperator();
-                }
               }
             }
             if (s1 !== peg$FAILED) {
@@ -6929,11 +6952,11 @@
             }
             return s0;
           }
-          function peg$parseRelationalNotOperator() {
+          function peg$parseReferenceOperator() {
             var s0;
-            if (input.substr(peg$currPos, 2) === peg$c191) {
+            if (input.charCodeAt(peg$currPos) === 42) {
               s0 = peg$c191;
-              peg$currPos += 2;
+              peg$currPos++;
             } else {
               s0 = peg$FAILED;
               if (peg$silentFails === 0) {
@@ -6942,9 +6965,9 @@
             }
             return s0;
           }
-          function peg$parseReferenceOperator() {
+          function peg$parseAnchorOperator() {
             var s0;
-            if (input.charCodeAt(peg$currPos) === 42) {
+            if (input.charCodeAt(peg$currPos) === 38) {
               s0 = peg$c193;
               peg$currPos++;
             } else {
@@ -6955,11 +6978,11 @@
             }
             return s0;
           }
-          function peg$parseAnchorOperator() {
+          function peg$parseAnchorRelationalOperator() {
             var s0;
-            if (input.charCodeAt(peg$currPos) === 38) {
+            if (input.substr(peg$currPos, 2) === peg$c195) {
               s0 = peg$c195;
-              peg$currPos++;
+              peg$currPos += 2;
             } else {
               s0 = peg$FAILED;
               if (peg$silentFails === 0) {
@@ -7351,9 +7374,8 @@
         DASH: "-",
         DOUBLEDASH: "--",
         RELATIONAL: ">",
-        RELATIONAL_NOT: "!>",
         AMPERSAND: "&",
-        AMPERSAND_NOT: "!&",
+        AMPERSAND_REL: "&>",
         EXTEND: ">>",
         MERGE: ">>>"
       };
@@ -7532,7 +7554,7 @@
             return traverse(attribute);
           });
         }
-        if (!expr && name.type === "reference") {
+        if (!expr && (name.type === "reference" || name.type === "alias")) {
           expr = name;
           name = name.value;
         }
@@ -7572,16 +7594,19 @@
           value: traverse(node.argument, node)
         });
         switch (node.operator) {
-         case tokens.RELATIONAL:
+         case tokens.AMPERSAND:
+          value.type = "reference";
+          value.visible = false;
+          break;
+
+         case tokens.AMPERSAND_REL:
           value.type = "reference";
           value.visible = true;
           break;
 
-         case tokens.AMPERSAND:
-         case tokens.AMPERSAND_NOT:
-         case tokens.RELATIONAL_NOT:
-          value.type = "reference";
-          value.visible = false;
+         case tokens.RELATIONAL:
+          value.type = "alias";
+          value.visible = true;
           break;
 
          case tokens.EXTEND:
@@ -7617,21 +7642,18 @@
           });
         }
       }
-      var EOL = /\n|\r|\r\n/g;
       function trimLeadingIndent(str, column) {
         if (!column) return str;
         column *= column === 1 ? 4 : 2;
         var buf = [];
         var leadingSpaces = new RegExp("^" + Array(column).join("\\s"));
         var leadingTabs = new RegExp("^" + Array(column).join("\\t"));
-        str.split(EOL).forEach(function(line, i) {
+        str.split(_.EOL).forEach(function(line, i) {
           line = line.replace(leadingSpaces, "").replace(leadingTabs, "");
           if (i > 0 && !isOddIndentLevel(line)) {
             line = getIndentChar(line) + line;
           }
-          console.log("--", line);
           line = trimRight(line);
-          console.log("--", line);
           buf.push(line);
         });
         return buf.join("\n");

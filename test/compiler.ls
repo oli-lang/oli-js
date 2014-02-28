@@ -355,6 +355,13 @@ describe 'Compiler', (_) ->
         '''
         expect result.hello .to.be.equal 'hello'
 
+      it 'should points to a string reference', ->
+        result = parse '''
+        say > salutation & hello.text: hello
+        hello: *hello.text
+        '''
+        expect result.hello .to.be.equal 'hello'
+
     describe 'multiple references', (_) ->
 
       it 'should apply properly multiple references', ->
