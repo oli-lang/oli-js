@@ -1,6 +1,6 @@
 require! '../lib/oli'
 
-module.exports = 
+module.exports =
   name: 'Parse blocks'
   tests: [
 
@@ -48,7 +48,7 @@ module.exports =
 
     * name: 'Multi-line: boolean'
       fn: -> oli.parse '''
-        block:  
+        block:
           true
           false
           no
@@ -58,7 +58,7 @@ module.exports =
 
     * name: 'Multi-line: numbers'
       fn: -> oli.parse '''
-        block:  
+        block:
           12
           2.3
           -23
@@ -68,7 +68,7 @@ module.exports =
 
     * name: 'Multi-line: strings'
       fn: -> oli.parse '''
-        block:  
+        block:
           "this is a sample string!!"
           "this is a another string!!"
           "this is a another string!!"
@@ -77,7 +77,7 @@ module.exports =
 
     * name: 'Multi-line: list'
       fn: -> oli.parse '''
-        block:  
+        block:
           - "string"
           - yes
           - 123
@@ -131,4 +131,4 @@ module.exports =
         end
       '''
   ]
-  
+

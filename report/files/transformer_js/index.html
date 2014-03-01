@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">70.29</p>
+      <p class="stat">70.33</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">359</p>
+      <p class="stat">340</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">53.05</p>
+      <p class="stat">50.35</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">2.96</p>
+      <p class="stat">2.75</p>
     </div>
   </div>
 </div>
@@ -315,11 +315,11 @@ function IdentifierExpression(node, traverse) {
   return value
 }
 
-function Identifier(node, traverse) {
+function Identifier(node) {
   return node.name
 }
 
-function ReferenceExpression(node, traverse) {
+function ReferenceExpression(node) {
   return referenceStringTemplate(node.name)
 }
 
@@ -413,16 +413,13 @@ function stringReferenceReplace(value) {
 function trimLeadingIndent(str, column) {
   if (!column) return str;
 
-  column *= column === 1 ? 4 : 2
+  column += 1
   var buf = []
-  var leadingSpaces = new RegExp(&#039;^&#039; + Array(column).join(&#039;\\s&#039;))
-  var leadingTabs =  new RegExp(&#039;^&#039; + Array(column).join(&#039;\\t&#039;))
+  var leadingSpaces = new RegExp(&#039;^(\\s){0,&#039;+ column +&#039;}&#039;)
+  var leadingTabs =  new RegExp(&#039;^(\\t){0,&#039;+ column +&#039;}&#039;)
 
   str.split(_.EOL).forEach(function (line, i) {
     line = line.replace(leadingSpaces, &#039;&#039;).replace(leadingTabs, &#039;&#039;)
-    if (i &gt; 0 &amp;&amp; !isOddIndentLevel(line)) {
-      line = getIndentChar(line) + line
-    }
     line = trimRight(line)
     buf.push(line)
   })
@@ -432,22 +429,6 @@ function trimLeadingIndent(str, column) {
 
 function trimRight(str) {
   return str.replace(/(\s+|\t+)$/, &#039;&#039;)
-}
-
-function isOddIndentLevel(line) {
-  var indent = line.match(/^[(\s+|\t+)]/)
-  if (indent) {
-    return indent.length % 2 === 0
-  }
-  return false
-}
-
-function getIndentChar(line) {
-  if (/^\t/.test(line)) {
-    return &#039;\t&#039;
-  } else {
-    return &#039; &#039;
-  }
 }</textarea>
   </div>
 </div>
