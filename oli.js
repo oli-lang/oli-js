@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 07:12 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 07:27 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -483,7 +483,7 @@
           return obj;
         }
         function replaceReferences(str) {
-          var matches, count = 1;
+          var matches, count = 0;
           while (matches = matchReferences(str)) {
             str = replaceReferences(str, matches);
             if (count > 1e3) {
