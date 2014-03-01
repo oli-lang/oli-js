@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 10:04 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 11:01 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -7645,15 +7645,12 @@
       }
       function trimLeadingIndent(str, column) {
         if (!column) return str;
-        column *= column === 1 ? 4 : 2;
+        column += 1;
         var buf = [];
-        var leadingSpaces = new RegExp("^" + Array(column).join("\\s"));
-        var leadingTabs = new RegExp("^" + Array(column).join("\\t"));
+        var leadingSpaces = new RegExp("^(\\s){0," + column + "}");
+        var leadingTabs = new RegExp("^(\\t){0," + column + "}");
         str.split(_.EOL).forEach(function(line, i) {
           line = line.replace(leadingSpaces, "").replace(leadingTabs, "");
-          if (i > 0 && !isOddIndentLevel(line)) {
-            line = getIndentChar(line) + line;
-          }
           line = trimRight(line);
           buf.push(line);
         });
@@ -7661,20 +7658,6 @@
       }
       function trimRight(str) {
         return str.replace(/(\s+|\t+)$/, "");
-      }
-      function isOddIndentLevel(line) {
-        var indent = line.match(/^[(\s+|\t+)]/);
-        if (indent) {
-          return indent.length % 2 === 0;
-        }
-        return false;
-      }
-      function getIndentChar(line) {
-        if (/^\t/.test(line)) {
-          return "	";
-        } else {
-          return " ";
-        }
       }
     }, {
       "./errors": 4,
