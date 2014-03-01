@@ -294,13 +294,13 @@ describe 'Compiler', (_) ->
             block:
               raw:>
                 I'm
-                  a
+                 a
                     raw
-                      string
+                     string
               end
             end
           '''
-          expect parse(code).block.raw .to.be.equal 'I\'m\n  a\n    raw\n      string'
+          expect parse(code).block.raw .to.be.equal 'I\'m\n a\n    raw\n     string'
 
         it 'should compile with the proper indent level', ->
           code = '''
