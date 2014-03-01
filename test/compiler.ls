@@ -3,7 +3,6 @@
   oli
   parse
   expect
-  inspect
 } = require './lib/helper'
 
 describe 'Compiler', (_) ->

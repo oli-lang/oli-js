@@ -1,4 +1,4 @@
-{ inspect, expect } = require './lib/helper'
+{ expect } = require './lib/helper'
 Memory = require '../lib/memory'
 
 describe 'Memory', ->

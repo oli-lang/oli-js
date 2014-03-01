@@ -3,7 +3,6 @@
   oli
   suppose
   expect
-  inspect
 } = require './lib/helper'
 
 describe 'Helpers', ->

@@ -3,7 +3,6 @@
   ast
   node
   expect
-  inspect
 } = require './lib/helper'
 
 describe 'API', ->

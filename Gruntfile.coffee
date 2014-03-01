@@ -79,7 +79,7 @@ module.exports = (grunt) ->
         report: 'min'
         banner: '/*! oli.js - v<%= pkg.version %> - MIT License - https://github.com/oli-lang/oli-js ' +
           '| Generated <%= grunt.template.today("yyyy-mm-dd hh:MM") %> */\n'
-      oli:
+      debug:
         files:
           'oli.js': ['oli.js']
       min:
