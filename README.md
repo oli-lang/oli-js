@@ -156,7 +156,7 @@ oli> - oli, rules, yes
 
 ## Programmatic API
 
-### Examples
+### Example
 
 Require the module
 ```
@@ -188,6 +188,10 @@ var result = oli.parse(code, {
 #### parse(code, options)
 Alias: `transpile`
 Return: `mixed`
+
+Parse and process the given code performing an end-to-end compilation and return the final result,
+that will be usually an object with the equivalent scheme tree equivalent representation
+of the Oli source code
 
 #### ast(code, options)
 Alias: `parseAST`

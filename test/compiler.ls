@@ -574,7 +574,7 @@ describe 'Compiler', (_) ->
 
     describe 'context binding', (_) ->
 
-      it 'should use a string reference from options locals context', ->
+      it 'should use a string reference from the given local context', ->
         context = name: 'oli'
         code = '''
         result:
@@ -585,7 +585,18 @@ describe 'Compiler', (_) ->
           result: name: 'oli'
         }
 
-      it 'should use a block reference from options locals context', ->
+      it 'should use a nested reference from the given local context', ->
+        context = info: name: 'oli'
+        code = '''
+        result:
+          name: *info.name
+        end
+        '''
+        expect parse code, locals: context .to.be.deep.equal { 
+          result: name: 'oli'
+        }
+
+      it 'should use a block reference from the given local context', ->
         context =
           name:
             oli: 'rules'
