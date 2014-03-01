@@ -336,6 +336,16 @@ Cyclomatic complexibility report
 $ grunt plato
 ```
 
+Browser sources bundle
+```
+$ grunt build
+```
+
+Release a new version
+```
+$ grunt release
+```
+
 ## License
 
 Copyright (c) Tomas Aparicio

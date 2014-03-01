@@ -6,7 +6,16 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON 'package.json'
 
-    clean: ['dist', 'test/*.js', 'benchmarks/*.js', 'lib/parser.js', 'test/fixtures/.tmp/**', '.tmp', 'docs/**']
+    clean: [
+        'oli.js'
+        'oli.min.js'
+        'test/*.js'
+        'benchmarks/*.js'
+        'lib/parser.js'
+        'test/fixtures/.tmp/**'
+        '.tmp'
+        'docs/**'
+      ]
 
     peg:
       example:
@@ -91,13 +100,6 @@ module.exports = (grunt) ->
         files:
           'oli.min.js': ['oli.js']
 
-     jsdoc:
-        dist:
-          src: ['lib/**/*.js']
-          options:
-            destination: 'docs'
-            template: 'united'
-
     watch:
       options:
         spawn: false
@@ -126,35 +128,27 @@ module.exports = (grunt) ->
     'mochacli'
   ]
 
-  grunt.registerTask 'bench', [
-    'compile'
-    'mochacli'
-    'benchmark'
-  ]
-
-  grunt.registerTask 'zen', [
-    'compile'
-    'mochacli'
-    'watch'
-  ]
-
-  grunt.registerTask 'browser', [
+  grunt.registerTask 'build', [
     'test'
     'browserify'
     'uglify'
   ]
 
+  grunt.registerTask 'bench', [
+    'test'
+    'benchmark'
+  ]
+
+  grunt.registerTask 'zen', [
+    'test'
+    'watch'
+  ]
+
   grunt.registerTask 'publish', [
     'test'
     'clean'
-    'jsdoc'
-    'browser'
+    'build'
     'release'
-  ]
-
-  grunt.registerTask 'docs', [
-    'clean'
-    'jsdoc'
   ]
 
   grunt.registerTask 'default', [
