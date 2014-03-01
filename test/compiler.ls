@@ -289,6 +289,48 @@ describe 'Compiler', (_) ->
           '''
           expect parse(code).block.raw .to.be.equal 'I\'m\n  a\n    raw\n      string'
 
+        it 'should compile propertly using even indent levels', ->
+          code = '''
+            block:
+              raw:>
+                I'm
+                  a
+                    raw
+                      string
+              end
+            end
+          '''
+          expect parse(code).block.raw .to.be.equal 'I\'m\n  a\n    raw\n      string'
+
+        it 'should compile with the proper indent level', ->
+          code = '''
+          html:
+            head:
+              script:>
+                if (foo) {
+                  bar(2 ^ 2)
+                }
+              end
+            end
+          end
+          '''
+          expect parse(code).html.head.script  .to.be.equal 'if (foo) {\n  bar(2 ^ 2)\n}'
+
+        it 'should compile properly using 4 indent level', ->
+          code = '''
+          html:
+            head:
+              script:>
+                if (foo) {
+                    bar(2 ^ 2)
+                        foo()
+                }
+              end
+            end
+          end
+          '''
+          expect parse(code).html.head.script  .to.be.equal 'if (foo) {\n    bar(2 ^ 2)\n        foo()\n}'
+
   describe 'references', ->
 
     describe 'primitives', (_) ->
