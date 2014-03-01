@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0-rc.1 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-02-28 08:24 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 10:04 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -481,9 +481,13 @@
           return obj;
         }
         function replaceReferences(str) {
-          var matches;
+          var matches, count = 1;
           while (matches = matchReferences(str)) {
             str = replaceReferences(str, matches);
+            if (count > 1e3) {
+              throw new e.CompileError("Circular reference detected");
+            }
+            count += 1;
           }
           return str;
           function matchReferences(str) {
@@ -975,7 +979,7 @@
       var Compiler = require("./compiler");
       var errors = require("./errors");
       var oli = exports = module.exports = {};
-      oli.version = "0.1.0-rc.1";
+      oli.version = "0.1.0";
       oli.parser = parser;
       oli.Compiler = Compiler;
       function parse(code, options) {
