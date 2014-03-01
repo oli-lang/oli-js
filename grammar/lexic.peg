@@ -7,7 +7,6 @@ WhiteSpace "whitespace"
   = [\t\v\f \u00A0\uFEFF]
   / Zs
 
-// use [\w|\W]
 IdentifierLetter
   = [a-zA-Z0-9\-_\^\º\ç\.\$\@\€\?\%\+\;]
 
