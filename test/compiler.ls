@@ -362,7 +362,7 @@ describe 'Compiler', (_) ->
         '''
         expect result.hello .to.be.equal 'hello'
 
-    describe 'multiple references', (_) ->
+    describe 'multiple', (_) ->
 
       it 'should apply properly multiple references', ->
         code = '''
@@ -383,6 +383,22 @@ describe 'Compiler', (_) ->
         full: "*name (*category)"
         '''
         expect parse(code).full .to.be.equal 'oli language (markup)'
+
+    describe 'circular', (_) ->
+
+      it 'should detect a circular reference', ->
+        code = '''
+        &name: hello *name
+        '''
+        expect (-> parse(code)) .to.throw /circular reference/i
+
+      it 'should detect a circular reference based on blocks', ->
+        code = '''
+        &name: oli
+        &text: Hello *name
+        &full: *text *full
+        '''
+        expect (-> parse(code)) .to.throw /circular reference/i
 
     describe 'blocks', (_) ->
 
