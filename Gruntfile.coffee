@@ -7,8 +7,6 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON 'package.json'
 
     clean: [
-        'oli.js'
-        'oli.min.js'
         'test/*.js'
         'benchmarks/*.js'
         'lib/parser.js'
