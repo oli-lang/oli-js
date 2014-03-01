@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 11:41 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-01 04:15 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -428,7 +428,9 @@
           if (attrs) {
             attrs = blockAttributes(attrs);
             setResult("$$attributes", attrs, alias);
-            setResult("$$body", body, alias);
+            if (body !== undefined) {
+              setResult("$$body", body, alias);
+            }
           } else {
             setResult("body", body, alias);
           }
@@ -7464,7 +7466,7 @@
         var left = traverse(node.left);
         var body = traverse(node.right);
         if (node.operator === tokens.ASSIGN_NOT) {
-          value[left.name] = null;
+          value[left.$$name] = null;
           return value;
         }
         if (_.isArray(body) && isBlockOperator(node)) {
@@ -7476,26 +7478,28 @@
           }
         }
         if (node.operator === tokens.EQUAL) {
-          memory.allocate(left.name, body);
+          memory.allocate(left.$$name, body);
           return;
         }
-        value[left.name] = createNode(node, {
-          $$name: left.name,
+        value[left.$$name] = createNode(node, {
+          $$name: left.$$name,
           $$operator: node.operator,
           $$duplicateKeys: duplicateKeys,
-          $$attributes: left.attributes,
-          $$expression: left.expression,
+          $$attributes: left.$$attributes,
+          $$expression: left.$$expression,
           $$body: body
         });
-        if (left.expression) {
-          if (_.isArray(left.expression)) {
-            _.forEach(left.expression, function(node) {
-              if (node.type === "reference") {
+        if (left.$$expression) {
+          if (_.isArray(left.$$expression)) {
+            _.forEach(left.$$expression, function(node) {
+              if (node.type === "reference" && body !== undefined) {
                 memory.allocate(node.value, body);
               }
             });
-          } else if (left.expression.type === "reference") {
-            memory.allocate(left.expression.value, body);
+          } else if (left.$$expression.type === "reference") {
+            if (body !== undefined) {
+              memory.allocate(left.$$expression.value, body);
+            }
           }
         }
         return value;
@@ -7560,9 +7564,9 @@
           name = name.value;
         }
         value = createNode(node, {
-          name: name,
-          attributes: attrsStore,
-          expression: expr
+          $$name: name,
+          $$attributes: attrsStore,
+          $$expression: expr
         });
         return value;
       }

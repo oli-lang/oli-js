@@ -113,6 +113,14 @@ describe 'Compiler', (_) ->
           $$attributes: one: yes, another: no
         }
 
+      it 'should parse an attributes only block', ->
+        result = parse '''
+          block (one: yes, another: no)
+        '''
+        expect result.block .to.be.deep.equal {
+          $$attributes: one: yes, another: no
+        }
+
     describe 'empty block', (_) ->
 
       it 'should compile as unassigned empty block', ->
