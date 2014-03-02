@@ -138,7 +138,7 @@ describe 'Compiler', (_) ->
         expect result.block[1] .to.be.deep.equal $$attributes: second: yes
         expect result.final .to.be.true
 
-      it 'should parse', ->
+      it 'should compile attributes with same identifier as array', ->
         result = parse '''
         head:
           title: Oml
@@ -147,8 +147,10 @@ describe 'Compiler', (_) ->
         end
         '''
         expect result.head.script .to.be.deep.equal [
-          * $$attributes: src: '/src.js'
-          * $$attributes: src: '/src2.js'
+          * $$name: 'script'
+            $$attributes: src: '/src.js'
+          * $$name: 'script'
+            $$attributes: src: '/src2.js'
         ]
 
     describe 'empty block', (_) ->

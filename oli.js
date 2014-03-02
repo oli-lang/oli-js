@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 10:51 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 11:13 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -384,8 +384,8 @@
               body[k].forEach(function(node) {
                 if (node.$$attributes) {
                   if (node.$$body === undefined) {
-                    node = _.omit(_.clean(node), "$$name");
-                    node.$$attributes = blockAttributes(node.$$attributes);
+                    node = _.clean(node);
+                    node.$$unassigned = true;
                   }
                   buf.push(node);
                 } else {
@@ -427,10 +427,12 @@
           var expr = obj.$$expression;
           var attrs = obj.$$attributes;
           var name = obj.$$name;
-          var setResult = blockResult(result, name);
-          if (name === undefined && attrs) {
+          if (obj.$$unassigned && attrs) {
+            obj.$$attributes = blockAttributes(attrs);
+            obj = _.omit(obj, "$$unassigned");
             return obj;
           }
+          var setResult = blockResult(result, name);
           var body = blockBody(obj);
           result[name] = {};
           if (expr) {
