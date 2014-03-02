@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 10:44 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 10:51 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -982,7 +982,7 @@
         }
       }
       function hasMetaData(obj) {
-        return _.has(obj, "$$body") || _.has(obj, "$$name");
+        return _.has(obj, "$$attributes") || _.has(obj, "$$name");
       }
     }, {
       "./helpers": 6
