@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">65.91</p>
+      <p class="stat">65.87</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">433</p>
+      <p class="stat">434</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">77.13</p>
+      <p class="stat">78.80</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">3.29</p>
+      <p class="stat">3.31</p>
     </div>
   </div>
 </div>
@@ -221,11 +221,11 @@ function generator(obj, memory) {
       var buf = []
       if (_.isArray(body[k])) {
         body[k].forEach(function (node) {
-          // block only-attributes
+          // block statement with attributes only
           if (node.$$attributes) {
             if (node.$$body === undefined) {
-              node = _.omit(_.clean(node), &#039;$$name&#039;)
-              node.$$attributes = blockAttributes(node.$$attributes)
+              node = _.clean(node)
+              node.$$unassigned = true
             }
             buf.push(node)
           } else {
@@ -269,12 +269,14 @@ function generator(obj, memory) {
     var expr = obj.$$expression
     var attrs = obj.$$attributes
     var name = obj.$$name
-    var setResult = blockResult(result, name)
 
-    if (name === undefined &amp;&amp; attrs) {
+    if (obj.$$unassigned &amp;&amp; attrs) {
+      obj.$$attributes = blockAttributes(attrs)
+      obj = _.omit(obj, &#039;$$unassigned&#039;)
       return obj
     }
 
+    var setResult = blockResult(result, name)
     var body = blockBody(obj)
 
     result[name] = {}
@@ -355,10 +357,9 @@ function generator(obj, memory) {
     var matches, count = 0
     while (matches = matchReferences(str)) {
       str = replaceReferences(str, matches)
-      if (count &gt; 1000) {
+      if (count++ &gt; 1000) {
         throw new e.CompileError(&#039;Circular reference detected&#039;)
       }
-      count += 1
     }
 
     return str

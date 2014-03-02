@@ -11,3 +11,5 @@ benchmarks/
 .travis.yml
 Gruntfile.*
 bower.json
+/oli.js
+/oli.min.js
