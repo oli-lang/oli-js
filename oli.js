@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 11:13 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 12:33 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -227,7 +227,6 @@
         return error;
       }
       function getErrorLines(src, e) {
-        var line;
         var buf = [];
         var current = e.line - 5;
         var end = e.line + 4;
@@ -239,13 +238,13 @@
           current += 1;
         } while (current < 0);
         while (current++ < end) {
-          buf.push(renderLine(line, src, current, end, e));
+          buf.push(renderLine(src, current, end, e));
         }
         return buf;
       }
-      function renderLine(line, src, current, end, e) {
-        var lineNumber = current + 1;
-        line = src[current];
+      function renderLine(src, current, end, e) {
+        var lineNumber = current;
+        var line = src[current - 1];
         if (e.line === lineNumber) {
           line = red(lineNumber + lineIndent(lineNumber, end) + "| ") + line.substr(0, e.column - 1) + bold(red(line.charAt(e.column - 1))) + line.substr(e.column);
         } else {
@@ -499,10 +498,9 @@
           var matches, count = 0;
           while (matches = matchReferences(str)) {
             str = replaceReferences(str, matches);
-            if (count > 1e3) {
+            if (count++ > 1e3) {
               throw new e.CompileError("Circular reference detected");
             }
-            count += 1;
           }
           return str;
           function matchReferences(str) {
