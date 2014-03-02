@@ -116,9 +116,40 @@ describe 'Compiler', (_) ->
         result = parse '''
           block (one: yes, another: no)
         '''
-        expect result.block .to.be.deep.equal {
-          $$attributes: one: yes, another: no
-        }
+        expect result.block .to.be.deep.equal $$attributes: one: yes, another: no
+
+      it 'should parse a multiple attributes only blocks', ->
+        result = parse '''
+          block (first: yes)
+          another (second: yes)
+          final: yes
+        '''
+        expect result.block .to.be.deep.equal $$attributes: first: yes
+        expect result.another .to.be.deep.equal $$attributes: second: yes
+        expect result.final .to.be.true
+
+      it 'should parse a multiple attributes only blocks with the same identifer', ->
+        result = parse '''
+          block (first: yes)
+          block (second: yes)
+          final: yes
+        '''
+        expect result.block[0] .to.be.deep.equal $$attributes: first: yes
+        expect result.block[1] .to.be.deep.equal $$attributes: second: yes
+        expect result.final .to.be.true
+
+      it 'should parse', ->
+        result = parse '''
+        head:
+          title: Oml
+          script(src: '/src.js')
+          script(src: '/src2.js')
+        end
+        '''
+        expect result.head.script .to.be.deep.equal [
+          * script: $$attributes: src: '/src.js'
+          * script: $$attributes: src: '/src2.js'
+        ]
 
     describe 'empty block', (_) ->
 

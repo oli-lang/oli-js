@@ -1,4 +1,4 @@
-# oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli-js.png)][4]
+# oli.js [![Build Status](https://secure.travis-ci.org/oli-lang/oli-js.png?branch=master)][2] [![Dependency Status](https://gemnasium.com/oli-lang/oli-js.png)][3] [![NPM version](https://badge.fury.io/js/oli.png)][4]
 
 > Oli language parser and compiler for node and the browser
 
@@ -27,7 +27,7 @@ and a rich [command-line interface](#command-line-interface)
 ## Features
 
 - Powerful parser based on parsing grammar expressions
-- Smart compiler with good type inference and checking
+- Smart compiler with smart type inference
 - Detailed parsing errors
 - Runs on node.js and the browser
 - High and intermediate level featured API

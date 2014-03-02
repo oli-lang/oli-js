@@ -114,7 +114,11 @@ BlockAttributeStatement
   = expr:IdenfitierAttributeExpression _ EOS {
     return astNode({
       type:       'ExpressionStatement',
-      expression: expr
+      expression: astNode({
+        type:     'BlockStatement',
+        left:     expr,
+        right:    null
+      })
     })
   }
 

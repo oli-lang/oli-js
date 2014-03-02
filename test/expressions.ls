@@ -469,6 +469,13 @@ describe 'Expressions', ->
       expect node ast('hello (key: [ 1, no, 3 ]): oli'), 'expression.left.attributes.0.right.elements.1.value'
         .to.be.equal false
 
+    describe 'attributes only', (_) ->
+
+      it 'should parse in-line block attributes', ->
+        ast-obj = ast 'block (one: yes, another: false)'
+        expect node ast-obj, 'expression.left.attributes.0.left.name' .to.be.equal 'one'
+        expect node ast-obj, 'expression.left.attributes.1.left.name' .to.be.equal 'another'
+
     describe 'reference', (_) ->
 
       it 'should parse "hello (*key)" as attribute identifier reference', ->
@@ -504,11 +511,3 @@ describe 'Expressions', ->
       it 'should parse "super value" as attribute assignment value', ->
         expect node ast('hello (key: value, super key: "super value"): oli'), 'expression.left.attributes.1.right.value'
           .to.be.equal 'super value'
-
-    describe 'block attributes', (_) ->
-
-      it 'should parse in-line block attributes', ->
-        ast-obj = ast 'block (one: yes, another: false)'
-        expect node ast-obj, 'expression.attributes.0.left.name' .to.be.equal 'one'
-        expect node ast-obj, 'expression.attributes.1.left.name' .to.be.equal 'another'
-

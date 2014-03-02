@@ -150,8 +150,28 @@ describe 'Statements', ->
             final: yes
           '''
           expect node ast-obj, '0.expression.left.id.name' .to.be.equal 'init'
-          expect node ast-obj, '1.expression.attributes.0.left.name' .to.be.equal 'one'
-          expect node ast-obj, '1.expression.attributes.1.left.name' .to.be.equal 'another'
+          expect node ast-obj, '1.expression.left.attributes.0.left.name' .to.be.equal 'one'
+          expect node ast-obj, '1.expression.left.attributes.1.left.name' .to.be.equal 'another'
+          expect node ast-obj, '2.expression.left.id.name' .to.be.equal 'final'
+
+        it 'should parse a multiple attributes only blocks', ->
+          ast-obj = ast '''
+            block (first: yes)
+            another (second: yes)
+            final: yes
+          '''
+          expect node ast-obj, '0.expression.left.attributes.0.left.name' .to.be.equal 'first'
+          expect node ast-obj, '1.expression.left.attributes.0.left.name' .to.be.equal 'second'
+          expect node ast-obj, '2.expression.left.id.name' .to.be.equal 'final'
+
+        it 'should parse a multiple attributes only blocks with the same identifier', ->
+          ast-obj = ast '''
+            block (first: yes)
+            block (second: yes)
+            final: yes
+          '''
+          expect node ast-obj, '0.expression.left.attributes.0.left.name' .to.be.equal 'first'
+          expect node ast-obj, '1.expression.left.attributes.0.left.name' .to.be.equal 'second'
           expect node ast-obj, '2.expression.left.id.name' .to.be.equal 'final'
 
     describe 'assignment', ->

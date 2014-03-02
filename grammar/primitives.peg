@@ -24,9 +24,7 @@ NilLiteral "nil"
   }
 
 NumberLiteral "number"
-  = number:(HexIntegerLiteral / DecimalLiteral / IntegerLiteral) {
-    return number;
-  }
+  = HexIntegerLiteral / DecimalLiteral / IntegerLiteral
 
 IntegerLiteral
   = number:$(HexIntegerLiteral / SignedInteger / DecimalIntegerLiteral) !IdentifierStart {
@@ -111,7 +109,7 @@ DoubleStringCharacter
   / LineContinuation
 
 SingleStringCharacter
-  = !("'" / "\\") char_:SourceCharacter { return char_;     }
+  = !("'" / "\\") char_:SourceCharacter { return char_; }
   / "\\" sequence:EscapeSequence { return sequence;  }
   / LineContinuation
 
