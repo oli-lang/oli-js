@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">70.33</p>
+      <p class="stat">70.17</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">340</p>
+      <p class="stat">342</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">50.35</p>
+      <p class="stat">52.79</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">2.75</p>
+      <p class="stat">2.77</p>
     </div>
   </div>
 </div>
@@ -196,7 +196,7 @@ function BlockStatement(node, traverse, memory) {
   var body = traverse(node.right)
 
   if (node.operator === tokens.ASSIGN_NOT) {
-    value[left.name] = null
+    value[left.$$name] = null
     return value
   }
 
@@ -211,28 +211,30 @@ function BlockStatement(node, traverse, memory) {
   }
 
   if (node.operator === tokens.EQUAL) {
-    memory.allocate(left.name, body)
+    memory.allocate(left.$$name, body)
     return
   }
 
-  value[left.name] = createNode(node, {
-    $$name: left.name,
+  value[left.$$name] = createNode(node, {
+    $$name: left.$$name,
     $$operator: node.operator,
     $$duplicateKeys: duplicateKeys,
-    $$attributes: left.attributes,
-    $$expression: left.expression,
+    $$attributes: left.$$attributes,
+    $$expression: left.$$expression,
     $$body: body
   })
 
-  if (left.expression) {
-    if (_.isArray(left.expression)) {
-      _.forEach(left.expression, function (node) {
-        if (node.type === &#039;reference&#039;) {
+  if (left.$$expression) {
+    if (_.isArray(left.$$expression)) {
+      _.forEach(left.$$expression, function (node) {
+        if (node.type === &#039;reference&#039; &amp;&amp; body !== undefined) {
           memory.allocate(node.value, body)
         }
       })
-    } else if (left.expression.type === &#039;reference&#039;) {
-      memory.allocate(left.expression.value, body)
+    } else if (left.$$expression.type === &#039;reference&#039;) {
+      if (body !== undefined) {
+        memory.allocate(left.$$expression.value, body)
+      }
     }
   }
 
@@ -307,9 +309,9 @@ function IdentifierExpression(node, traverse) {
   }
 
   value = createNode(node, {
-    name: name,
-    attributes: attrsStore,
-    expression: expr
+    $$name: name,
+    $$attributes: attrsStore,
+    $$expression: expr
   })
 
   return value

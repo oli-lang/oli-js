@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">66.39</p>
+      <p class="stat">65.91</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">415</p>
+      <p class="stat">433</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">75.22</p>
+      <p class="stat">77.13</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">3.16</p>
+      <p class="stat">3.29</p>
     </div>
   </div>
 </div>
@@ -186,7 +186,7 @@ function generator(obj, memory) {
       expr = [ expr ]
     }
     expr.forEach(function (expr) {
-      if (expr.type === &#039;alias&#039;) {
+      if (expr &amp;&amp; expr.type === &#039;alias&#039;) {
         if (expr.visible) {
           alias = expr.value
         }
@@ -221,7 +221,16 @@ function generator(obj, memory) {
       var buf = []
       if (_.isArray(body[k])) {
         body[k].forEach(function (node) {
-          buf.push(node.$$body)
+          // block only-attributes
+          if (node.$$attributes) {
+            if (node.$$body === undefined) {
+              node = _.omit(_.clean(node), &#039;$$name&#039;)
+              node.$$attributes = blockAttributes(node.$$attributes)
+            }
+            buf.push(node)
+          } else {
+            buf.push(node.$$body)
+          }
         })
         body[k] = buf
       }
@@ -262,7 +271,12 @@ function generator(obj, memory) {
     var name = obj.$$name
     var setResult = blockResult(result, name)
 
+    if (name === undefined &amp;&amp; attrs) {
+      return obj
+    }
+
     var body = blockBody(obj)
+
     result[name] = {}
 
     if (expr) {
@@ -272,7 +286,9 @@ function generator(obj, memory) {
     if (attrs) {
       attrs = blockAttributes(attrs)
       setResult(&#039;$$attributes&#039;, attrs, alias)
-      setResult(&#039;$$body&#039;, body, alias)
+      if (body !== undefined) {
+        setResult(&#039;$$body&#039;, body, alias)
+      }
     } else {
       setResult(&#039;body&#039;, body, alias)
     }
@@ -336,7 +352,7 @@ function generator(obj, memory) {
   }
 
   function replaceReferences(str) {
-    var matches, count = 1
+    var matches, count = 0
     while (matches = matchReferences(str)) {
       str = replaceReferences(str, matches)
       if (count &gt; 1000) {
@@ -381,7 +397,9 @@ function generator(obj, memory) {
         mutateBlock(node, expr)
       } else if (_.isArray(expr)) {
         expr.forEach(function (ex) {
-          mutateBlock(node, ex)
+          if (ex) {
+            mutateBlock(node, ex)
+          }
         })
       }
       return node
@@ -493,7 +511,7 @@ function isUniqueReference(str) {
 }
 
 function hasMetaData(obj) {
-  return _.has(obj, &#039;$$body&#039;) || _.has(obj, &#039;$$name&#039;)
+  return _.has(obj, &#039;$$attributes&#039;) || _.has(obj, &#039;$$name&#039;)
 }
 
 function removeReferencesChars(str) {
