@@ -106,7 +106,7 @@ To disable the automatic parsing, just add `data-ignore` attribute in the script
 
 There are important features in Oli language spec 0.2. You can see the future features discussion [here](https://github.com/oli-lang/oli/issues?labels=discussion&milestone=1&page=1&state=open)
 
-A summary about most important features that will be implemented
+A little summary about the most relevant features that are planned to implement
 
 - Interpolated code expressions ([oli/#3](https://github.com/oli-lang/oli/issues/3))
 - Generic helper functions (random, string format, date format...)
@@ -159,7 +159,7 @@ oli> - oli, rules, yes
 ### Example
 
 Require the module
-```
+```js
 var oli = require('oli')
 ```
 
@@ -175,7 +175,7 @@ try {
 console.log(result) // => { message: [ "hello", "oli!" ] } }
 ```
 
-Binding a custom context to the compiler
+Binding a context to the compiler
 ```js
 var code = 'directory: *env.HOME'
 var result = oli.parse(code, {
@@ -183,6 +183,7 @@ var result = oli.parse(code, {
     env: process.env
   }
 })
+console.log(result.directory) // => '/home/voldemort'
 ```
 
 #### parse(code, options)
