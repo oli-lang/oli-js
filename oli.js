@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 03:56 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 10:44 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -382,7 +382,11 @@
             var buf = [];
             if (_.isArray(body[k])) {
               body[k].forEach(function(node) {
-                if (node.$$attributes && node.$$attributes.length) {
+                if (node.$$attributes) {
+                  if (node.$$body === undefined) {
+                    node = _.omit(_.clean(node), "$$name");
+                    node.$$attributes = blockAttributes(node.$$attributes);
+                  }
                   buf.push(node);
                 } else {
                   buf.push(node.$$body);
@@ -424,6 +428,9 @@
           var attrs = obj.$$attributes;
           var name = obj.$$name;
           var setResult = blockResult(result, name);
+          if (name === undefined && attrs) {
+            return obj;
+          }
           var body = blockBody(obj);
           result[name] = {};
           if (expr) {
@@ -619,7 +626,7 @@
         return uniqueReferencePattern.test(str);
       }
       function hasMetaData(obj) {
-        return _.has(obj, "$$body") || _.has(obj, "$$name");
+        return _.has(obj, "$$attributes") || _.has(obj, "$$name");
       }
       function removeReferencesChars(str) {
         return str.replace(/^\@{3}/g, "").replace(/\@{3}$/g, "");

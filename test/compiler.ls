@@ -147,8 +147,8 @@ describe 'Compiler', (_) ->
         end
         '''
         expect result.head.script .to.be.deep.equal [
-          * script: $$attributes: src: '/src.js'
-          * script: $$attributes: src: '/src2.js'
+          * $$attributes: src: '/src.js'
+          * $$attributes: src: '/src2.js'
         ]
 
     describe 'empty block', (_) ->
