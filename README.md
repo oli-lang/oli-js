@@ -27,7 +27,7 @@ and a rich [command-line interface](#command-line-interface)
 ## Features
 
 - Powerful parser based on parsing grammar expressions
-- Smart compiler with smart type inference
+- Smart compiler with type inference
 - Detailed parsing errors
 - Runs on node.js and the browser
 - High and intermediate level featured API
