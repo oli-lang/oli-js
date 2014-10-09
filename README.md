@@ -54,7 +54,7 @@ $ bower install oli
 ```
 Or load the script remotely (just for testing or development)
 ```html
-<script src="//rawgithub.com/oli-lang/oli-js/master/oli.js"></script>
+<script src="//cdn.rawgit.com/oli-lang/oli-js/master/oli.js"></script>
 ```
 Then you can create script tags with `text/oli` MIME type
 ```html
