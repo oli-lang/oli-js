@@ -1,4 +1,4 @@
-/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-03-02 01:45 */
+/*! oli.js - v0.1.0 - MIT License - https://github.com/oli-lang/oli-js | Generated 2014-10-09 11:09 */
 !function(e) {
   if ("object" == typeof exports) module.exports = e(); else if ("function" == typeof define && define.amd) define(e); else {
     var f;
@@ -897,7 +897,9 @@
               }
             }
           } else if (child) {
-            child.parent = node;
+            try {
+              child.parent = node;
+            } catch (e) {}
             walk(child, node, cb);
           }
         }
